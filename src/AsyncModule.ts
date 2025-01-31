@@ -10,6 +10,8 @@ export type RetryDelay<E> = (retryAttempt: number, error: E) => number;
 
 export type AsyncOperation<T> = () => Promise<T>;
 
+export type RetryHandlerFn = (retryAttempt: number) => void;
+
 export function waitUntil(time: number) {
 	return new Promise(resolve => setTimeout(resolve, time));
 }
@@ -20,10 +22,11 @@ export function waitUntil(time: number) {
  * @param retryDelay retry delay function
  * @param retryCount maximum number of retries.
  */
-export async function retryAsyncOperation<T, E>(
+export async function retryAsyncOperation<T, E = unknown>(
 	operation: AsyncOperation<T>,
 	retryDelay: RetryDelay<E>,
-	retryCount: number
+	retryCount: number,
+	retryHandleFn: RetryHandlerFn | null = null
 ): Promise<T> {
 	let retryAttempt = 0;
 	let lastError: E;
@@ -40,6 +43,7 @@ export async function retryAsyncOperation<T, E>(
 			const delay = retryDelay(retryAttempt, lastError);
 			if (delay < 0) throw lastError;
 			await waitUntil(delay);
+			retryHandleFn?.(retryAttempt);
 		}
 	}
 
