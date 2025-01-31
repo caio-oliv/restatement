@@ -1,3 +1,4 @@
+export * from '@/Type';
 export * from '@/AsyncModule';
 export * from '@/TimerModule';
 export * from '@/PubSub';

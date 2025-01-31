@@ -2,34 +2,17 @@ import { CacheStore } from '@/Cache';
 import { RetryDelay, retryAsyncOperation } from '@/AsyncModule';
 import { JitterExponentialBackoffTimer } from '@/TimerModule';
 import { PubSub, SubscriberHandle } from '@/PubSub';
-
-export type FetchStatus = 'idle' | 'loading' | 'stale' | 'success' | 'error';
-
-export type QueryCache = 'no-cache' | 'stale' | 'fresh';
-
-export type QueryFn<K, T> = (key: K, signal: AbortSignal) => Promise<T>;
-
-export type KeyHashFn<K> = (key: K) => string;
-
-export type KeepCacheOnError<E> = (err: E) => boolean;
-
-export interface QueryState<T, E> {
-	data: T | null;
-	error: E | null;
-	status: FetchStatus;
-}
-
-export type UpdateQueryStateHandler<T, E> = (state: QueryState<T, E>) => void;
-
-export type DataHandler<T> = (data: T) => void;
-
-export type ErrorHandler<E> = (err: E) => void;
-
-export interface RemoteStateQueryHandler<T, E> {
-	stateFn?: UpdateQueryStateHandler<T, E>;
-	dataFn?: DataHandler<T>;
-	errorFn?: ErrorHandler<E>;
-}
+import type {
+	QueryFn,
+	KeyHashFn,
+	RemoteStateQueryHandler,
+	QueryState,
+	QueryCache,
+	KeepCacheOnError,
+	DataHandler,
+	ErrorHandler,
+	Millisecond,
+} from '@/Type';
 
 export interface RemoteStateQueryInput<K, T, E> {
 	/**
@@ -71,7 +54,7 @@ export interface RemoteStateQueryInput<K, T, E> {
 	 *
 	 * @default 30 * 1000; // 30 seconds
 	 */
-	freshDuration?: number;
+	freshDuration?: Millisecond;
 	/**
 	 * Time in milliseconds that the data is considered stale.
 	 *
@@ -81,7 +64,7 @@ export interface RemoteStateQueryInput<K, T, E> {
 	 *
 	 * @default 3 * 60 * 1000 // 3 minutes
 	 */
-	staleDuration?: number;
+	staleDuration?: Millisecond;
 	/**
 	 * Update handlers.
 	 */
@@ -125,8 +108,8 @@ export class RemoteStateQuery<K, T, E> {
 	public readonly keyHashFn: KeyHashFn<K>;
 	public readonly retry: number;
 	public readonly retryDelay: RetryDelay<E>;
-	public readonly freshDuration: number;
-	public readonly staleDuration: number;
+	public readonly freshDuration: Millisecond;
+	public readonly staleDuration: Millisecond;
 
 	public constructor({
 		cacheStore,
@@ -156,11 +139,12 @@ export class RemoteStateQuery<K, T, E> {
 			: null;
 	}
 
-	public execute = (
+	// TODO: should the execute method be async?
+	public execute = async (
 		key: K,
 		cache: QueryCache = 'stale',
 		ctl: AbortController = new AbortController()
-	): void => {
+	): Promise<void> => {
 		const keyHash = this.keyHashFn(key);
 		this.subscriberHandle?.useTopic(keyHash);
 
@@ -169,14 +153,17 @@ export class RemoteStateQuery<K, T, E> {
 			return;
 		}
 
-		const now = Date.now();
-		const entry = this.cacheStore.getEntry(keyHash);
+		// TODO: fix async cacheStore
+		const entry = await this.cacheStore.getEntry(keyHash);
 		if (entry === undefined) {
 			this.makeQueryNoCache(key, ctl);
 			return;
 		}
 
-		if ((cache === 'fresh' || cache === 'stale') && now - entry.date < this.freshDuration) {
+		if (
+			(cache === 'fresh' || cache === 'stale') &&
+			entry.ttl - entry.remain_ttl < this.freshDuration
+		) {
 			// Fresh from cache (less time than fresh duration).
 			const state: QueryState<T, E> = {
 				status: 'success',
@@ -214,22 +201,18 @@ export class RemoteStateQuery<K, T, E> {
 		return this.state;
 	};
 
-	/**
-	 * Remove a key from the cache.
-	 */
-	public removeCache = (key: K) => {
-		const keyHash = this.keyHashFn(key);
-		this.cacheStore.delete(keyHash);
-	};
-
 	public dispose = () => {
 		this.subscriberHandle?.unsubscribe();
 	};
 
 	private makeQueryNoCache = (key: K, ctl: AbortController) => {
 		// Fetching status should not be published.
-		this.state.status = 'loading';
-		this.state.error = null;
+		const state: QueryState<T, E> = {
+			status: 'loading',
+			data: this.state.data,
+			error: null,
+		};
+		this.state = state;
 		this.handler.stateFn?.(this.state);
 		this.runQuery(key, ctl);
 	};
@@ -247,6 +230,7 @@ export class RemoteStateQuery<K, T, E> {
 			error: null,
 			data,
 		};
+		// TODO: fix async cacheStore
 		this.cacheStore.set(keyHash, data, this.staleDuration + Date.now());
 		this.updateState(keyHash, state);
 		this.stateProvider?.publish(keyHash, state);
@@ -260,14 +244,13 @@ export class RemoteStateQuery<K, T, E> {
 			data: null,
 		});
 		if (!this.keepCacheOnError(err as E)) {
+			// TODO: fix async cacheStore
 			this.cacheStore.delete(keyHash);
 		}
 	};
 
 	private updateState = (_: string, state: QueryState<T, E>) => {
-		this.state.data = state.data;
-		this.state.error = state.error;
-		this.state.status = state.status;
+		this.state = state;
 		if (this.state.data !== null) {
 			this.handler.dataFn?.(this.state.data);
 		}
@@ -402,7 +385,7 @@ export interface RemoteStateCacheControlInput {
 	/**
 	 * Cache duration.
 	 */
-	duration?: number;
+	duration?: Millisecond;
 	/**
 	 * Cache store.
 	 */
@@ -415,7 +398,7 @@ export interface RemoteStateCacheControlInput {
 
 export class RemoteStateCacheControl {
 	public readonly keyHashFn: KeyHashFn<unknown>;
-	public readonly duration: number;
+	public readonly duration: Millisecond;
 
 	public constructor({
 		keyHashFn = defaultKeyHashFn,
@@ -429,9 +412,10 @@ export class RemoteStateCacheControl {
 		this.stateProvider = stateProvider;
 	}
 
-	public setValue = <K, T>(key: K, data: T, duration?: number): void => {
+	public setValue = async <K, T>(key: K, data: T, duration?: Millisecond): Promise<void> => {
 		const keyHash = this.keyHashFn(key);
-		this.cacheStore.set(keyHash, data, (duration ?? this.duration) + Date.now());
+		// TODO: fix async cacheStore
+		await this.cacheStore.set(keyHash, data, (duration ?? this.duration) + Date.now());
 		this.stateProvider?.publish(keyHash, {
 			data,
 			error: null,
@@ -439,9 +423,10 @@ export class RemoteStateCacheControl {
 		});
 	};
 
-	public getValue = <K, T>(key: K): T | undefined => {
+	public getValue = async <K, T>(key: K): Promise<T | undefined> => {
 		const keyHash = this.keyHashFn(key);
-		return (this.cacheStore as CacheStore<T>).get(keyHash);
+		// TODO: fix async cacheStore
+		return await (this.cacheStore as CacheStore<T>).get(keyHash);
 	};
 
 	private readonly cacheStore: CacheStore<unknown>;

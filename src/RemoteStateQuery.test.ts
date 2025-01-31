@@ -1,14 +1,10 @@
 import { assert, describe, it } from 'vitest';
-import {
-	RemoteStateQuery,
-	defaultKeyHashFn,
-	RemoteStateQueryHandler,
-	QueryState,
-} from '@/RemoteState';
-import { makeCache } from '@/Cache.helper';
+import { RemoteStateQuery, defaultKeyHashFn } from '@/RemoteState';
+import { makeCache } from '@/Cache/Helper';
 import { waitUntil } from '@/AsyncModule';
 import { JitterExponentialBackoffTimer } from '@/TimerModule';
 import { PubSub } from '@/PubSub';
+import { QueryState, RemoteStateQueryHandler } from '@/Type';
 
 describe('RemoteState default keyHashFn', () => {
 	it('produce different keys for different input', () => {
@@ -122,7 +118,7 @@ describe('RemoteStateQuery', () => {
 				status: 'success',
 			});
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), '##unique-key##');
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), '##unique-key##');
 		});
 
 		it('replace cache entry on subsequent calls', async () => {
@@ -160,7 +156,7 @@ describe('RemoteStateQuery', () => {
 				status: 'success',
 			});
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), '##unique-key##1');
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), '##unique-key##1');
 
 			queryApi.execute('unique-key', 'no-cache');
 
@@ -178,7 +174,7 @@ describe('RemoteStateQuery', () => {
 				status: 'success',
 			});
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), '##unique-key##2');
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), '##unique-key##2');
 
 			queryApi.execute('unique-key', 'no-cache');
 
@@ -196,7 +192,7 @@ describe('RemoteStateQuery', () => {
 				status: 'success',
 			});
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), '##unique-key##3');
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), '##unique-key##3');
 		});
 
 		it('call handlers on each state transition', async () => {
@@ -334,13 +330,7 @@ describe('RemoteStateQuery', () => {
 
 			queryApi.execute('unique-key', 'fresh');
 
-			assert.deepStrictEqual(queryApi.getState(), {
-				data: null,
-				error: null,
-				status: 'loading',
-			});
-
-			await waitUntil(sleepTime);
+			await waitUntil(100);
 
 			assert.deepStrictEqual(queryApi.getState(), {
 				data: 'unique-key#1',
@@ -370,14 +360,8 @@ describe('RemoteStateQuery', () => {
 				status: 'idle',
 			});
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), undefined);
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), undefined);
 			queryApi.execute('unique-key', 'fresh');
-
-			assert.deepStrictEqual(queryApi.getState(), {
-				data: null,
-				error: null,
-				status: 'loading',
-			});
 
 			await waitUntil(sleepTime);
 
@@ -389,7 +373,7 @@ describe('RemoteStateQuery', () => {
 
 			assert.strictEqual(queryFnCalled, 1);
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), 'unique-key#1');
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), 'unique-key#1');
 			queryApi.execute('unique-key', 'fresh');
 
 			assert.deepStrictEqual(queryApi.getState(), {
@@ -424,7 +408,7 @@ describe('RemoteStateQuery', () => {
 				staleDuration: sleepTime * 3,
 			});
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), undefined);
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), undefined);
 			queryApi.execute('unique-key', 'fresh');
 			await waitUntil(sleepTime);
 
@@ -436,20 +420,14 @@ describe('RemoteStateQuery', () => {
 
 			assert.strictEqual(queryFnCalled, 1);
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), 'unique-key#1');
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), 'unique-key#1');
 
 			await waitUntil(sleepTime + 10);
 			queryApi.execute('unique-key', 'fresh');
 
-			assert.deepStrictEqual(queryApi.getState(), {
-				data: 'unique-key#1',
-				error: null,
-				status: 'loading',
-			});
-
 			await waitUntil(sleepTime);
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), 'unique-key#2');
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), 'unique-key#2');
 
 			assert.deepStrictEqual(queryApi.getState(), {
 				data: 'unique-key#2',
@@ -494,14 +472,6 @@ describe('RemoteStateQuery', () => {
 
 			await waitUntil(sleepTime * 3);
 			queryApi.execute('unique-key', 'fresh');
-
-			assert.deepStrictEqual(queryApi.getState(), {
-				data: 'unique-key#3',
-				error: null,
-				status: 'loading',
-			});
-
-			assert.deepStrictEqual(counter, { dataCalled: 1, errorCalled: 0, stateCalled: 3 });
 
 			await waitUntil(sleepTime * 3);
 
@@ -536,14 +506,8 @@ describe('RemoteStateQuery', () => {
 				status: 'idle',
 			});
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), undefined);
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), undefined);
 			queryApi.execute('unique-key', 'stale');
-
-			assert.deepStrictEqual(queryApi.getState(), {
-				data: null,
-				error: null,
-				status: 'loading',
-			});
 
 			await waitUntil(sleepTime);
 
@@ -555,7 +519,7 @@ describe('RemoteStateQuery', () => {
 
 			assert.strictEqual(queryFnCalled, 1);
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), 'unique-key#1');
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), 'unique-key#1');
 		});
 
 		it('return from cache when the cache entry is fresh without running background query', async () => {
@@ -577,14 +541,8 @@ describe('RemoteStateQuery', () => {
 				status: 'idle',
 			});
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), undefined);
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), undefined);
 			queryApi.execute('unique-key', 'stale');
-
-			assert.deepStrictEqual(queryApi.getState(), {
-				data: null,
-				error: null,
-				status: 'loading',
-			});
 
 			await waitUntil(sleepTime);
 
@@ -596,7 +554,7 @@ describe('RemoteStateQuery', () => {
 
 			assert.strictEqual(queryFnCalled, 1);
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), 'unique-key#1');
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), 'unique-key#1');
 			queryApi.execute('unique-key', 'stale');
 
 			assert.deepStrictEqual(queryApi.getState(), {
@@ -619,21 +577,23 @@ describe('RemoteStateQuery', () => {
 		});
 
 		it('return from cache when the cache entry is stale running background query', async () => {
-			const freshDuration = Math.ceil(sleepTime * 0.5);
+			const sleep = 100;
+			const fresh = 50;
+
 			let queryFnCalled = 0;
 			const { counter, handler } = makeCountHandlers<string, Error>();
 			const [, cache] = makeCache<string>();
 			const queryApi = new RemoteStateQuery({
 				cacheStore: cache,
 				queryFn: async key => {
-					await waitUntil(freshDuration);
+					await waitUntil(fresh);
 					queryFnCalled += 1;
 					return key + '#' + queryFnCalled;
 				},
 				retry: 0,
 				retryDelay: retryTimer.delay,
-				freshDuration,
-				staleDuration: sleepTime * 3,
+				freshDuration: fresh,
+				staleDuration: sleep * 3,
 				handler,
 			});
 
@@ -643,18 +603,11 @@ describe('RemoteStateQuery', () => {
 				status: 'idle',
 			});
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), undefined);
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), undefined);
+
 			queryApi.execute('unique-key', 'stale');
 
-			assert.deepStrictEqual(counter, { dataCalled: 0, errorCalled: 0, stateCalled: 1 });
-
-			assert.deepStrictEqual(queryApi.getState(), {
-				data: null,
-				error: null,
-				status: 'loading',
-			});
-
-			await waitUntil(sleepTime * 2);
+			await waitUntil(sleep * 2);
 
 			assert.deepStrictEqual(queryApi.getState(), {
 				data: 'unique-key#1',
@@ -662,33 +615,38 @@ describe('RemoteStateQuery', () => {
 				status: 'success',
 			});
 
-			assert.deepStrictEqual(counter, { dataCalled: 1, errorCalled: 0, stateCalled: 2 });
 			assert.strictEqual(queryFnCalled, 1);
+			assert.deepStrictEqual(counter, { dataCalled: 1, errorCalled: 0, stateCalled: 2 });
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), 'unique-key#1');
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), 'unique-key#1');
+
 			queryApi.execute('unique-key', 'stale');
 
+			await waitUntil(fresh);
+
+			assert.strictEqual(queryFnCalled, 1);
+			assert.deepStrictEqual(counter, { dataCalled: 2, errorCalled: 0, stateCalled: 3 });
+
+			// returned the stale data
 			assert.deepStrictEqual(queryApi.getState(), {
 				data: 'unique-key#1',
 				error: null,
 				status: 'stale',
 			});
 
-			assert.deepStrictEqual(counter, { dataCalled: 2, errorCalled: 0, stateCalled: 3 });
-			assert.strictEqual(queryFnCalled, 1);
+			await waitUntil(200);
 
-			await waitUntil(freshDuration);
-
-			assert.deepStrictEqual(counter, { dataCalled: 3, errorCalled: 0, stateCalled: 4 });
 			assert.strictEqual(queryFnCalled, 2);
+			assert.deepStrictEqual(counter, { dataCalled: 3, errorCalled: 0, stateCalled: 4 });
 
+			// returned the new data from the query function that executed in the background
 			assert.deepStrictEqual(queryApi.getState(), {
 				data: 'unique-key#2',
 				error: null,
 				status: 'success',
 			});
 
-			assert.strictEqual(cache.get(defaultKeyHashFn('unique-key')), 'unique-key#2');
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), 'unique-key#2');
 		});
 
 		it('retry query on error', async () => {
@@ -724,15 +682,8 @@ describe('RemoteStateQuery', () => {
 			assert.deepStrictEqual(queryFnCalled, 3);
 
 			await waitUntil(sleepTime * 3);
+
 			queryApi.execute('unique-key', 'stale');
-
-			assert.deepStrictEqual(queryApi.getState(), {
-				data: 'unique-key#3',
-				error: null,
-				status: 'loading',
-			});
-
-			assert.deepStrictEqual(counter, { dataCalled: 1, errorCalled: 0, stateCalled: 3 });
 
 			await waitUntil(sleepTime * 3);
 
@@ -842,7 +793,7 @@ describe('RemoteStateQuery', () => {
 		queryApi.execute('unique');
 		await waitUntil(sleepTime);
 
-		assert.strictEqual(cache.get(queryApi.keyHashFn('unique')), '#unique#');
+		assert.strictEqual(await cache.get(queryApi.keyHashFn('unique')), '#unique#');
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: '#unique#',
 			error: null,
@@ -854,7 +805,7 @@ describe('RemoteStateQuery', () => {
 		queryApi.execute('unique', 'no-cache');
 		await waitUntil(sleepTime);
 
-		assert.strictEqual(cache.get(queryApi.keyHashFn('unique')), '#unique#');
+		assert.strictEqual(await cache.get(queryApi.keyHashFn('unique')), '#unique#');
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
 			error: new Error('should keep = true'),
@@ -866,7 +817,7 @@ describe('RemoteStateQuery', () => {
 		queryApi.execute('unique', 'no-cache');
 		await waitUntil(sleepTime);
 
-		assert.strictEqual(cache.get(queryApi.keyHashFn('unique')), undefined);
+		assert.strictEqual(await cache.get(queryApi.keyHashFn('unique')), undefined);
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
 			error: new Error('should keep = false'),
@@ -877,7 +828,7 @@ describe('RemoteStateQuery', () => {
 		queryApi.execute('unique', 'no-cache');
 		await waitUntil(sleepTime);
 
-		assert.strictEqual(cache.get(queryApi.keyHashFn('unique')), '#unique#');
+		assert.strictEqual(await cache.get(queryApi.keyHashFn('unique')), '#unique#');
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: '#unique#',
 			error: null,

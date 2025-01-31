@@ -1,4 +1,4 @@
-import { CacheEntry, AproximateLRUCache } from '@/Cache';
+import { AproximateLRUCache, type LRUCacheEntry } from '@/Cache/AproximateLRUCache';
 
 /**
  *
@@ -8,8 +8,8 @@ import { CacheEntry, AproximateLRUCache } from '@/Cache';
 export function makeCache<T>(
 	capacity: number = 10,
 	tru_duration_threshold: number = 5 * 1000
-): [Map<string, CacheEntry<T>>, AproximateLRUCache<T>] {
-	const storage = new Map<string, CacheEntry<T>>();
+): [Map<string, LRUCacheEntry<T>>, AproximateLRUCache<T>] {
+	const storage = new Map<string, LRUCacheEntry<T>>();
 	const cache = new AproximateLRUCache<T>(storage, capacity, tru_duration_threshold);
 	return [storage, cache];
 }

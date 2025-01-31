@@ -3,13 +3,13 @@
 	"version": "0.2.0",
 	"description": "remote state management for front-end applications",
 	"author": "Caio Oliveira <caio.vsoliveira23@gmail.com>",
-	"homepage": "https://github.com/CaioOliveira793/restatement#readme",
+	"homepage": "https://github.com/caio-oliv/restatement#readme",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/CaioOliveira793/restatement+git"
+		"url": "https://github.com/caio-oliv/restatement+git"
 	},
 	"bugs": {
-		"url": "https://github.com/CaioOliveira793/restatement/issues"
+		"url": "https://github.com/caio-oliv/restatement/issues"
 	},
 	"keywords": [
 		"state",
@@ -37,6 +37,7 @@
 		"build:type": "dts-bundle-generator src/lib.ts --no-check --out-file 'dist/lib-type.d.ts'",
 		"build": "run-z clear:build build:js,build:type",
 		"test": "vitest run",
+		"test:cov": "vitest run --bail 1 --coverage",
 		"bench": "vitest bench --run",
 		"clear:coverage": "rimraf coverage",
 		"clear:build": "rimraf dist",
