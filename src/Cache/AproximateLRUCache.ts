@@ -28,7 +28,7 @@ function mapLRUCacheEntryToCacheEntry<T>(entry: LRUCacheEntry<T>): CacheEntry<T>
  * @see http://oldblog.antirez.com/post/redis-as-LRU-cache.html
  * @see http://antirez.com/news/109
  */
-export class AproximateLRUCache<T> implements CacheStore<T> {
+export class AproximateLRUCache<T> implements CacheStore<string, T> {
 	public readonly storage: Map<string, LRUCacheEntry<T>>;
 
 	public constructor(

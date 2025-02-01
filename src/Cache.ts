@@ -13,19 +13,19 @@ export interface CacheEntry<T> {
 	readonly remain_ttl: number;
 }
 
-export interface CacheStore<T> {
+export interface CacheStore<K, V> {
 	/**
 	 * Get the data of a cache entry of a key.
 	 *
 	 * @param key Unique key.
 	 */
-	get(key: string): Promise<T | undefined>;
+	get(key: K): Promise<V | undefined>;
 	/**
 	 * Get the entire cache entry of a key.
 	 *
 	 * @param key Unique key.
 	 */
-	getEntry(key: string): Promise<CacheEntry<T> | undefined>;
+	getEntry(key: K): Promise<CacheEntry<V> | undefined>;
 	/**
 	 * Set an entry for this key in the cache.
 	 *
@@ -33,13 +33,13 @@ export interface CacheStore<T> {
 	 * @param data Data being cached.
 	 * @param ttl Time To Live of this cache entry.
 	 */
-	set(key: string, data: T, ttl: number): Promise<void>;
+	set(key: K, data: V, ttl: number): Promise<void>;
 	/**
 	 * Delete the cache entry of a key.
 	 *
 	 * @param key Unique key.
 	 */
-	delete(key: string): Promise<void>;
+	delete(key: K): Promise<void>;
 }
 
 export interface MapStorage<Data> {

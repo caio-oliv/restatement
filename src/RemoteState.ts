@@ -1,5 +1,5 @@
 import { CacheStore } from '@/Cache';
-import { RetryDelay, retryAsyncOperation } from '@/AsyncModule';
+import { RetryDelay, RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
 import { JitterExponentialBackoffTimer } from '@/TimerModule';
 import { PubSub, SubscriberHandle } from '@/PubSub';
 import type {
@@ -18,7 +18,7 @@ export interface RemoteStateQueryInput<K, T, E> {
 	/**
 	 * Cache store.
 	 */
-	cacheStore: CacheStore<T>;
+	cacheStore: CacheStore<string, T>;
 	/**
 	 * Query function.
 	 *
@@ -41,6 +41,10 @@ export interface RemoteStateQueryInput<K, T, E> {
 	 * @default 3
 	 */
 	retry?: number;
+	/**
+	 * Retry handler function
+	 */
+	retryHandleFn?: RetryHandlerFn | null;
 	/**
 	 * Use the previus cached data on error of the `queryFn`
 	 */
@@ -117,6 +121,7 @@ export class RemoteStateQuery<K, T, E> {
 		keyHashFn = defaultKeyHashFn,
 		retryDelay = DEFAULT_RETRY_DELAY.delay,
 		retry = DEFAULT_RETRY,
+		retryHandleFn = null,
 		keepCacheOnError = defaultKeepCacheOnError,
 		freshDuration = DEFAULT_FRESH_TIME,
 		staleDuration = DEFAULT_STALE_TIME,
@@ -128,6 +133,7 @@ export class RemoteStateQuery<K, T, E> {
 		this.queryFn = queryFn;
 		this.retryDelay = retryDelay;
 		this.keepCacheOnError = keepCacheOnError;
+		this.retryHandleFn = retryHandleFn;
 		this.retry = retry;
 		this.freshDuration = freshDuration;
 		this.staleDuration = staleDuration;
@@ -139,7 +145,7 @@ export class RemoteStateQuery<K, T, E> {
 			: null;
 	}
 
-	// TODO: should the execute method be async?
+	// TODO: return `QueryState<T, E>`
 	public execute = async (
 		key: K,
 		cache: QueryCache = 'stale',
@@ -218,7 +224,12 @@ export class RemoteStateQuery<K, T, E> {
 	};
 
 	private runQuery = (key: K, ctl: AbortController) => {
-		retryAsyncOperation(() => this.queryFn(key, ctl.signal), this.retryDelay, this.retry)
+		retryAsyncOperation(
+			() => this.queryFn(key, ctl.signal),
+			this.retryDelay,
+			this.retry,
+			this.retryHandleFn
+		)
 			.then(ok => this.fetchResolve(ok, key))
 			.catch(err => this.fetchReject(err, key));
 	};
@@ -260,12 +271,13 @@ export class RemoteStateQuery<K, T, E> {
 		this.handler.stateFn?.(this.state);
 	};
 
-	private readonly cacheStore: CacheStore<T>;
+	private readonly cacheStore: CacheStore<string, T>;
 	private readonly handler: RemoteStateQueryHandler<T, E>;
 	private readonly stateProvider: PubSub<QueryState<T, E>> | null;
 	private readonly subscriberHandle: SubscriberHandle<QueryState<T, E>> | null;
 	private readonly queryFn: QueryFn<K, T>;
 	private readonly keepCacheOnError: KeepCacheOnError<E>;
+	private readonly retryHandleFn: RetryHandlerFn | null;
 	private state: QueryState<T, E>;
 }
 
@@ -389,7 +401,7 @@ export interface RemoteStateCacheControlInput {
 	/**
 	 * Cache store.
 	 */
-	cacheStore: CacheStore<unknown>;
+	cacheStore: CacheStore<string, unknown>;
 	/**
 	 * State provider.
 	 */
@@ -426,9 +438,9 @@ export class RemoteStateCacheControl {
 	public getValue = async <K, T>(key: K): Promise<T | undefined> => {
 		const keyHash = this.keyHashFn(key);
 		// TODO: fix async cacheStore
-		return await (this.cacheStore as CacheStore<T>).get(keyHash);
+		return await (this.cacheStore as CacheStore<string, T>).get(keyHash);
 	};
 
-	private readonly cacheStore: CacheStore<unknown>;
+	private readonly cacheStore: CacheStore<string, unknown>;
 	private readonly stateProvider?: PubSub<QueryState<unknown, unknown>> | null;
 }
