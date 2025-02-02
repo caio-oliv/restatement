@@ -61,8 +61,9 @@ namespace LRUCache {
 
 export const REQUIRED_LRU_CACHE_OPTIONS = {
 	allowStale: false,
-	updateAgeOnGet: true,
-	updateAgeOnHas: true,
+	noUpdateTTL: true,
+	updateAgeOnGet: false,
+	updateAgeOnHas: false,
 } as const;
 
 export class LRUCacheAdapter<K = unknown, V = unknown> implements CacheStore<K, V> {
@@ -73,16 +74,19 @@ export class LRUCacheAdapter<K = unknown, V = unknown> implements CacheStore<K, 
 	}
 
 	public async get(key: K): Promise<V | undefined> {
-		return this.cache.get(key);
+		return (await this.getEntry(key))?.data;
 	}
 
 	public async getEntry(key: K): Promise<CacheEntry<V> | undefined> {
 		const status: LRUCache.Status<V> = {};
 
 		const data = this.cache.get(key, { status });
-		if (!data || !status.ttl || !status.remainingTTL) return;
+		if (!data || !status.ttl || !status.start) return;
 
-		return { data, remain_ttl: status.remainingTTL, ttl: status.ttl };
+		const remain_ttl = Math.trunc(status.ttl - (Date.now() - status.start));
+		if (remain_ttl <= 0) return;
+
+		return { data, remain_ttl, ttl: status.ttl };
 	}
 
 	public async set(key: K, data: V, ttl: number): Promise<void> {
