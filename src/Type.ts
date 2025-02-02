@@ -35,8 +35,26 @@ export type DataHandler<T> = (data: T) => void;
 
 export type ErrorHandler<E> = (error: E) => void;
 
-export interface RemoteStateQueryHandler<T, E> {
+export interface QueryControlHandler<T, E> {
 	stateFn?: QueryStateHandler<T, E>;
+	dataFn?: DataHandler<T>;
+	errorFn?: ErrorHandler<E>;
+}
+
+export type MutationStatus = 'idle' | 'loading' | 'success' | 'error';
+
+export interface MutationState<T, E> {
+	data: T | null;
+	error: E | null;
+	status: MutationStatus;
+}
+
+export type MutationFn<I, T> = (input: I, signal: AbortSignal) => Promise<T>;
+
+export type MutationStateHandler<T, E> = (state: MutationState<T, E>) => void;
+
+export interface MutationControlHandler<T, E> {
+	stateFn?: MutationStateHandler<T, E>;
 	dataFn?: DataHandler<T>;
 	errorFn?: ErrorHandler<E>;
 }

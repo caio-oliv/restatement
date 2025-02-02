@@ -1,7 +1,8 @@
 import { assert, describe, it } from 'vitest';
 import { waitUntil } from '@/AsyncModule';
-import { RemoteStateMutation, RemoteStateMutationHandler } from '@/RemoteState';
+import { MutationControl } from '@/MutationControl';
 import { JitterExponentialBackoffTimer } from '@/TimerModule';
+import { MutationControlHandler } from '@/Type';
 
 function makeCountHandlers<T, E>() {
 	const counter = {
@@ -10,7 +11,7 @@ function makeCountHandlers<T, E>() {
 		dataCalled: 0,
 	};
 
-	const handler: RemoteStateMutationHandler<T, E> = {
+	const handler: MutationControlHandler<T, E> = {
 		stateFn: () => {
 			counter.stateCalled += 1;
 		},
@@ -33,7 +34,7 @@ describe('RemoteStateMutation', () => {
 		let error = false;
 		const mutationCall: Array<{ id: string }> = [];
 		const { handler, counter } = makeCountHandlers();
-		const mutationApi = new RemoteStateMutation<{ id: string }, string, Error>({
+		const mutationApi = new MutationControl<{ id: string }, string, Error>({
 			mutationFn: async input => {
 				if (error) {
 					throw new Error('mutation failed');
@@ -100,7 +101,7 @@ describe('RemoteStateMutation', () => {
 		let error = false;
 		const mutationCall: Array<{ id: string }> = [];
 		const { handler, counter } = makeCountHandlers();
-		const mutationApi = new RemoteStateMutation<{ id: string }, string, Error>({
+		const mutationApi = new MutationControl<{ id: string }, string, Error>({
 			mutationFn: async input => {
 				if (error) {
 					throw new Error('mutation failed');
@@ -147,7 +148,7 @@ describe('RemoteStateMutation', () => {
 	it('retry mutation on error', async () => {
 		let mutationCalled = 0;
 		const { handler, counter } = makeCountHandlers();
-		const mutationApi = new RemoteStateMutation<string, string, Error>({
+		const mutationApi = new MutationControl<string, string, Error>({
 			mutationFn: async input => {
 				mutationCalled += 1;
 				if (mutationCalled % 3 !== 0) {
@@ -175,7 +176,7 @@ describe('RemoteStateMutation', () => {
 	it('retry async mutation on error', async () => {
 		let mutationCalled = 0;
 		const { handler, counter } = makeCountHandlers();
-		const mutationApi = new RemoteStateMutation<string, string, Error>({
+		const mutationApi = new MutationControl<string, string, Error>({
 			mutationFn: async input => {
 				mutationCalled += 1;
 				if (mutationCalled % 3 !== 0) {

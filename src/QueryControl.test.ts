@@ -1,10 +1,11 @@
 import { assert, describe, it } from 'vitest';
-import { RemoteStateQuery, defaultKeyHashFn } from '@/RemoteState';
+import { QueryControl } from '@/QueryControl';
 import { makeCache } from '@/Cache/Helper';
 import { waitUntil } from '@/AsyncModule';
 import { JitterExponentialBackoffTimer } from '@/TimerModule';
 import { PubSub } from '@/PubSub';
-import { QueryState, RemoteStateQueryHandler } from '@/Type';
+import { QueryState, QueryControlHandler } from '@/Type';
+import { defaultKeyHashFn } from '@/Default';
 
 describe('RemoteState default keyHashFn', () => {
 	it('produce different keys for different input', () => {
@@ -27,7 +28,7 @@ function makeCountHandlers<T, E>() {
 		dataCalled: 0,
 	};
 
-	const handler: RemoteStateQueryHandler<T, E> = {
+	const handler: QueryControlHandler<T, E> = {
 		stateFn: () => {
 			counter.stateCalled += 1;
 		},
@@ -50,7 +51,7 @@ describe('RemoteStateQuery', () => {
 		it('execute query function', async () => {
 			let queryFnCalled = 0;
 			const [, cache] = makeCache();
-			const queryApi = new RemoteStateQuery({
+			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
 					queryFnCalled += 1;
@@ -87,7 +88,7 @@ describe('RemoteStateQuery', () => {
 
 		it('create cache entry', async () => {
 			const [, cache] = makeCache();
-			const queryApi = new RemoteStateQuery({
+			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
 					return '##' + key + '##';
@@ -124,7 +125,7 @@ describe('RemoteStateQuery', () => {
 		it('replace cache entry on subsequent calls', async () => {
 			let queryFnCalled = 0;
 			const [, cache] = makeCache();
-			const queryApi = new RemoteStateQuery({
+			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
 					queryFnCalled += 1;
@@ -200,7 +201,7 @@ describe('RemoteStateQuery', () => {
 			const { counter, handler } = makeCountHandlers<string, Error>();
 
 			const [, cache] = makeCache<string>();
-			const queryApi = new RemoteStateQuery({
+			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
 					queryFnCalled += 1;
@@ -268,7 +269,7 @@ describe('RemoteStateQuery', () => {
 			const { counter, handler } = makeCountHandlers<string, Error>();
 
 			const [, cache] = makeCache<string>();
-			const queryApi = new RemoteStateQuery({
+			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
 					queryFnCalled += 1;
@@ -312,7 +313,7 @@ describe('RemoteStateQuery', () => {
 		it('execute query function when no cache entry is found', async () => {
 			let queryFnCalled = 0;
 			const [, cache] = makeCache();
-			const queryApi = new RemoteStateQuery({
+			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
 					queryFnCalled += 1;
@@ -344,7 +345,7 @@ describe('RemoteStateQuery', () => {
 		it('return from cache when the cache entry is fresh', async () => {
 			let queryFnCalled = 0;
 			const [, cache] = makeCache();
-			const queryApi = new RemoteStateQuery({
+			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
 					queryFnCalled += 1;
@@ -396,7 +397,7 @@ describe('RemoteStateQuery', () => {
 		it('execute query function when a cache entry is found, but is not fresh', async () => {
 			let queryFnCalled = 0;
 			const [, cache] = makeCache();
-			const queryApi = new RemoteStateQuery({
+			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
 					queryFnCalled += 1;
@@ -442,7 +443,7 @@ describe('RemoteStateQuery', () => {
 			let queryFnCalled = 0;
 			const { counter, handler } = makeCountHandlers<string, Error>();
 			const [, cache] = makeCache<string>();
-			const queryApi = new RemoteStateQuery({
+			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
 					queryFnCalled += 1;
@@ -490,7 +491,7 @@ describe('RemoteStateQuery', () => {
 		it('execute query function when no cache entry is found', async () => {
 			let queryFnCalled = 0;
 			const [, cache] = makeCache();
-			const queryApi = new RemoteStateQuery({
+			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
 					queryFnCalled += 1;
@@ -525,7 +526,7 @@ describe('RemoteStateQuery', () => {
 		it('return from cache when the cache entry is fresh without running background query', async () => {
 			let queryFnCalled = 0;
 			const [, cache] = makeCache();
-			const queryApi = new RemoteStateQuery({
+			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
 					queryFnCalled += 1;
@@ -583,7 +584,7 @@ describe('RemoteStateQuery', () => {
 			let queryFnCalled = 0;
 			const { counter, handler } = makeCountHandlers<string, Error>();
 			const [, cache] = makeCache<string>();
-			const queryApi = new RemoteStateQuery({
+			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
 					await waitUntil(fresh);
@@ -653,7 +654,7 @@ describe('RemoteStateQuery', () => {
 			let queryFnCalled = 0;
 			const { counter, handler } = makeCountHandlers<string, Error>();
 			const [, cache] = makeCache<string>();
-			const queryApi = new RemoteStateQuery({
+			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
 					queryFnCalled += 1;
@@ -703,13 +704,13 @@ describe('RemoteStateQuery', () => {
 			const [, cache] = makeCache<string>();
 			const provider = new PubSub<QueryState<string, Error>>();
 
-			const queryApi1 = new RemoteStateQuery<string, string, Error>({
+			const queryApi1 = new QueryControl<string, string, Error>({
 				cacheStore: cache,
 				queryFn: async key => key,
 				stateProvider: provider,
 			});
 
-			const queryApi2 = new RemoteStateQuery<string, string, Error>({
+			const queryApi2 = new QueryControl<string, string, Error>({
 				cacheStore: cache,
 				queryFn: async key => key,
 				stateProvider: provider,
@@ -730,13 +731,13 @@ describe('RemoteStateQuery', () => {
 				stateList.push({ ...data });
 			});
 
-			const queryApi1 = new RemoteStateQuery<string, string, Error>({
+			const queryApi1 = new QueryControl<string, string, Error>({
 				cacheStore: cache,
 				queryFn: async key => key + '#1',
 				stateProvider: provider,
 			});
 
-			const queryApi2 = new RemoteStateQuery<string, string, Error>({
+			const queryApi2 = new QueryControl<string, string, Error>({
 				cacheStore: cache,
 				queryFn: async key => key + '#2',
 				stateProvider: provider,
@@ -777,7 +778,7 @@ describe('RemoteStateQuery', () => {
 		let error = false,
 			keepCache = false;
 		const [, cache] = makeCache<string>();
-		const queryApi = new RemoteStateQuery<string, string, Error>({
+		const queryApi = new QueryControl<string, string, Error>({
 			cacheStore: cache,
 			queryFn: async key => {
 				if (error) {

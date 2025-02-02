@@ -1,20 +1,27 @@
-import { CacheStore } from '@/Cache';
-import { RetryDelay, RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
-import { JitterExponentialBackoffTimer } from '@/TimerModule';
+import type { CacheStore } from '@/Cache';
+import { type RetryDelay, type RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
 import { PubSub, SubscriberHandle } from '@/PubSub';
 import type {
 	QueryFn,
 	KeyHashFn,
-	RemoteStateQueryHandler,
+	QueryControlHandler,
 	QueryState,
 	QueryCache,
 	KeepCacheOnError,
-	DataHandler,
-	ErrorHandler,
 	Millisecond,
 } from '@/Type';
+import {
+	defaultKeyHashFn,
+	DEFAULT_RETRY_DELAY,
+	DEFAULT_RETRY,
+	defaultKeepCacheOnError,
+	DEFAULT_FRESH_TIME,
+	DEFAULT_STALE_TIME,
+	defaultQueryHandler,
+	defaultQueryState,
+} from '@/Default';
 
-export interface RemoteStateQueryInput<K, T, E> {
+export interface QueryControlInput<K, T, E> {
 	/**
 	 * Cache store.
 	 */
@@ -72,43 +79,14 @@ export interface RemoteStateQueryInput<K, T, E> {
 	/**
 	 * Update handlers.
 	 */
-	handler?: RemoteStateQueryHandler<T, E>;
+	handler?: QueryControlHandler<T, E>;
 	/**
 	 * State provider.
 	 */
 	stateProvider?: PubSub<QueryState<T, E>> | null;
 }
 
-export const DEFAULT_RETRY = 3;
-export const DEFAULT_FRESH_TIME = 30 * 1000; // 30 seconds
-export const DEFAULT_STALE_TIME = 3 * 60 * 1000; // 3 minutes
-export const DEFAULT_RETRY_DELAY = new JitterExponentialBackoffTimer(1000, 30 * 1000);
-
-export function defaultKeyHashFn<T>(key: T): string {
-	return JSON.stringify(key);
-}
-
-export function defaultKeepCacheOnError() {
-	return false;
-}
-
-export function defaultQueryState<T, E>(): QueryState<T, E> {
-	return {
-		data: null,
-		error: null,
-		status: 'idle',
-	};
-}
-
-export function defaultQueryHandler<T, E>(): RemoteStateQueryHandler<T, E> {
-	return {
-		dataFn: undefined,
-		errorFn: undefined,
-		stateFn: undefined,
-	};
-}
-
-export class RemoteStateQuery<K, T, E> {
+export class QueryControl<K, T, E> {
 	public readonly keyHashFn: KeyHashFn<K>;
 	public readonly retry: number;
 	public readonly retryDelay: RetryDelay<E>;
@@ -127,7 +105,7 @@ export class RemoteStateQuery<K, T, E> {
 		staleDuration = DEFAULT_STALE_TIME,
 		handler = defaultQueryHandler(),
 		stateProvider = null,
-	}: RemoteStateQueryInput<K, T, E>) {
+	}: QueryControlInput<K, T, E>) {
 		this.cacheStore = cacheStore;
 		this.keyHashFn = keyHashFn;
 		this.queryFn = queryFn;
@@ -272,175 +250,11 @@ export class RemoteStateQuery<K, T, E> {
 	};
 
 	private readonly cacheStore: CacheStore<string, T>;
-	private readonly handler: RemoteStateQueryHandler<T, E>;
+	private readonly handler: QueryControlHandler<T, E>;
 	private readonly stateProvider: PubSub<QueryState<T, E>> | null;
 	private readonly subscriberHandle: SubscriberHandle<QueryState<T, E>> | null;
 	private readonly queryFn: QueryFn<K, T>;
 	private readonly keepCacheOnError: KeepCacheOnError<E>;
 	private readonly retryHandleFn: RetryHandlerFn | null;
 	private state: QueryState<T, E>;
-}
-
-export type MutationStatus = 'idle' | 'loading' | 'success' | 'error';
-
-export interface MutationState<T, E> {
-	data: T | null;
-	error: E | null;
-	status: MutationStatus;
-}
-
-export type MutationFn<I, T> = (input: I, signal: AbortSignal) => Promise<T>;
-
-export type UpdateMutationStateHandler<T, E> = (state: MutationState<T, E>) => void;
-
-export interface RemoteStateMutationHandler<T, E> {
-	stateFn?: UpdateMutationStateHandler<T, E>;
-	dataFn?: DataHandler<T>;
-	errorFn?: ErrorHandler<E>;
-}
-
-export interface RemoteStateMutationInput<I, T, E> {
-	mutationFn: MutationFn<I, T>;
-	retry?: number;
-	retryDelay?: RetryDelay<E>;
-	handler?: RemoteStateMutationHandler<T, E>;
-}
-
-export function defaultMutationState<T, E>(): MutationState<T, E> {
-	return {
-		data: null,
-		error: null,
-		status: 'idle',
-	};
-}
-
-export function defaultMutationHandler<T, E>(): RemoteStateMutationHandler<T, E> {
-	return {
-		stateFn: undefined,
-		dataFn: undefined,
-		errorFn: undefined,
-	};
-}
-
-export class RemoteStateMutation<I, T, E> {
-	public readonly retry: number;
-	public readonly retryDelay: RetryDelay<E>;
-
-	public constructor({
-		mutationFn,
-		retry = 3,
-		retryDelay = DEFAULT_RETRY_DELAY.delay,
-		handler = defaultMutationHandler(),
-	}: RemoteStateMutationInput<I, T, E>) {
-		this.mutationFn = mutationFn;
-		this.retry = retry;
-		this.retryDelay = retryDelay;
-		this.handler = handler;
-		this.state = defaultMutationState();
-	}
-
-	public execute = (input: I, ctl: AbortController = new AbortController()): void => {
-		this.state.status = 'loading';
-		this.handler.stateFn?.({ ...this.state });
-		retryAsyncOperation(() => this.mutationFn(input, ctl.signal), this.retryDelay, this.retry)
-			.then(this.mutationResolve)
-			.catch(this.mutationReject);
-	};
-
-	public executeAsync = async (
-		input: I,
-		ctl: AbortController = new AbortController()
-	): Promise<T | E> => {
-		try {
-			this.state.status = 'loading';
-			this.handler.stateFn?.({ ...this.state });
-			const data = await retryAsyncOperation(
-				() => this.mutationFn(input, ctl.signal),
-				this.retryDelay,
-				this.retry
-			);
-			this.mutationResolve(data);
-			return data;
-		} catch (err: unknown) {
-			this.mutationReject(err as E);
-			return err as E;
-		}
-	};
-
-	public getState = (): MutationState<T, E> => {
-		return this.state;
-	};
-
-	private mutationResolve = (data: T) => {
-		this.state.error = null;
-		this.state.data = data;
-		this.state.status = 'success';
-		this.handler.dataFn?.(data);
-		this.handler.stateFn?.({ ...this.state });
-	};
-
-	private mutationReject = (err: E) => {
-		this.state.error = err;
-		this.state.data = null;
-		this.state.status = 'error';
-		this.handler.errorFn?.(err);
-		this.handler.stateFn?.({ ...this.state });
-	};
-
-	private readonly handler: RemoteStateMutationHandler<T, E>;
-	private readonly mutationFn: MutationFn<I, T>;
-	private state: MutationState<T, E>;
-}
-
-export interface RemoteStateCacheControlInput {
-	keyHashFn?: KeyHashFn<unknown>;
-	/**
-	 * Cache duration.
-	 */
-	duration?: Millisecond;
-	/**
-	 * Cache store.
-	 */
-	cacheStore: CacheStore<string, unknown>;
-	/**
-	 * State provider.
-	 */
-	stateProvider?: PubSub<QueryState<unknown, unknown>> | null;
-}
-
-export class RemoteStateCacheControl {
-	public readonly keyHashFn: KeyHashFn<unknown>;
-	public readonly duration: Millisecond;
-
-	public constructor({
-		keyHashFn = defaultKeyHashFn,
-		duration = DEFAULT_STALE_TIME,
-		cacheStore,
-		stateProvider,
-	}: RemoteStateCacheControlInput) {
-		this.keyHashFn = keyHashFn;
-		this.duration = duration;
-		this.cacheStore = cacheStore;
-		this.stateProvider = stateProvider;
-	}
-
-	public setValue = async <K, T>(key: K, data: T, duration?: Millisecond): Promise<void> => {
-		const keyHash = this.keyHashFn(key);
-		// TODO: fix async cacheStore
-		await this.cacheStore.set(keyHash, data, (duration ?? this.duration) + Date.now());
-		this.stateProvider?.publish(keyHash, {
-			data,
-			error: null,
-			status: 'success',
-		});
-	};
-
-	public getValue = async <K, T>(key: K): Promise<T | undefined> => {
-		const keyHash = this.keyHashFn(key);
-		// TODO: fix async cacheStore
-		return await (this.cacheStore as CacheStore<string, T>).get(keyHash);
-	};
-
-	private readonly cacheStore: CacheStore<string, unknown>;
-	private readonly stateProvider?: PubSub<QueryState<unknown, unknown>> | null;
 }
