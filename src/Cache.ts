@@ -41,17 +41,3 @@ export interface CacheStore<K, V> {
 	 */
 	delete(key: K): Promise<void>;
 }
-
-export interface MapStorage<Data> {
-	get(key: string): Data | undefined;
-	set(key: string, value: Data): void;
-	delete(key: string): void;
-}
-
-// NOTE: interface for IndexedDB
-// export interface BTreeStorage<Data> {
-// 	get(key: string): Data | undefined;
-// 	set(key: string, value: Data): void;
-// 	delete(key: string): void;
-// 	entries(): IterableIterator<[string, Data]>;
-// }
