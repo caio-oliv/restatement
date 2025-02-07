@@ -19,6 +19,7 @@
 		"typescript",
 		"frontent"
 	],
+	"private": false,
 	"license": "MIT",
 	"type": "module",
 	"source": "src/lib.ts",
@@ -63,5 +64,18 @@
 		"vite": "^5.2.8",
 		"vitest": "^1.5.0"
 	},
-	"packageManager": "pnpm@8.15.0"
+	"packageManager": "pnpm@8.15.0",
+	"engines": {
+		"node": ">=18.0.0"
+	},
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"onFail": "error"
+		},
+		"packageManager": {
+			"name": "pnpm",
+			"onFail": "error"
+		}
+	}
 }
