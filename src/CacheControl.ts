@@ -2,6 +2,7 @@ import type { KeyHashFn, Millisecond, QueryState } from '@/Type';
 import type { CacheStore } from '@/Cache';
 import { defaultKeyHashFn, DEFAULT_STALE_TIME } from '@/Default';
 import { PubSub } from '@/PubSub';
+import { blackhole } from '@/Internal';
 
 export interface CacheControlInput {
 	keyHashFn?: KeyHashFn<unknown>;
@@ -38,7 +39,7 @@ export class CacheControl {
 
 	public async setValue<K, T>(key: K, data: T, duration?: Millisecond): Promise<void> {
 		const keyHash = this.keyHashFn(key);
-		await this.cacheStore.set(keyHash, data, (duration ?? this.duration) + Date.now());
+		await this.cacheStore.set(keyHash, data, duration ?? this.duration).catch(blackhole);
 		this.stateProvider?.publish(keyHash, {
 			data,
 			error: null,
@@ -48,7 +49,7 @@ export class CacheControl {
 
 	public async getValue<K, T>(key: K): Promise<T | void> {
 		const keyHash = this.keyHashFn(key);
-		return await (this.cacheStore as CacheStore<string, T>).get(keyHash);
+		return (await this.cacheStore.get(keyHash).catch(blackhole)) as T | void;
 	}
 
 	private readonly cacheStore: CacheStore<string, unknown>;

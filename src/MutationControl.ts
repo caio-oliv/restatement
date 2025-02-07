@@ -26,6 +26,7 @@ export class MutationControl<I, T, E> {
 		this.state = defaultMutationState();
 	}
 
+	// TODO: remove sync version of execute
 	public execute = (input: I, ctl: AbortController = new AbortController()): void => {
 		this.state.status = 'loading';
 		this.handler.stateFn?.({ ...this.state });
