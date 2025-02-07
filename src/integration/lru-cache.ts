@@ -90,7 +90,7 @@ export class LRUCacheAdapter<K = unknown, V = unknown> implements CacheStore<K, 
 	}
 
 	public async set(key: K, data: V, ttl: number): Promise<void> {
-		this.cache.set(key, data, { start: Date.now(), ttl });
+		this.cache.set(key, data, { start: Date.now(), ttl, noUpdateTTL: false });
 	}
 
 	public async delete(key: K): Promise<void> {

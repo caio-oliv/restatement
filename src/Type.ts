@@ -35,6 +35,7 @@ export type DataHandler<T> = (data: T) => void;
 
 export type ErrorHandler<E> = (error: E) => void;
 
+// TODO: support async handler functions
 export interface QueryControlHandler<T, E> {
 	stateFn?: QueryStateHandler<T, E>;
 	dataFn?: DataHandler<T>;
@@ -53,6 +54,7 @@ export type MutationFn<I, T> = (input: I, signal: AbortSignal) => Promise<T>;
 
 export type MutationStateHandler<T, E> = (state: MutationState<T, E>) => void;
 
+// TODO: support async handler functions
 export interface MutationControlHandler<T, E> {
 	stateFn?: MutationStateHandler<T, E>;
 	dataFn?: DataHandler<T>;

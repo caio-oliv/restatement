@@ -20,6 +20,7 @@ import {
 	defaultQueryHandler,
 	defaultQueryState,
 } from '@/Default';
+import { blackhole } from '@/Internal';
 
 export interface QueryControlInput<K, T, E> {
 	/**
@@ -119,7 +120,7 @@ export class QueryControl<K, T, E> {
 		this.handler = handler;
 		this.stateProvider = stateProvider;
 		this.subscriberHandle = this.stateProvider
-			? new SubscriberHandle(this.updateState, this.stateProvider)
+			? new SubscriberHandle(this.updateState.bind(this), this.stateProvider)
 			: null;
 	}
 
@@ -137,8 +138,7 @@ export class QueryControl<K, T, E> {
 			return;
 		}
 
-		// TODO: fix async cacheStore
-		const entry = await this.cacheStore.getEntry(keyHash);
+		const entry = await this.cacheStore.getEntry(keyHash).catch(blackhole);
 		if (entry === undefined) {
 			this.makeQueryNoCache(key, ctl);
 			return;
@@ -212,20 +212,19 @@ export class QueryControl<K, T, E> {
 			.catch(err => this.fetchReject(err, key));
 	};
 
-	private fetchResolve = (data: T, key: K) => {
+	private async fetchResolve(data: T, key: K) {
 		const keyHash = this.keyHashFn(key);
 		const state: QueryState<T, E> = {
 			status: 'success',
 			error: null,
 			data,
 		};
-		// TODO: fix async cacheStore
-		this.cacheStore.set(keyHash, data, this.staleDuration + Date.now());
+		await this.cacheStore.set(keyHash, data, this.staleDuration).catch(blackhole);
 		this.updateState(keyHash, state);
 		this.stateProvider?.publish(keyHash, state);
-	};
+	}
 
-	private fetchReject = (err: unknown, key: K) => {
+	private async fetchReject(err: unknown, key: K) {
 		const keyHash = this.keyHashFn(key);
 		this.updateState(keyHash, {
 			status: 'error',
@@ -233,12 +232,11 @@ export class QueryControl<K, T, E> {
 			data: null,
 		});
 		if (!this.keepCacheOnError(err as E)) {
-			// TODO: fix async cacheStore
-			this.cacheStore.delete(keyHash);
+			await this.cacheStore.delete(keyHash).catch(blackhole);
 		}
-	};
+	}
 
-	private updateState = (_: string, state: QueryState<T, E>) => {
+	private updateState(_: string, state: QueryState<T, E>): void {
 		this.state = state;
 		if (this.state.data !== null) {
 			this.handler.dataFn?.(this.state.data);
@@ -247,7 +245,7 @@ export class QueryControl<K, T, E> {
 			this.handler.errorFn?.(this.state.error);
 		}
 		this.handler.stateFn?.(this.state);
-	};
+	}
 
 	private readonly cacheStore: CacheStore<string, T>;
 	private readonly handler: QueryControlHandler<T, E>;

@@ -19,6 +19,7 @@ export interface CacheControlInput {
 	stateProvider?: PubSub<QueryState<unknown, unknown>> | null;
 }
 
+// TODO: change class name
 export class CacheControl {
 	public readonly keyHashFn: KeyHashFn<unknown>;
 	public readonly duration: Millisecond;
@@ -45,7 +46,7 @@ export class CacheControl {
 		});
 	}
 
-	public async getValue<K, T>(key: K): Promise<T | undefined> {
+	public async getValue<K, T>(key: K): Promise<T | void> {
 		const keyHash = this.keyHashFn(key);
 		return await (this.cacheStore as CacheStore<string, T>).get(keyHash);
 	}

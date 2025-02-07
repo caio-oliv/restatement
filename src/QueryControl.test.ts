@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 import { QueryControl } from '@/QueryControl';
-import { makeCache } from '@/Cache/Helper';
+import { makeCache } from '@/integration/LRUCache.mock';
 import { waitUntil } from '@/AsyncModule';
 import { JitterExponentialBackoffTimer } from '@/TimerModule';
 import { PubSub } from '@/PubSub';
@@ -50,7 +50,7 @@ describe('RemoteStateQuery', () => {
 	describe('no-cache', () => {
 		it('execute query function', async () => {
 			let queryFnCalled = 0;
-			const [, cache] = makeCache();
+			const cache = makeCache();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
@@ -87,7 +87,7 @@ describe('RemoteStateQuery', () => {
 		});
 
 		it('create cache entry', async () => {
-			const [, cache] = makeCache();
+			const cache = makeCache();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
@@ -124,7 +124,7 @@ describe('RemoteStateQuery', () => {
 
 		it('replace cache entry on subsequent calls', async () => {
 			let queryFnCalled = 0;
-			const [, cache] = makeCache();
+			const cache = makeCache();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
@@ -200,7 +200,7 @@ describe('RemoteStateQuery', () => {
 			let queryFnCalled = 0;
 			const { counter, handler } = makeCountHandlers<string, Error>();
 
-			const [, cache] = makeCache<string>();
+			const cache = makeCache<string>();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
@@ -268,7 +268,7 @@ describe('RemoteStateQuery', () => {
 			let queryFnCalled = 0;
 			const { counter, handler } = makeCountHandlers<string, Error>();
 
-			const [, cache] = makeCache<string>();
+			const cache = makeCache<string>();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
@@ -312,7 +312,7 @@ describe('RemoteStateQuery', () => {
 	describe('fresh', () => {
 		it('execute query function when no cache entry is found', async () => {
 			let queryFnCalled = 0;
-			const [, cache] = makeCache();
+			const cache = makeCache();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
@@ -344,7 +344,7 @@ describe('RemoteStateQuery', () => {
 
 		it('return from cache when the cache entry is fresh', async () => {
 			let queryFnCalled = 0;
-			const [, cache] = makeCache();
+			const cache = makeCache();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
@@ -396,7 +396,7 @@ describe('RemoteStateQuery', () => {
 
 		it('execute query function when a cache entry is found, but is not fresh', async () => {
 			let queryFnCalled = 0;
-			const [, cache] = makeCache();
+			const cache = makeCache();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
@@ -410,7 +410,8 @@ describe('RemoteStateQuery', () => {
 			});
 
 			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), undefined);
-			queryApi.execute('unique-key', 'fresh');
+
+			await queryApi.execute('unique-key', 'fresh');
 			await waitUntil(sleepTime);
 
 			assert.deepStrictEqual(queryApi.getState(), {
@@ -423,12 +424,12 @@ describe('RemoteStateQuery', () => {
 
 			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), 'unique-key#1');
 
-			await waitUntil(sleepTime + 10);
-			queryApi.execute('unique-key', 'fresh');
+			await waitUntil(sleepTime * 5);
 
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), undefined);
+
+			await queryApi.execute('unique-key', 'fresh');
 			await waitUntil(sleepTime);
-
-			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), 'unique-key#2');
 
 			assert.deepStrictEqual(queryApi.getState(), {
 				data: 'unique-key#2',
@@ -437,12 +438,14 @@ describe('RemoteStateQuery', () => {
 			});
 
 			assert.strictEqual(queryFnCalled, 2);
+
+			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), 'unique-key#2');
 		});
 
 		it('retry query on error', async () => {
 			let queryFnCalled = 0;
 			const { counter, handler } = makeCountHandlers<string, Error>();
-			const [, cache] = makeCache<string>();
+			const cache = makeCache<string>();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
@@ -490,7 +493,7 @@ describe('RemoteStateQuery', () => {
 	describe('stale', () => {
 		it('execute query function when no cache entry is found', async () => {
 			let queryFnCalled = 0;
-			const [, cache] = makeCache();
+			const cache = makeCache();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
@@ -525,7 +528,7 @@ describe('RemoteStateQuery', () => {
 
 		it('return from cache when the cache entry is fresh without running background query', async () => {
 			let queryFnCalled = 0;
-			const [, cache] = makeCache();
+			const cache = makeCache();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
@@ -583,7 +586,7 @@ describe('RemoteStateQuery', () => {
 
 			let queryFnCalled = 0;
 			const { counter, handler } = makeCountHandlers<string, Error>();
-			const [, cache] = makeCache<string>();
+			const cache = makeCache<string>();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
@@ -653,7 +656,7 @@ describe('RemoteStateQuery', () => {
 		it('retry query on error', async () => {
 			let queryFnCalled = 0;
 			const { counter, handler } = makeCountHandlers<string, Error>();
-			const [, cache] = makeCache<string>();
+			const cache = makeCache<string>();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
 				queryFn: async key => {
@@ -670,8 +673,8 @@ describe('RemoteStateQuery', () => {
 				handler,
 			});
 
-			queryApi.execute('unique-key', 'stale');
-			await waitUntil(sleepTime * 3);
+			await queryApi.execute('unique-key', 'stale');
+			await waitUntil(sleepTime * 5);
 
 			assert.deepStrictEqual(queryApi.getState(), {
 				data: 'unique-key#3',
@@ -682,10 +685,7 @@ describe('RemoteStateQuery', () => {
 			assert.deepStrictEqual(counter, { dataCalled: 1, errorCalled: 0, stateCalled: 2 });
 			assert.deepStrictEqual(queryFnCalled, 3);
 
-			await waitUntil(sleepTime * 3);
-
-			queryApi.execute('unique-key', 'stale');
-
+			await queryApi.execute('unique-key', 'stale');
 			await waitUntil(sleepTime * 3);
 
 			assert.deepStrictEqual(queryApi.getState(), {
@@ -701,7 +701,7 @@ describe('RemoteStateQuery', () => {
 
 	describe('state provider', () => {
 		it('subscribe for state changes', async () => {
-			const [, cache] = makeCache<string>();
+			const cache = makeCache<string>();
 			const provider = new PubSub<QueryState<string, Error>>();
 
 			const queryApi1 = new QueryControl<string, string, Error>({
@@ -724,7 +724,7 @@ describe('RemoteStateQuery', () => {
 		});
 
 		it('update the state when provided', async () => {
-			const [, cache] = makeCache<string>();
+			const cache = makeCache<string>();
 			const stateList: QueryState<string, Error>[] = [];
 			const provider = new PubSub<QueryState<string, Error>>();
 			provider.subscribe('"?name=Pantera"', (_, data) => {
@@ -777,7 +777,7 @@ describe('RemoteStateQuery', () => {
 	it('keep previus cache on error', async () => {
 		let error = false,
 			keepCache = false;
-		const [, cache] = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryApi = new QueryControl<string, string, Error>({
 			cacheStore: cache,
 			queryFn: async key => {
