@@ -68,6 +68,14 @@
 		"vite": "^6.1.0",
 		"vitest": "^3.0.5"
 	},
+	"peerDependencies": {
+		"lru-cache": ">=8.0.0"
+	},
+	"peerDependenciesMeta": {
+		"lru-cache": {
+			"optional": true
+		}
+	},
 	"packageManager": "pnpm@8.15.0",
 	"engines": {
 		"node": ">=18.0.0"
