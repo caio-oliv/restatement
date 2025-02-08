@@ -68,7 +68,7 @@ export class SubscriberHandle<T> {
 		return this.topic;
 	};
 
-	public unsubscribe = () => {
+	public unsubscribe = (): void => {
 		if (this.topic) this.provider.unsubscribe(this.topic, this.listener);
 		this.topic = null;
 	};

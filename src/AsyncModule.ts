@@ -1,8 +1,6 @@
 /**
- *
  * @param retryAttempt current retry attempt.
  * @param error error returned from the operation.
- *
  * @returns retry delay in milliseconds. If a negative number is returned, the
  * operation will be rejected with the current error.
  */
@@ -12,15 +10,22 @@ export type AsyncOperation<T> = () => Promise<T>;
 
 export type RetryHandlerFn = (retryAttempt: number) => void;
 
-export function waitUntil(time: number) {
-	return new Promise(resolve => setTimeout(resolve, time));
+/**
+ * @param time wait time in milliseconds
+ * @returns promise that will resolve after specified time.
+ */
+export function waitUntil(time: number): Promise<void> {
+	return new Promise(resolve => {
+		setTimeout(resolve, time);
+	});
 }
 
 /**
- *
  * @param operation async operation
  * @param retryDelay retry delay function
- * @param retryCount maximum number of retries.
+ * @param retryCount maximum number of retries
+ * @param retryHandleFn retry callback handler, called before every retry
+ * @returns promise with the result of all the retry attempts.
  */
 export async function retryAsyncOperation<T, E = unknown>(
 	operation: AsyncOperation<T>,
@@ -31,7 +36,6 @@ export async function retryAsyncOperation<T, E = unknown>(
 	let retryAttempt = 0;
 	let lastError: E;
 
-	// eslint-disable-next-line no-constant-condition
 	while (true) {
 		try {
 			return await operation();

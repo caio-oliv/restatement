@@ -1,6 +1,6 @@
 import type { CacheStore } from '@/Cache';
 import { type RetryDelay, type RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
-import { PubSub, SubscriberHandle } from '@/PubSub';
+import { type PubSub, SubscriberHandle } from '@/PubSub';
 import type {
 	QueryFn,
 	KeyHashFn,
@@ -45,7 +45,6 @@ export interface QueryControlInput<K, T, E> {
 	retryDelay?: RetryDelay<E>;
 	/**
 	 * Maximum retry attempt
-	 *
 	 * @default 3
 	 */
 	retry?: number;
@@ -56,14 +55,13 @@ export interface QueryControlInput<K, T, E> {
 	/**
 	 * Use the previus cached data on error of the `queryFn`
 	 */
-	keepCacheOnError?: (err: E) => boolean;
+	keepCacheOnError?(err: E): boolean;
 	/**
 	 * Time in milliseconds that the data is considered fresh.
 	 *
 	 * # Invariant
 	 *
 	 * `freshDuration` must be less than `staleDuration`
-	 *
 	 * @default 30 * 1000; // 30 seconds
 	 */
 	freshDuration?: Millisecond;
@@ -73,7 +71,6 @@ export interface QueryControlInput<K, T, E> {
 	 * # Invariant
 	 *
 	 * `staleDuration` must be greater than `freshDuration`
-	 *
 	 * @default 3 * 60 * 1000 // 3 minutes
 	 */
 	staleDuration?: Millisecond;
@@ -177,19 +174,18 @@ export class QueryControl<K, T, E> {
 	};
 
 	/**
-	 * Get the current query state.
-	 *
-	 * @returns {QueryState<T, E>} current query state.
+	 * @description Get the current query state.
+	 * @returns current query state
 	 */
-	public getState = (): QueryState<T, E> => {
+	public readonly getState = (): QueryState<T, E> => {
 		return this.state;
 	};
 
-	public dispose = () => {
+	public readonly dispose = (): void => {
 		this.subscriberHandle?.unsubscribe();
 	};
 
-	private makeQueryNoCache = (key: K, ctl: AbortController) => {
+	private readonly makeQueryNoCache = (key: K, ctl: AbortController): void => {
 		// Fetching status should not be published.
 		const state: QueryState<T, E> = {
 			status: 'loading',
@@ -201,7 +197,7 @@ export class QueryControl<K, T, E> {
 		this.runQuery(key, ctl);
 	};
 
-	private runQuery = (key: K, ctl: AbortController) => {
+	private readonly runQuery = (key: K, ctl: AbortController): void => {
 		retryAsyncOperation(
 			() => this.queryFn(key, ctl.signal),
 			this.retryDelay,
@@ -212,7 +208,7 @@ export class QueryControl<K, T, E> {
 			.catch(err => this.fetchReject(err, key));
 	};
 
-	private async fetchResolve(data: T, key: K) {
+	private async fetchResolve(data: T, key: K): Promise<void> {
 		const keyHash = this.keyHashFn(key);
 		const state: QueryState<T, E> = {
 			status: 'success',
@@ -224,7 +220,7 @@ export class QueryControl<K, T, E> {
 		this.stateProvider?.publish(keyHash, state);
 	}
 
-	private async fetchReject(err: unknown, key: K) {
+	private async fetchReject(err: unknown, key: K): Promise<void> {
 		const keyHash = this.keyHashFn(key);
 		this.updateState(keyHash, {
 			status: 'error',

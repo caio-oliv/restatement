@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-
 import type { Linter } from 'eslint';
 import { includeIgnoreFile } from '@eslint/compat';
 import eslint from '@eslint/js';
@@ -27,8 +25,8 @@ const testConfig: Linter.Config = {
 	rules: {
 		complexity: ['error', 20],
 		'max-depth': ['error', 5],
-		'max-lines': ['error', { max: 1000, skipBlankLines: true, skipComments: true }],
-		'max-lines-per-function': ['error', { max: 200, skipBlankLines: true, skipComments: true }],
+		'max-lines': ['error', { max: 3000, skipBlankLines: true, skipComments: true }],
+		'max-lines-per-function': ['error', { max: 1000, skipBlankLines: true, skipComments: true }],
 		'max-nested-callbacks': ['error', 5],
 		'max-params': ['error', 6],
 		'no-console': 'warn',
@@ -36,7 +34,6 @@ const testConfig: Linter.Config = {
 		'@typescript-eslint/no-non-null-assertion': 'off',
 		'@typescript-eslint/no-useless-constructor': 'off',
 		'@typescript-eslint/no-empty-function': 'off',
-		'@typescript-eslint/no-magic-numbers': 'off',
 
 		'@typescript-eslint/explicit-function-return-type': 'off',
 
@@ -77,7 +74,7 @@ const projectConfig: Linter.Config = {
 		'class-methods-use-this': 'error',
 		'grouped-accessor-pairs': 'error',
 		'func-names': 'error',
-		'consistent-return': 'error',
+		'consistent-return': 'off', // using @typescript-eslint version
 		'default-case-last': 'error',
 		'require-await': 'off', // using @typescript-eslint version
 		eqeqeq: 'error',
@@ -120,15 +117,6 @@ const projectConfig: Linter.Config = {
 		'@typescript-eslint/no-useless-constructor': 'error',
 		'@typescript-eslint/no-empty-function': 'error',
 		'@typescript-eslint/no-loop-func': 'error',
-		'@typescript-eslint/no-magic-numbers': [
-			'error',
-			{
-				ignoreEnums: true,
-				ignoreNumericLiteralTypes: true,
-				ignoreReadonlyClassProperties: true,
-				ignoreTypeIndexes: true,
-			},
-		],
 		'@typescript-eslint/no-use-before-define': 'error',
 		'@typescript-eslint/prefer-for-of': 'error',
 		'@typescript-eslint/prefer-readonly': 'error',
@@ -146,6 +134,9 @@ const projectConfig: Linter.Config = {
 		'@typescript-eslint/consistent-indexed-object-style': ['error', 'record'],
 		'@typescript-eslint/method-signature-style': ['error', 'method'],
 		'@typescript-eslint/return-await': ['warn', 'always'],
+
+		'@typescript-eslint/no-magic-numbers': 'off',
+		'@typescript-eslint/consistent-return': 'off', // using tsconfig rule
 
 		'jsdoc/require-jsdoc': 'warn',
 

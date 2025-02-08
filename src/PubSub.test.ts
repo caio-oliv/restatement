@@ -1,5 +1,5 @@
 import { assert, describe, it } from 'vitest';
-import { Listener, PubSub, SubscriberHandle } from '@/PubSub';
+import { type Listener, PubSub, SubscriberHandle } from '@/PubSub';
 
 describe('PubSub', () => {
 	it('subscribe to a topic', () => {

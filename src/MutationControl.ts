@@ -1,5 +1,5 @@
-import { type RetryDelay, retryAsyncOperation } from '@/AsyncModule';
 import type { MutationFn, MutationState, MutationControlHandler } from '@/Type';
+import { type RetryDelay, retryAsyncOperation } from '@/AsyncModule';
 import { DEFAULT_RETRY_DELAY, defaultMutationHandler, defaultMutationState } from '@/Default';
 
 export interface MutationControlInput<I, T, E> {
@@ -28,8 +28,13 @@ export class MutationControl<I, T, E> {
 
 	// TODO: remove sync version of execute
 	public execute = (input: I, ctl: AbortController = new AbortController()): void => {
-		this.state.status = 'loading';
-		this.handler.stateFn?.({ ...this.state });
+		const state: MutationState<T, E> = {
+			status: 'loading',
+			data: this.state.data,
+			error: this.state.error,
+		};
+		this.state = state;
+		this.handler.stateFn?.(this.state);
 		retryAsyncOperation(() => this.mutationFn(input, ctl.signal), this.retryDelay, this.retry)
 			.then(this.mutationResolve)
 			.catch(this.mutationReject);
@@ -40,8 +45,13 @@ export class MutationControl<I, T, E> {
 		ctl: AbortController = new AbortController()
 	): Promise<T | E> => {
 		try {
-			this.state.status = 'loading';
-			this.handler.stateFn?.({ ...this.state });
+			const state: MutationState<T, E> = {
+				status: 'loading',
+				data: this.state.data,
+				error: this.state.error,
+			};
+			this.state = state;
+			this.handler.stateFn?.(this.state);
 			const data = await retryAsyncOperation(
 				() => this.mutationFn(input, ctl.signal),
 				this.retryDelay,
@@ -59,19 +69,25 @@ export class MutationControl<I, T, E> {
 		return this.state;
 	};
 
-	private mutationResolve = (data: T) => {
-		this.state.error = null;
-		this.state.data = data;
-		this.state.status = 'success';
+	private readonly mutationResolve = (data: T): void => {
+		const state: MutationState<T, E> = {
+			status: 'success',
+			data,
+			error: null,
+		};
+		this.state = state;
 		this.handler.dataFn?.(data);
 		this.handler.stateFn?.({ ...this.state });
 	};
 
-	private mutationReject = (err: E) => {
-		this.state.error = err;
-		this.state.data = null;
-		this.state.status = 'error';
-		this.handler.errorFn?.(err);
+	private readonly mutationReject = (error: E): void => {
+		const state: MutationState<T, E> = {
+			status: 'error',
+			data: null,
+			error,
+		};
+		this.state = state;
+		this.handler.errorFn?.(error);
 		this.handler.stateFn?.({ ...this.state });
 	};
 

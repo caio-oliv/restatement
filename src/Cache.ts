@@ -16,19 +16,16 @@ export interface CacheEntry<T> {
 export interface CacheStore<K, V> {
 	/**
 	 * Get the data of a cache entry of a key.
-	 *
 	 * @param key Unique key.
 	 */
-	get(key: K): Promise<V | void>;
+	get(key: K): Promise<V | undefined>;
 	/**
 	 * Get the entire cache entry of a key.
-	 *
 	 * @param key Unique key.
 	 */
-	getEntry(key: K): Promise<CacheEntry<V> | void>;
+	getEntry(key: K): Promise<CacheEntry<V> | undefined>;
 	/**
 	 * Set an entry for this key in the cache.
-	 *
 	 * @param key Unique key that references this data.
 	 * @param data Data being cached.
 	 * @param ttl Time To Live of this cache entry (duration).
@@ -36,7 +33,6 @@ export interface CacheStore<K, V> {
 	set(key: K, data: V, ttl: number): Promise<void>;
 	/**
 	 * Delete the cache entry of a key.
-	 *
 	 * @param key Unique key.
 	 */
 	delete(key: K): Promise<void>;

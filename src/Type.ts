@@ -45,9 +45,9 @@ export interface QueryControlHandler<T, E> {
 export type MutationStatus = 'idle' | 'loading' | 'success' | 'error';
 
 export interface MutationState<T, E> {
-	data: T | null;
-	error: E | null;
-	status: MutationStatus;
+	readonly data: T | null;
+	readonly error: E | null;
+	readonly status: MutationStatus;
 }
 
 export type MutationFn<I, T> = (input: I, signal: AbortSignal) => Promise<T>;

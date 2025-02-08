@@ -1,4 +1,4 @@
-import { CacheEntry, CacheStore } from '@/Cache';
+import type { CacheEntry, CacheStore } from '@/Cache';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 namespace LRUCache {
@@ -84,7 +84,7 @@ export class LRUCacheAdapter<K = unknown, V = unknown> implements CacheStore<K, 
 		if (!data || !status.ttl || !status.start) return;
 
 		const remain_ttl = Math.trunc(status.ttl - (Date.now() - status.start));
-		if (remain_ttl <= 0) return;
+		if (remain_ttl <= 0) return undefined;
 
 		return { data, remain_ttl, ttl: status.ttl };
 	}

@@ -1,6 +1,5 @@
 /**
- * Retry timer with exponential backoff and jitter.
- *
+ * @description Retry timer with exponential backoff and jitter.
  * @see https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter
  */
 export class JitterExponentialBackoffTimer {

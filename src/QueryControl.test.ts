@@ -1,15 +1,15 @@
 import { assert, describe, it } from 'vitest';
+import type { QueryState, QueryControlHandler } from '@/Type';
 import { QueryControl } from '@/QueryControl';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { waitUntil } from '@/AsyncModule';
 import { JitterExponentialBackoffTimer } from '@/TimerModule';
 import { PubSub } from '@/PubSub';
-import { QueryState, QueryControlHandler } from '@/Type';
 import { defaultKeyHashFn } from '@/Default';
 
 describe('RemoteState default keyHashFn', () => {
 	it('produce different keys for different input', () => {
-		const input: unknown[] = ['string', { object: true }, [4, 'list'], 3.1415];
+		const input: Array<unknown> = ['string', { object: true }, [4, 'list'], 3.1415];
 
 		const keys = input.map(defaultKeyHashFn);
 
@@ -725,7 +725,7 @@ describe('RemoteStateQuery', () => {
 
 		it('update the state when provided', async () => {
 			const cache = makeCache<string>();
-			const stateList: QueryState<string, Error>[] = [];
+			const stateList: Array<QueryState<string, Error>> = [];
 			const provider = new PubSub<QueryState<string, Error>>();
 			provider.subscribe('"?name=Pantera"', (_, data) => {
 				stateList.push({ ...data });
