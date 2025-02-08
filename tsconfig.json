@@ -5,23 +5,27 @@
 		"lib": ["esnext", "dom"],
 		"module": "esnext",
 		"moduleResolution": "node",
-		"allowJs": true,
-		"checkJs": true,
-		"declaration": true,
-		"declarationMap": false,
-		"sourceMap": true,
+
 		"rootDir": "./",
+		"outDir": "dist",
 		"baseUrl": "src",
 		"paths": {
 			"@/*": ["./*"],
 			"@test/*": ["./../test/*"]
 		},
-		"outDir": "dist",
-		"isolatedModules": false,
-		"resolveJsonModule": true,
+
+		"allowJs": true,
+		"checkJs": true,
+		"declaration": true,
+		"declarationMap": false,
+		"sourceMap": true,
 		"removeComments": false,
 		"stripInternal": true,
+		"isolatedModules": false,
 		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+
 		"strict": true,
 		"strictNullChecks": true,
 		"strictFunctionTypes": true,
@@ -35,7 +39,7 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
-		"noUncheckedIndexedAccess": false,
+		"noUncheckedIndexedAccess": true,
 		"noPropertyAccessFromIndexSignature": true,
 		"noStrictGenericChecks": false,
 		"allowUnreachableCode": false,
@@ -44,9 +48,15 @@
 		"useUnknownInCatchVariables": true,
 		"exactOptionalPropertyTypes": false,
 		"forceConsistentCasingInFileNames": true,
-		"downlevelIteration": false,
-		"skipLibCheck": true
+		"downlevelIteration": false
 	},
-	"include": ["src/**/*", "test/**/*", "rollup.config.js"],
+	"include": [
+		"src/**/*",
+		"test/**/*",
+		"rollup.config.js",
+		"eslint.config.ts",
+		"vite.config.ts",
+		"vitest.e2e.config.ts"
+	],
 	"exclude": ["node_modules/**", "dist/**", "coverage/**"]
 }
