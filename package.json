@@ -33,8 +33,9 @@
 	"scripts": {
 		"check:type": "tsc --noEmit",
 		"check:lint": "eslint",
+		"check:all": "run-z check test build",
 		"check": "run-z check:type,check:lint",
-		"build:js": "rollup --config",
+		"build:js": "rollup --config rollup.config.ts --configPlugin typescript",
 		"build:type": "dts-bundle-generator src/lib.ts --no-check --out-file 'dist/lib-type.d.ts'",
 		"build": "run-z clear:build build:js,build:type",
 		"test": "vitest run",
