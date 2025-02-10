@@ -17,6 +17,7 @@ export default defineConfig({
 		environment: 'node',
 		coverage: {
 			include: ['src/**/*.[jt]s'],
+			exclude: ['src/**/*.mock.[jt]s', 'src/**/*.test.[jt]s'],
 			provider: 'v8',
 			reportsDirectory: 'coverage',
 			reporter: ['text', 'html', 'lcov'],

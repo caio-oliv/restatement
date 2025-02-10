@@ -1,7 +1,6 @@
 import { assert, describe, it } from 'vitest';
 import {
 	type QueryState,
-	type QueryControlHandler,
 	QueryControl,
 	waitUntil,
 	JitterExponentialBackoffTimer,
@@ -9,6 +8,7 @@ import {
 	defaultKeyHashFn,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
+import { fakeQueryControlHandler } from '@/controller/Control.mock';
 
 describe('RemoteState default keyHashFn', () => {
 	it('produce different keys for different input', () => {
@@ -23,28 +23,6 @@ describe('RemoteState default keyHashFn', () => {
 		}
 	});
 });
-
-function makeCountHandlers<T, E>() {
-	const counter = {
-		stateCalled: 0,
-		errorCalled: 0,
-		dataCalled: 0,
-	};
-
-	const handler: QueryControlHandler<T, E> = {
-		stateFn: () => {
-			counter.stateCalled += 1;
-		},
-		errorFn: () => {
-			counter.errorCalled += 1;
-		},
-		dataFn: () => {
-			counter.dataCalled += 1;
-		},
-	};
-
-	return { handler, counter };
-}
 
 describe('RemoteStateQuery', () => {
 	const sleepTime = 150; // 150 milliseconds
@@ -201,7 +179,7 @@ describe('RemoteStateQuery', () => {
 
 		it('call handlers on each state transition', async () => {
 			let queryFnCalled = 0;
-			const { counter, handler } = makeCountHandlers<string, Error>();
+			const { counter, handler } = fakeQueryControlHandler<string, Error>();
 
 			const cache = makeCache<string>();
 			const queryApi = new QueryControl({
@@ -269,7 +247,7 @@ describe('RemoteStateQuery', () => {
 
 		it('retry query on error', async () => {
 			let queryFnCalled = 0;
-			const { counter, handler } = makeCountHandlers<string, Error>();
+			const { counter, handler } = fakeQueryControlHandler<string, Error>();
 
 			const cache = makeCache<string>();
 			const queryApi = new QueryControl({
@@ -447,7 +425,7 @@ describe('RemoteStateQuery', () => {
 
 		it('retry query on error', async () => {
 			let queryFnCalled = 0;
-			const { counter, handler } = makeCountHandlers<string, Error>();
+			const { counter, handler } = fakeQueryControlHandler<string, Error>();
 			const cache = makeCache<string>();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
@@ -588,7 +566,7 @@ describe('RemoteStateQuery', () => {
 			const fresh = 50;
 
 			let queryFnCalled = 0;
-			const { counter, handler } = makeCountHandlers<string, Error>();
+			const { counter, handler } = fakeQueryControlHandler<string, Error>();
 			const cache = makeCache<string>();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
@@ -658,7 +636,7 @@ describe('RemoteStateQuery', () => {
 
 		it('retry query on error', async () => {
 			let queryFnCalled = 0;
-			const { counter, handler } = makeCountHandlers<string, Error>();
+			const { counter, handler } = fakeQueryControlHandler<string, Error>();
 			const cache = makeCache<string>();
 			const queryApi = new QueryControl({
 				cacheStore: cache,
