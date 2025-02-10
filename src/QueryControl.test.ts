@@ -1,11 +1,14 @@
 import { assert, describe, it } from 'vitest';
-import type { QueryState, QueryControlHandler } from '@/Type';
-import { QueryControl } from '@/QueryControl';
+import {
+	type QueryState,
+	type QueryControlHandler,
+	QueryControl,
+	waitUntil,
+	JitterExponentialBackoffTimer,
+	PubSub,
+	defaultKeyHashFn,
+} from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
-import { waitUntil } from '@/AsyncModule';
-import { JitterExponentialBackoffTimer } from '@/TimerModule';
-import { PubSub } from '@/PubSub';
-import { defaultKeyHashFn } from '@/Default';
 
 describe('RemoteState default keyHashFn', () => {
 	it('produce different keys for different input', () => {

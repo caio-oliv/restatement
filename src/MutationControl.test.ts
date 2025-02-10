@@ -1,8 +1,10 @@
 import { assert, describe, it } from 'vitest';
-import type { MutationControlHandler } from '@/Type';
-import { waitUntil } from '@/AsyncModule';
-import { MutationControl } from '@/MutationControl';
-import { JitterExponentialBackoffTimer } from '@/TimerModule';
+import {
+	type MutationControlHandler,
+	waitUntil,
+	MutationControl,
+	JitterExponentialBackoffTimer,
+} from '@/lib';
 
 function makeCountHandlers<T, E>() {
 	const counter = {

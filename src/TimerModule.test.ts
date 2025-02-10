@@ -1,5 +1,5 @@
 import { assert, describe, it } from 'vitest';
-import { JitterExponentialBackoffTimer } from '@/TimerModule';
+import { JitterExponentialBackoffTimer } from '@/lib';
 
 const base = 1_000; // 1 seconds
 const limit = 30_000; // 30 seconds
