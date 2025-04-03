@@ -7,8 +7,8 @@ import type {
 } from '@/Type';
 
 export const DEFAULT_RETRY = 3;
-export const DEFAULT_FRESH_TIME = 30 * 1000; // 30 seconds
-export const DEFAULT_STALE_TIME = 3 * 60 * 1000; // 3 minutes
+export const DEFAULT_FRESH_DURATION = 30 * 1000; // 30 seconds
+export const DEFAULT_TTL_DURATION = 3 * 60 * 1000; // 3 minutes
 export const DEFAULT_RETRY_DELAY = new JitterExponentialBackoffTimer(1000, 30 * 1000);
 
 /**

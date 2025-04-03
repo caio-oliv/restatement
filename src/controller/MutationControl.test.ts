@@ -1,32 +1,6 @@
 import { assert, describe, it } from 'vitest';
-import {
-	type MutationControlHandler,
-	waitUntil,
-	MutationControl,
-	JitterExponentialBackoffTimer,
-} from '@/lib';
-
-function makeCountHandlers<T, E>() {
-	const counter = {
-		stateCalled: 0,
-		errorCalled: 0,
-		dataCalled: 0,
-	};
-
-	const handler: MutationControlHandler<T, E> = {
-		stateFn: () => {
-			counter.stateCalled += 1;
-		},
-		errorFn: () => {
-			counter.errorCalled += 1;
-		},
-		dataFn: () => {
-			counter.dataCalled += 1;
-		},
-	};
-
-	return { handler, counter };
-}
+import { waitUntil, MutationControl, JitterExponentialBackoffTimer } from '@/lib';
+import { fakeMutationControlHandler } from '@/controller/Control.mock';
 
 describe('RemoteStateMutation', () => {
 	const sleepTime = 100;
@@ -35,7 +9,7 @@ describe('RemoteStateMutation', () => {
 	it('run mutation function in background', async () => {
 		let error = false;
 		const mutationCall: Array<{ id: string }> = [];
-		const { handler, counter } = makeCountHandlers();
+		const { handler, counter } = fakeMutationControlHandler();
 		const mutationApi = new MutationControl<{ id: string }, string, Error>({
 			mutationFn: async input => {
 				if (error) {
@@ -102,7 +76,7 @@ describe('RemoteStateMutation', () => {
 	it('run mutation async function', async () => {
 		let error = false;
 		const mutationCall: Array<{ id: string }> = [];
-		const { handler, counter } = makeCountHandlers();
+		const { handler, counter } = fakeMutationControlHandler();
 		const mutationApi = new MutationControl<{ id: string }, string, Error>({
 			mutationFn: async input => {
 				if (error) {
@@ -149,7 +123,7 @@ describe('RemoteStateMutation', () => {
 
 	it('retry mutation on error', async () => {
 		let mutationCalled = 0;
-		const { handler, counter } = makeCountHandlers();
+		const { handler, counter } = fakeMutationControlHandler();
 		const mutationApi = new MutationControl<string, string, Error>({
 			mutationFn: async input => {
 				mutationCalled += 1;
@@ -177,7 +151,7 @@ describe('RemoteStateMutation', () => {
 
 	it('retry async mutation on error', async () => {
 		let mutationCalled = 0;
-		const { handler, counter } = makeCountHandlers();
+		const { handler, counter } = fakeMutationControlHandler();
 		const mutationApi = new MutationControl<string, string, Error>({
 			mutationFn: async input => {
 				mutationCalled += 1;

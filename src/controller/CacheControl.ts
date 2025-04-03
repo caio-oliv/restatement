@@ -1,7 +1,7 @@
 import type { KeyHashFn, Millisecond, QueryState } from '@/Type';
 import type { CacheStore } from '@/Cache';
 import type { PubSub } from '@/PubSub';
-import { defaultKeyHashFn, DEFAULT_STALE_TIME } from '@/Default';
+import { defaultKeyHashFn, DEFAULT_TTL_DURATION } from '@/Default';
 import { blackhole } from '@/Internal';
 
 export interface CacheControlInput {
@@ -27,7 +27,7 @@ export class CacheControl {
 
 	public constructor({
 		keyHashFn = defaultKeyHashFn,
-		duration = DEFAULT_STALE_TIME,
+		duration = DEFAULT_TTL_DURATION,
 		cacheStore,
 		stateProvider,
 	}: CacheControlInput) {

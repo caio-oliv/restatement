@@ -7,3 +7,11 @@
 export function blackhole<T>(_: T): void {
 	// empty function
 }
+
+/**
+ * @description Function that returns a resolved promise with `null`.
+ * @returns null promise
+ */
+export function nullpromise(): Promise<null> {
+	return Promise.resolve(null);
+}

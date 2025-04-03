@@ -29,17 +29,23 @@ export interface QueryState<T, E> {
 	readonly status: FetchStatus;
 }
 
-export type QueryStateHandler<T, E> = (state: QueryState<T, E>) => void;
+export type QueryStateHandler<T, E> = (state: QueryState<T, E>) => Promise<void>;
 
-export type DataHandler<T> = (data: T) => void;
+export type DataHandler<T> = (data: T) => Promise<void>;
 
-export type ErrorHandler<E> = (error: E) => void;
+export type ErrorHandler<E> = (error: E) => Promise<void>;
 
-// TODO: support async handler functions
 export interface QueryControlHandler<T, E> {
 	stateFn?: QueryStateHandler<T, E>;
 	dataFn?: DataHandler<T>;
 	errorFn?: ErrorHandler<E>;
+}
+
+export type NextQueryState<T, E> = QueryState<T, E> | null;
+
+export interface QueryExecutorResult<T, E> {
+	state: QueryState<T, E>;
+	next(): Promise<NextQueryState<T, E>>;
 }
 
 export type MutationStatus = 'idle' | 'loading' | 'success' | 'error';
@@ -52,9 +58,8 @@ export interface MutationState<T, E> {
 
 export type MutationFn<I, T> = (input: I, signal: AbortSignal) => Promise<T>;
 
-export type MutationStateHandler<T, E> = (state: MutationState<T, E>) => void;
+export type MutationStateHandler<T, E> = (state: MutationState<T, E>) => Promise<void>;
 
-// TODO: support async handler functions
 export interface MutationControlHandler<T, E> {
 	stateFn?: MutationStateHandler<T, E>;
 	dataFn?: DataHandler<T>;

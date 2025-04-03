@@ -386,8 +386,8 @@ describe('RemoteStateQuery', () => {
 				},
 				retry: 0,
 				retryDelay: retryTimer.delay,
-				freshDuration: sleepTime,
-				staleDuration: sleepTime * 3,
+				fresh: sleepTime,
+				ttl: sleepTime * 3,
 			});
 
 			assert.strictEqual(await cache.get(defaultKeyHashFn('unique-key')), undefined);
@@ -438,8 +438,8 @@ describe('RemoteStateQuery', () => {
 				},
 				retry: 2,
 				retryDelay: retryTimer.delay,
-				freshDuration: sleepTime,
-				staleDuration: sleepTime * 3,
+				fresh: sleepTime,
+				ttl: sleepTime * 3,
 				handler,
 			});
 
@@ -577,8 +577,8 @@ describe('RemoteStateQuery', () => {
 				},
 				retry: 0,
 				retryDelay: retryTimer.delay,
-				freshDuration: fresh,
-				staleDuration: sleep * 3,
+				fresh: fresh,
+				ttl: sleep * 3,
 				handler,
 			});
 
@@ -649,8 +649,8 @@ describe('RemoteStateQuery', () => {
 				},
 				retry: 2,
 				retryDelay: retryTimer.delay,
-				freshDuration: sleepTime,
-				staleDuration: sleepTime * 3,
+				fresh: sleepTime,
+				ttl: sleepTime * 3,
 				handler,
 			});
 
