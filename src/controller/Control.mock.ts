@@ -1,72 +1,55 @@
+import { vi, type Mock } from 'vitest';
 import { waitUntil } from '@/AsyncModule';
-import type { MutationControlHandler, QueryControlHandler } from '@/Type';
+import type {
+	DataHandler,
+	ErrorHandler,
+	MutationControlHandler,
+	MutationStateHandler,
+	QueryControlHandler,
+	QueryStateHandler,
+} from '@/Type';
 
-export interface FakeControlHandlerCounter {
-	stateCalled: number;
-	errorCalled: number;
-	dataCalled: number;
+/**
+ * Make a empty promise
+ */
+async function emptypromise(): Promise<void> {
+	/* no-op */
 }
 
-export interface FakeQueryControlHandlerReturn<T, E> {
-	handler: QueryControlHandler<T, E>;
-	counter: FakeControlHandlerCounter;
+export interface MockQueryControlHandler<T, E> extends QueryControlHandler<T, E> {
+	stateFn: Mock<QueryStateHandler<T, E>>;
+	dataFn: Mock<DataHandler<T>>;
+	errorFn: Mock<ErrorHandler<E>>;
 }
 
 /**
- * @description Query control handler mocks
- * @returns handlers and execution counters
+ * @description Mock the {@link QueryControlHandler} functions
+ * @returns mock of `QueryControlHandler`
  */
-export function fakeQueryControlHandler<T, E>(): FakeQueryControlHandlerReturn<T, E> {
-	const counter: FakeControlHandlerCounter = {
-		stateCalled: 0,
-		errorCalled: 0,
-		dataCalled: 0,
+export function mockQueryControlHandler<T, E = unknown>(): MockQueryControlHandler<T, E> {
+	return {
+		dataFn: vi.fn(emptypromise),
+		errorFn: vi.fn(emptypromise),
+		stateFn: vi.fn(emptypromise),
 	};
-
-	const handler: QueryControlHandler<T, E> = {
-		stateFn: async () => {
-			counter.stateCalled += 1;
-		},
-		errorFn: async () => {
-			counter.errorCalled += 1;
-		},
-		dataFn: async () => {
-			counter.dataCalled += 1;
-		},
-	};
-
-	return { handler, counter };
 }
 
-export interface FakeMutationControlHandlerReturn<T, E> {
-	handler: MutationControlHandler<T, E>;
-	counter: FakeControlHandlerCounter;
+export interface MockMutationControlHandler<T, E> extends MutationControlHandler<T, E> {
+	stateFn: Mock<MutationStateHandler<T, E>>;
+	dataFn: Mock<DataHandler<T>>;
+	errorFn: Mock<ErrorHandler<E>>;
 }
 
 /**
- * @description Mutation control handler mocks
- * @returns handlers and execution counters
+ * @description Mock the {@link MutationControlHandler} functions
+ * @returns mock of `MutationControlHandler`
  */
-export function fakeMutationControlHandler<T, E>(): FakeMutationControlHandlerReturn<T, E> {
-	const counter: FakeControlHandlerCounter = {
-		stateCalled: 0,
-		errorCalled: 0,
-		dataCalled: 0,
+export function mockMutationControlHandler<T, E = unknown>(): MockMutationControlHandler<T, E> {
+	return {
+		dataFn: vi.fn(emptypromise),
+		errorFn: vi.fn(emptypromise),
+		stateFn: vi.fn(emptypromise),
 	};
-
-	const handler: MutationControlHandler<T, E> = {
-		stateFn: async () => {
-			counter.stateCalled += 1;
-		},
-		errorFn: async () => {
-			counter.errorCalled += 1;
-		},
-		dataFn: async () => {
-			counter.dataCalled += 1;
-		},
-	};
-
-	return { handler, counter };
 }
 
 /**
@@ -80,11 +63,11 @@ export function immediateRetryDelay(): number {
 export type QuerySharpFn = (key: string) => Promise<string>;
 
 /**
- * @description Query function that resturns data if a hash (pound, sharp) symbol ('#') is found.
+ * @description Query function for tests that resturns data if a hash (pound, sharp) symbol ('#') is found.
  * @param key - key string
  * @returns promise with data result
  */
-export async function querySharpFn(key: string): Promise<string> {
+export async function testQuery(key: string): Promise<string> {
 	const index = key.indexOf('#');
 	if (index === -1) throw new Error('invalid_key');
 
@@ -92,13 +75,13 @@ export async function querySharpFn(key: string): Promise<string> {
 }
 
 /**
- * @description Make a delayed query function
+ * @description Make a delayed test query function
  * @param delay - wait time in milliseconds
  * @returns Delayed `querySharpFn`
  */
-export function makeDelayedQuerySharpFn(delay: number): QuerySharpFn {
+export function makeDelayedTestQuery(delay: number): QuerySharpFn {
 	return async (key: string): Promise<string> => {
 		await waitUntil(delay);
-		return await querySharpFn(key);
+		return await testQuery(key);
 	};
 }

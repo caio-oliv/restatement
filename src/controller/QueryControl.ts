@@ -24,7 +24,7 @@ import {
 } from '@/Default';
 import { blackhole, nullpromise } from '@/Internal';
 
-export interface QueryControlInput<K, T, E> {
+export interface QueryControlInput<K, T, E = unknown> {
 	/**
 	 * Cache store.
 	 */
@@ -102,7 +102,7 @@ function boxNextQueryFn<T, E>(
 	return () => query;
 }
 
-export class QueryControl<K, T, E> {
+export class QueryControl<K, T, E = unknown> {
 	public readonly keyHashFn: KeyHashFn<K>;
 	public readonly retry: number;
 	public readonly retryDelay: RetryDelay<E>;
@@ -221,7 +221,7 @@ export class QueryControl<K, T, E> {
 			error: null,
 		};
 		this.state = state;
-		this.handler.stateFn?.(this.state).catch(blackhole);
+		this.handler.stateFn?.(this.state)?.catch(blackhole);
 		return await this.runQuery(key, ctl);
 	}
 
@@ -295,12 +295,12 @@ export class QueryControl<K, T, E> {
 	private updateState(_: string, state: QueryState<T, E>): void {
 		this.state = state;
 		if (this.state.data !== null) {
-			this.handler.dataFn?.(this.state.data).catch(blackhole);
+			this.handler.dataFn?.(this.state.data)?.catch(blackhole);
 		}
 		if (this.state.error !== null) {
-			this.handler.errorFn?.(this.state.error).catch(blackhole);
+			this.handler.errorFn?.(this.state.error)?.catch(blackhole);
 		}
-		this.handler.stateFn?.(this.state).catch(blackhole);
+		this.handler.stateFn?.(this.state)?.catch(blackhole);
 	}
 
 	private readonly cacheStore: CacheStore<string, T>;

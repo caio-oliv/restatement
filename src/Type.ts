@@ -23,11 +23,42 @@ export type KeyHashFn<K> = (key: K) => string;
 
 export type KeepCacheOnError<E> = (err: E) => boolean;
 
-export interface QueryState<T, E> {
-	readonly data: T | null;
-	readonly error: E | null;
-	readonly status: FetchStatus;
+export interface IdleQueryState {
+	readonly data: null;
+	readonly error: null;
+	readonly status: 'idle';
 }
+
+export interface LoadingQueryState<T> {
+	readonly data: T | null;
+	readonly error: null;
+	readonly status: 'loading';
+}
+
+export interface StaleQueryState<T> {
+	readonly data: T;
+	readonly error: null;
+	readonly status: 'stale';
+}
+
+export interface SuccessQueryState<T> {
+	readonly data: T;
+	readonly error: null;
+	readonly status: 'success';
+}
+
+export interface ErrorQueryState<E> {
+	readonly data: null;
+	readonly error: E;
+	readonly status: 'error';
+}
+
+export type QueryState<T, E> =
+	| IdleQueryState
+	| LoadingQueryState<T>
+	| StaleQueryState<T>
+	| SuccessQueryState<T>
+	| ErrorQueryState<E>;
 
 export type QueryStateHandler<T, E> = (state: QueryState<T, E>) => Promise<void>;
 
