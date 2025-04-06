@@ -61,9 +61,17 @@ export interface QueryControlInput<K, T, E = unknown> {
 	/**
 	 * @description Duration in which cache entries will be fresh.
 	 *
+	 * ## Pro tip
+	 *
+	 * If all of the cache results **must be stale**, set the fresh
+	 * option to zero.
+	 *
+	 * If all of the cache results **must be fresh**, set the fresh
+	 * option equal to the cache {@link ttl}.
+	 *
 	 * ## Invariant
 	 *
-	 * Must be less than the cache {@link ttl}.
+	 * Must be less than or equal the cache {@link ttl}.
 	 * @default 30 * 1000; // 30 seconds
 	 */
 	fresh?: Millisecond;
@@ -72,7 +80,7 @@ export interface QueryControlInput<K, T, E = unknown> {
 	 *
 	 * ## Invariant
 	 *
-	 * Must be greater than {@link fresh} cache duration.
+	 * Must be greater than or equal {@link fresh} cache duration.
 	 * @default 3 * 60 * 1000 // 3 minutes
 	 */
 	ttl?: Millisecond;
