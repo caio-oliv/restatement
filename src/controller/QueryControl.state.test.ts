@@ -8,7 +8,7 @@ describe('QueryControl state transition / no-cache query', () => {
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -21,7 +21,7 @@ describe('QueryControl state transition / no-cache query', () => {
 			status: 'idle',
 		});
 
-		const result = await queryApi.execute('key#1', 'no-cache');
+		const result = await queryApi.execute(['key#1'], 'no-cache');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -44,7 +44,7 @@ describe('QueryControl state transition / no-cache query', () => {
 	it('start the query state as "idle" and change to "error" after failed execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -57,7 +57,7 @@ describe('QueryControl state transition / no-cache query', () => {
 			status: 'idle',
 		});
 
-		const result = await queryApi.execute('nokey', 'no-cache');
+		const result = await queryApi.execute(['nokey'], 'no-cache');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -80,7 +80,7 @@ describe('QueryControl state transition / no-cache query', () => {
 	it('start the query state as "idle" and change to "loading" after start of execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -93,7 +93,7 @@ describe('QueryControl state transition / no-cache query', () => {
 			status: 'idle',
 		});
 
-		const resultPromise = queryApi.execute('key#1', 'no-cache');
+		const resultPromise = queryApi.execute(['key#1'], 'no-cache');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -126,7 +126,7 @@ describe('QueryControl state transition / no-cache query', () => {
 	it('start the query state as "success" and change to "loading" and to "success" after successful execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -139,7 +139,7 @@ describe('QueryControl state transition / no-cache query', () => {
 			status: 'idle',
 		});
 
-		const resutl1 = await queryApi.execute('key#1', 'no-cache');
+		const resutl1 = await queryApi.execute(['key#1'], 'no-cache');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -159,7 +159,7 @@ describe('QueryControl state transition / no-cache query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		const result2Promise = queryApi.execute('key#2', 'no-cache');
+		const result2Promise = queryApi.execute(['key#2'], 'no-cache');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -190,7 +190,7 @@ describe('QueryControl state transition / no-cache query', () => {
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -203,7 +203,7 @@ describe('QueryControl state transition / no-cache query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('key#1', 'no-cache');
+		const result1 = await queryApi.execute(['key#1'], 'no-cache');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -223,7 +223,7 @@ describe('QueryControl state transition / no-cache query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		const result2Promise = queryApi.execute('invalid', 'no-cache');
+		const result2Promise = queryApi.execute(['invalid'], 'no-cache');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -254,7 +254,7 @@ describe('QueryControl state transition / no-cache query', () => {
 	it('start the query state as "error" and change to "loading" and to "success" after successful execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -267,7 +267,7 @@ describe('QueryControl state transition / no-cache query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('invalid', 'no-cache');
+		const result1 = await queryApi.execute(['invalid'], 'no-cache');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -287,7 +287,7 @@ describe('QueryControl state transition / no-cache query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		const result2Promise = queryApi.execute('key#2', 'no-cache');
+		const result2Promise = queryApi.execute(['key#2'], 'no-cache');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -318,7 +318,7 @@ describe('QueryControl state transition / no-cache query', () => {
 	it('start the query state as "error" and change to "loading" and to "error" after failed execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -331,7 +331,7 @@ describe('QueryControl state transition / no-cache query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('invalid_1', 'no-cache');
+		const result1 = await queryApi.execute(['invalid_1'], 'no-cache');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -351,7 +351,7 @@ describe('QueryControl state transition / no-cache query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		const result2Promise = queryApi.execute('invalid_2', 'no-cache');
+		const result2Promise = queryApi.execute(['invalid_2'], 'no-cache');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -386,7 +386,7 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -399,7 +399,7 @@ describe('QueryControl state transition / fresh query', () => {
 			status: 'idle',
 		});
 
-		const result = await queryApi.execute('key#1', 'fresh');
+		const result = await queryApi.execute(['key#1'], 'fresh');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -422,7 +422,7 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "idle" and change to "success" after result from cache', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -435,9 +435,9 @@ describe('QueryControl state transition / fresh query', () => {
 			status: 'idle',
 		});
 
-		await cacheStore.set(defaultKeyHashFn('key#1'), 'data#1', 30_000);
+		await cacheStore.set(defaultKeyHashFn(['key#1']), 'data#1', 30_000);
 
-		const result = await queryApi.execute('key#1', 'fresh');
+		const result = await queryApi.execute(['key#1'], 'fresh');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -460,7 +460,7 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "idle" and change to "error" after failed execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -473,7 +473,7 @@ describe('QueryControl state transition / fresh query', () => {
 			status: 'idle',
 		});
 
-		const result = await queryApi.execute('nokey', 'fresh');
+		const result = await queryApi.execute(['nokey'], 'fresh');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -496,7 +496,7 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "idle" and change to "loading" after start of execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -511,7 +511,7 @@ describe('QueryControl state transition / fresh query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		const resultPromise = queryApi.execute('key#1', 'fresh');
+		const resultPromise = queryApi.execute(['key#1'], 'fresh');
 
 		await waitUntil(50);
 
@@ -546,7 +546,7 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "success" and change to "loading" and to "success" after successful execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -560,7 +560,7 @@ describe('QueryControl state transition / fresh query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('key#1', 'fresh');
+		const result1 = await queryApi.execute(['key#1'], 'fresh');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -582,7 +582,7 @@ describe('QueryControl state transition / fresh query', () => {
 
 		await waitUntil(70);
 
-		const result2Promise = queryApi.execute('key#1', 'fresh');
+		const result2Promise = queryApi.execute(['key#1'], 'fresh');
 
 		await waitUntil(50);
 
@@ -617,7 +617,7 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "success" and change to "success" after result from cache', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -630,7 +630,7 @@ describe('QueryControl state transition / fresh query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('key#1', 'fresh');
+		const result1 = await queryApi.execute(['key#1'], 'fresh');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -648,7 +648,7 @@ describe('QueryControl state transition / fresh query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		const result2Promise = queryApi.execute('key#1', 'fresh');
+		const result2Promise = queryApi.execute(['key#1'], 'fresh');
 
 		await waitUntil(50);
 
@@ -675,7 +675,7 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -688,7 +688,7 @@ describe('QueryControl state transition / fresh query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('key#1', 'fresh');
+		const result1 = await queryApi.execute(['key#1'], 'fresh');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -708,7 +708,7 @@ describe('QueryControl state transition / fresh query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		const result2Promise = queryApi.execute('invalid_key', 'fresh');
+		const result2Promise = queryApi.execute(['invalid_key'], 'fresh');
 
 		await waitUntil(50);
 
@@ -743,7 +743,7 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "error" and change to "loading" and to "success" after successful execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -756,7 +756,7 @@ describe('QueryControl state transition / fresh query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('invalid', 'fresh');
+		const result1 = await queryApi.execute(['invalid'], 'fresh');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -776,7 +776,7 @@ describe('QueryControl state transition / fresh query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		const result2Promise = queryApi.execute('key#2', 'fresh');
+		const result2Promise = queryApi.execute(['key#2'], 'fresh');
 
 		await waitUntil(50);
 
@@ -811,7 +811,7 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "error" and change to "success" after result from cache', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -824,7 +824,7 @@ describe('QueryControl state transition / fresh query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('invalid', 'fresh');
+		const result1 = await queryApi.execute(['invalid'], 'fresh');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -844,9 +844,9 @@ describe('QueryControl state transition / fresh query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		await cacheStore.set(defaultKeyHashFn('key#2'), 'data#2', 30_000);
+		await cacheStore.set(defaultKeyHashFn(['key#2']), 'data#2', 30_000);
 
-		const result2Promise = queryApi.execute('key#2', 'fresh');
+		const result2Promise = queryApi.execute(['key#2'], 'fresh');
 
 		await waitUntil(50);
 
@@ -873,7 +873,7 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "error" and change to "loading" and to "error" after failed execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -886,7 +886,7 @@ describe('QueryControl state transition / fresh query', () => {
 			status: 'idle',
 		});
 
-		const resutl1 = await queryApi.execute('invalid_1', 'fresh');
+		const resutl1 = await queryApi.execute(['invalid_1'], 'fresh');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -906,7 +906,7 @@ describe('QueryControl state transition / fresh query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		const result2Promise = queryApi.execute('invalid_2', 'fresh');
+		const result2Promise = queryApi.execute(['invalid_2'], 'fresh');
 
 		await waitUntil(50);
 
@@ -943,7 +943,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -956,7 +956,7 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		const result = await queryApi.execute('key#1', 'stale');
+		const result = await queryApi.execute(['key#1'], 'stale');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -979,7 +979,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "success" after result from cache', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -992,9 +992,9 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		cacheStore.set(defaultKeyHashFn('key#1'), 'data#1', 30_000);
+		cacheStore.set(defaultKeyHashFn(['key#1']), 'data#1', 30_000);
 
-		const result = await queryApi.execute('key#1', 'stale');
+		const result = await queryApi.execute(['key#1'], 'stale');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -1017,7 +1017,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "stale" and to "success" after background query', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -1032,13 +1032,13 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		await cacheStore.set(defaultKeyHashFn('key#1'), 'stale_data#1', 200);
+		await cacheStore.set(defaultKeyHashFn(['key#1']), 'stale_data#1', 200);
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(50));
 
 		await waitUntil(60);
 
-		const resultPromise = queryApi.execute('key#1', 'stale');
+		const resultPromise = queryApi.execute(['key#1'], 'stale');
 
 		await waitUntil(10);
 
@@ -1079,7 +1079,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "stale" and to "error" after background query', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -1094,13 +1094,13 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		await cacheStore.set(defaultKeyHashFn('invalid_1'), 'stale_data#1', 200);
+		await cacheStore.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', 200);
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(50));
 
 		await waitUntil(60);
 
-		const resultPromise = queryApi.execute('invalid_1', 'stale');
+		const resultPromise = queryApi.execute(['invalid_1'], 'stale');
 
 		await waitUntil(10);
 
@@ -1141,7 +1141,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "error" after failed execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -1154,7 +1154,7 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		const result = await queryApi.execute('nokey', 'stale');
+		const result = await queryApi.execute(['nokey'], 'stale');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1177,7 +1177,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "loading" after start of execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -1192,7 +1192,7 @@ describe('QueryControl state transition / stale query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		const resultPromise = queryApi.execute('key#1', 'stale');
+		const resultPromise = queryApi.execute(['key#1'], 'stale');
 
 		await waitUntil(50);
 
@@ -1227,7 +1227,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "success" and change to "loading" and to "success" after successful execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -1240,7 +1240,7 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('key#1', 'stale');
+		const result1 = await queryApi.execute(['key#1'], 'stale');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -1260,9 +1260,9 @@ describe('QueryControl state transition / stale query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		await cacheStore.delete(defaultKeyHashFn('key#1'));
+		await cacheStore.delete(defaultKeyHashFn(['key#1']));
 
-		const result2Promise = queryApi.execute('key#1', 'stale');
+		const result2Promise = queryApi.execute(['key#1'], 'stale');
 
 		await waitUntil(50);
 
@@ -1297,7 +1297,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "success" and change to "success" after result from cache', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -1310,7 +1310,7 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('key#1', 'stale');
+		const result1 = await queryApi.execute(['key#1'], 'stale');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -1328,7 +1328,7 @@ describe('QueryControl state transition / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		const result2Promise = queryApi.execute('key#1', 'stale');
+		const result2Promise = queryApi.execute(['key#1'], 'stale');
 
 		await waitUntil(50);
 
@@ -1355,7 +1355,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "stale" and to "success" after background query', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -1370,7 +1370,7 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('key#1', 'stale');
+		const result1 = await queryApi.execute(['key#1'], 'stale');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -1388,13 +1388,13 @@ describe('QueryControl state transition / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn('key#1'), 'stale_data#1', 200);
+		await cacheStore.set(defaultKeyHashFn(['key#1']), 'stale_data#1', 200);
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(50));
 
 		await waitUntil(60);
 
-		const result2Promise = queryApi.execute('key#1', 'stale');
+		const result2Promise = queryApi.execute(['key#1'], 'stale');
 
 		await waitUntil(10);
 
@@ -1435,7 +1435,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "stale" and to "error" after background query', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -1450,7 +1450,7 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('key#1', 'stale');
+		const result1 = await queryApi.execute(['key#1'], 'stale');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -1468,13 +1468,13 @@ describe('QueryControl state transition / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn('invalid_1'), 'stale_data#1', 200);
+		await cacheStore.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', 200);
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(50));
 
 		await waitUntil(60);
 
-		const result2Promise = queryApi.execute('invalid_1', 'stale');
+		const result2Promise = queryApi.execute(['invalid_1'], 'stale');
 
 		await waitUntil(10);
 
@@ -1515,7 +1515,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -1528,7 +1528,7 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('key#1', 'stale');
+		const result1 = await queryApi.execute(['key#1'], 'stale');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -1548,9 +1548,9 @@ describe('QueryControl state transition / stale query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		await cacheStore.delete(defaultKeyHashFn('key#1'));
+		await cacheStore.delete(defaultKeyHashFn(['key#1']));
 
-		const result2Promise = queryApi.execute('invalid_key', 'stale');
+		const result2Promise = queryApi.execute(['invalid_key'], 'stale');
 
 		await waitUntil(50);
 
@@ -1585,7 +1585,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "error" and change to "loading" and to "success" after successful execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -1598,7 +1598,7 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('invalid_1', 'stale');
+		const result1 = await queryApi.execute(['invalid_1'], 'stale');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1618,7 +1618,7 @@ describe('QueryControl state transition / stale query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		const result2Promise = queryApi.execute('key#1', 'stale');
+		const result2Promise = queryApi.execute(['key#1'], 'stale');
 
 		await waitUntil(50);
 
@@ -1653,7 +1653,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "error" and change to "loading" and to "success" after result from cache', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -1666,7 +1666,7 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('invalid_1', 'stale');
+		const result1 = await queryApi.execute(['invalid_1'], 'stale');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1686,9 +1686,9 @@ describe('QueryControl state transition / stale query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		await cacheStore.set(defaultKeyHashFn('key#1'), 'data#1', 10_000);
+		await cacheStore.set(defaultKeyHashFn(['key#1']), 'data#1', 10_000);
 
-		const result2Promise = queryApi.execute('key#1', 'stale');
+		const result2Promise = queryApi.execute(['key#1'], 'stale');
 
 		await waitUntil(70);
 
@@ -1715,7 +1715,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "error" and change to "stale" and to "success" after background query', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -1732,7 +1732,7 @@ describe('QueryControl state transition / stale query', () => {
 
 		queryFn.mockRejectedValueOnce(new Error('invalid_key'));
 
-		const result1 = await queryApi.execute('key#1', 'stale');
+		const result1 = await queryApi.execute(['key#1'], 'stale');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1750,13 +1750,13 @@ describe('QueryControl state transition / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn('key#1'), 'stale_data#1', 200);
+		await cacheStore.set(defaultKeyHashFn(['key#1']), 'stale_data#1', 200);
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(50));
 
 		await waitUntil(60);
 
-		const result2Promise = queryApi.execute('key#1', 'stale');
+		const result2Promise = queryApi.execute(['key#1'], 'stale');
 
 		await waitUntil(10);
 
@@ -1797,7 +1797,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "error" and change to "stale" and to "error" after background query', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -1812,7 +1812,7 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('invalid_1', 'stale');
+		const result1 = await queryApi.execute(['invalid_1'], 'stale');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1830,13 +1830,13 @@ describe('QueryControl state transition / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn('invalid_1'), 'stale_data#1', 200);
+		await cacheStore.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', 200);
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(50));
 
 		await waitUntil(60);
 
-		const result2Promise = queryApi.execute('invalid_1', 'stale');
+		const result2Promise = queryApi.execute(['invalid_1'], 'stale');
 
 		await waitUntil(10);
 
@@ -1877,7 +1877,7 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
 		const cacheStore = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
-		const queryApi = new QueryControl<string, string, Error>({
+		const queryApi = new QueryControl<[string], string, Error>({
 			cacheStore,
 			queryFn,
 			retry: 0,
@@ -1890,7 +1890,7 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		const result1 = await queryApi.execute('invalid_1', 'stale');
+		const result1 = await queryApi.execute(['invalid_1'], 'stale');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1910,7 +1910,7 @@ describe('QueryControl state transition / stale query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		const result2Promise = queryApi.execute('invalid_1', 'stale');
+		const result2Promise = queryApi.execute(['invalid_1'], 'stale');
 
 		await waitUntil(50);
 

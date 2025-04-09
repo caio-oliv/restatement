@@ -20,7 +20,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(0);
 
-		await queryApi.execute('key#1', 'no-cache');
+		await queryApi.execute(['key#1'], 'no-cache');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -58,7 +58,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(0);
 
-		await queryApi.execute('invalid_k', 'no-cache');
+		await queryApi.execute(['invalid_k'], 'no-cache');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -92,7 +92,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			handler,
 		});
 
-		await queryApi.execute('key#1', 'no-cache');
+		await queryApi.execute(['key#1'], 'no-cache');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -113,7 +113,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await queryApi.execute('key#1', 'no-cache');
+		await queryApi.execute(['key#1'], 'no-cache');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -147,7 +147,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			handler,
 		});
 
-		await queryApi.execute('key#1', 'no-cache');
+		await queryApi.execute(['key#1'], 'no-cache');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -168,7 +168,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await queryApi.execute('invalid_1', 'no-cache');
+		await queryApi.execute(['invalid_1'], 'no-cache');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -202,7 +202,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			handler,
 		});
 
-		await queryApi.execute('invalid_1', 'no-cache');
+		await queryApi.execute(['invalid_1'], 'no-cache');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -223,7 +223,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await queryApi.execute('key#1', 'no-cache');
+		await queryApi.execute(['key#1'], 'no-cache');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -257,7 +257,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			handler,
 		});
 
-		await queryApi.execute('invalid_1', 'no-cache');
+		await queryApi.execute(['invalid_1'], 'no-cache');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -278,7 +278,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await queryApi.execute('invalid_2', 'no-cache');
+		await queryApi.execute(['invalid_2'], 'no-cache');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(2);
@@ -318,7 +318,7 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(0);
 
-		await queryApi.execute('key#1', 'fresh');
+		await queryApi.execute(['key#1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -356,9 +356,9 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(0);
 
-		await cacheStore.set(defaultKeyHashFn('key#1'), 'data#1', DEFAULT_TTL_DURATION);
+		await cacheStore.set(defaultKeyHashFn(['key#1']), 'data#1', DEFAULT_TTL_DURATION);
 
-		await queryApi.execute('key#1', 'fresh');
+		await queryApi.execute(['key#1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -391,7 +391,7 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(0);
 
-		await queryApi.execute('invalid_1', 'fresh');
+		await queryApi.execute(['invalid_1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -425,7 +425,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			handler,
 		});
 
-		await queryApi.execute('key#1', 'fresh');
+		await queryApi.execute(['key#1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -446,9 +446,9 @@ describe('QueryControl handler execution / fresh query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.delete(defaultKeyHashFn('key#1'));
+		await cacheStore.delete(defaultKeyHashFn(['key#1']));
 
-		await queryApi.execute('key#1', 'fresh');
+		await queryApi.execute(['key#1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -482,7 +482,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			handler,
 		});
 
-		await queryApi.execute('key#1', 'fresh');
+		await queryApi.execute(['key#1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -503,7 +503,7 @@ describe('QueryControl handler execution / fresh query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await queryApi.execute('key#1', 'fresh');
+		await queryApi.execute(['key#1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -532,7 +532,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			handler,
 		});
 
-		await queryApi.execute('key#1', 'fresh');
+		await queryApi.execute(['key#1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -553,7 +553,7 @@ describe('QueryControl handler execution / fresh query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await queryApi.execute('invalid_1', 'fresh');
+		await queryApi.execute(['invalid_1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -587,7 +587,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			handler,
 		});
 
-		await queryApi.execute('invalid_1', 'fresh');
+		await queryApi.execute(['invalid_1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -608,7 +608,7 @@ describe('QueryControl handler execution / fresh query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await queryApi.execute('key#1', 'fresh');
+		await queryApi.execute(['key#1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -642,7 +642,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			handler,
 		});
 
-		await queryApi.execute('invalid_1', 'fresh');
+		await queryApi.execute(['invalid_1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -663,9 +663,9 @@ describe('QueryControl handler execution / fresh query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn('key#1'), 'data#1', DEFAULT_TTL_DURATION);
+		await cacheStore.set(defaultKeyHashFn(['key#1']), 'data#1', DEFAULT_TTL_DURATION);
 
-		await queryApi.execute('key#1', 'fresh');
+		await queryApi.execute(['key#1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -694,7 +694,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			handler,
 		});
 
-		await queryApi.execute('invalid_1', 'fresh');
+		await queryApi.execute(['invalid_1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -715,7 +715,7 @@ describe('QueryControl handler execution / fresh query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await queryApi.execute('invalid_2', 'fresh');
+		await queryApi.execute(['invalid_2'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(2);
@@ -755,7 +755,7 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(0);
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -793,9 +793,9 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(0);
 
-		await cacheStore.set(defaultKeyHashFn('key#1'), 'data#1', DEFAULT_TTL_DURATION);
+		await cacheStore.set(defaultKeyHashFn(['key#1']), 'data#1', DEFAULT_TTL_DURATION);
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -829,7 +829,7 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(0);
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -850,11 +850,11 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn('key#1'), 'stale_data#1', DEFAULT_TTL_DURATION);
+		await cacheStore.set(defaultKeyHashFn(['key#1']), 'stale_data#1', DEFAULT_TTL_DURATION);
 
 		await waitUntil(70);
 
-		const result = await queryApi.execute('key#1', 'stale');
+		const result = await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -900,7 +900,7 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(0);
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -921,11 +921,11 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn('invalid_1'), 'stale_data#1', DEFAULT_TTL_DURATION);
+		await cacheStore.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', DEFAULT_TTL_DURATION);
 
 		await waitUntil(70);
 
-		const result = await queryApi.execute('invalid_1', 'stale');
+		const result = await queryApi.execute(['invalid_1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -970,7 +970,7 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(0);
 
-		await queryApi.execute('invalid_1', 'stale');
+		await queryApi.execute(['invalid_1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -1004,7 +1004,7 @@ describe('QueryControl handler execution / stale query', () => {
 			handler,
 		});
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1025,9 +1025,9 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.delete(defaultKeyHashFn('key#1'));
+		await cacheStore.delete(defaultKeyHashFn(['key#1']));
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1061,7 +1061,7 @@ describe('QueryControl handler execution / stale query', () => {
 			handler,
 		});
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1082,7 +1082,7 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1112,7 +1112,7 @@ describe('QueryControl handler execution / stale query', () => {
 			fresh: 50,
 		});
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1133,11 +1133,11 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn('key#1'), 'stale_data#1', DEFAULT_TTL_DURATION);
+		await cacheStore.set(defaultKeyHashFn(['key#1']), 'stale_data#1', DEFAULT_TTL_DURATION);
 
 		await waitUntil(70);
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1182,7 +1182,7 @@ describe('QueryControl handler execution / stale query', () => {
 			fresh: 50,
 		});
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1203,11 +1203,11 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn('invalid_1'), 'stale_data#1', DEFAULT_TTL_DURATION);
+		await cacheStore.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', DEFAULT_TTL_DURATION);
 
 		await waitUntil(70);
 
-		await queryApi.execute('invalid_1', 'stale');
+		await queryApi.execute(['invalid_1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1251,7 +1251,7 @@ describe('QueryControl handler execution / stale query', () => {
 			handler,
 		});
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1272,7 +1272,7 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await queryApi.execute('invalid_1', 'stale');
+		await queryApi.execute(['invalid_1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -1306,7 +1306,7 @@ describe('QueryControl handler execution / stale query', () => {
 			handler,
 		});
 
-		await queryApi.execute('invalid_1', 'stale');
+		await queryApi.execute(['invalid_1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -1327,7 +1327,7 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -1361,7 +1361,7 @@ describe('QueryControl handler execution / stale query', () => {
 			handler,
 		});
 
-		await queryApi.execute('invalid_1', 'stale');
+		await queryApi.execute(['invalid_1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -1382,9 +1382,9 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn('key#1'), 'data#1', DEFAULT_TTL_DURATION);
+		await cacheStore.set(defaultKeyHashFn(['key#1']), 'data#1', DEFAULT_TTL_DURATION);
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -1414,7 +1414,7 @@ describe('QueryControl handler execution / stale query', () => {
 			fresh: 50,
 		});
 
-		await queryApi.execute('invalid_1', 'stale');
+		await queryApi.execute(['invalid_1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -1435,11 +1435,11 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn('key#1'), 'stale_data#1', DEFAULT_TTL_DURATION);
+		await cacheStore.set(defaultKeyHashFn(['key#1']), 'stale_data#1', DEFAULT_TTL_DURATION);
 
 		await waitUntil(70);
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -1484,7 +1484,7 @@ describe('QueryControl handler execution / stale query', () => {
 			fresh: 50,
 		});
 
-		await queryApi.execute('invalid_1', 'stale');
+		await queryApi.execute(['invalid_1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -1505,11 +1505,11 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn('invalid_1'), 'stale_data#1', DEFAULT_TTL_DURATION);
+		await cacheStore.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', DEFAULT_TTL_DURATION);
 
 		await waitUntil(70);
 
-		await queryApi.execute('invalid_1', 'stale');
+		await queryApi.execute(['invalid_1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -1554,7 +1554,7 @@ describe('QueryControl handler execution / stale query', () => {
 			fresh: 50,
 		});
 
-		await queryApi.execute('invalid_1', 'stale');
+		await queryApi.execute(['invalid_1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -1575,7 +1575,7 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await queryApi.execute('invalid_1', 'stale');
+		await queryApi.execute(['invalid_1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(2);
@@ -1615,7 +1615,7 @@ describe('QueryControl handler exception handling', () => {
 		handler.errorFn.mockRejectedValue(new Error('broken_error_handler'));
 		handler.stateFn.mockRejectedValue(new Error('broken_state_handler'));
 
-		await queryApi.execute('key#1', 'no-cache');
+		await queryApi.execute(['key#1'], 'no-cache');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1636,7 +1636,7 @@ describe('QueryControl handler exception handling', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await queryApi.execute('invalid', 'no-cache');
+		await queryApi.execute(['invalid'], 'no-cache');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -1674,7 +1674,7 @@ describe('QueryControl handler exception handling', () => {
 		handler.errorFn.mockRejectedValue(new Error('broken_error_handler'));
 		handler.stateFn.mockRejectedValue(new Error('broken_state_handler'));
 
-		await queryApi.execute('key#1', 'fresh');
+		await queryApi.execute(['key#1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1695,7 +1695,7 @@ describe('QueryControl handler exception handling', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await queryApi.execute('invalid', 'fresh');
+		await queryApi.execute(['invalid'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -1716,7 +1716,7 @@ describe('QueryControl handler exception handling', () => {
 
 		expect(queryFn).toBeCalledTimes(2);
 
-		await queryApi.execute('key#1', 'fresh');
+		await queryApi.execute(['key#1'], 'fresh');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -1749,7 +1749,7 @@ describe('QueryControl handler exception handling', () => {
 		handler.errorFn.mockRejectedValue(new Error('broken_error_handler'));
 		handler.stateFn.mockRejectedValue(new Error('broken_state_handler'));
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1770,7 +1770,7 @@ describe('QueryControl handler exception handling', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await queryApi.execute('invalid', 'stale');
+		await queryApi.execute(['invalid'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
@@ -1791,7 +1791,7 @@ describe('QueryControl handler exception handling', () => {
 
 		expect(queryFn).toBeCalledTimes(2);
 
-		await queryApi.execute('key#1', 'stale');
+		await queryApi.execute(['key#1'], 'stale');
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);

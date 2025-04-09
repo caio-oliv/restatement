@@ -138,7 +138,7 @@ describe('lru-cache package integration', () => {
 		assert.strictEqual(await adapter.get('/boot'), undefined);
 	});
 
-	it('delete values no in the cache', async () => {
+	it('delete values not in the cache', async () => {
 		const options: LRUCache.Options<string, number, unknown> = {
 			max: 500,
 			...REQUIRED_LRU_CACHE_OPTIONS,

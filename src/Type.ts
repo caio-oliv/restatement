@@ -17,9 +17,12 @@ export type FetchStatus = 'idle' | 'loading' | 'stale' | 'success' | 'error';
  */
 export type QueryCache = 'no-cache' | 'stale' | 'fresh';
 
-export type QueryFn<K, T> = (key: K, signal: AbortSignal) => Promise<T>;
+export type QueryFn<K extends ReadonlyArray<unknown>, T> = (
+	key: K,
+	signal: AbortSignal
+) => Promise<T>;
 
-export type KeyHashFn<K> = (key: K) => string;
+export type KeyHashFn<K extends ReadonlyArray<unknown>> = (key: K) => string;
 
 export type KeepCacheOnError<E> = (err: E) => boolean;
 

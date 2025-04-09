@@ -1,20 +1,6 @@
 import { assert, describe, it } from 'vitest';
-import { type QueryState, QueryControl, waitUntil, PubSub, defaultKeyHashFn } from '@/lib';
+import { type QueryState, QueryControl, waitUntil, PubSub } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
-
-describe('RemoteState default keyHashFn', () => {
-	it('produce different keys for different input', () => {
-		const input: Array<unknown> = ['string', { object: true }, [4, 'list'], 3.1415];
-
-		const keys = input.map(defaultKeyHashFn);
-
-		for (const [index, key] of keys.entries()) {
-			for (let i = index + 1; i < input.length; i++) {
-				assert.notStrictEqual(key, keys[i]);
-			}
-		}
-	});
-});
 
 describe('RemoteStateQuery', () => {
 	const sleepTime = 150; // 150 milliseconds
@@ -24,23 +10,23 @@ describe('RemoteStateQuery', () => {
 			const cache = makeCache<string>();
 			const provider = new PubSub<QueryState<string, Error>>();
 
-			const queryApi1 = new QueryControl<string, string, Error>({
+			const queryApi1 = new QueryControl<[string], string, Error>({
 				cacheStore: cache,
-				queryFn: async key => key,
+				queryFn: async key => key[0],
 				stateProvider: provider,
 			});
 
-			const queryApi2 = new QueryControl<string, string, Error>({
+			const queryApi2 = new QueryControl<[string], string, Error>({
 				cacheStore: cache,
-				queryFn: async key => key,
+				queryFn: async key => key[0],
 				stateProvider: provider,
 			});
 
-			queryApi1.execute('?name=Pantera');
-			assert.strictEqual(provider.subscriberCount(queryApi1.keyHashFn('?name=Pantera')), 1);
+			queryApi1.execute(['?name=Pantera']);
+			assert.strictEqual(provider.subscriberCount(queryApi1.keyHashFn(['?name=Pantera'])), 1);
 
-			queryApi2.execute('?name=Pantera');
-			assert.strictEqual(provider.subscriberCount(queryApi1.keyHashFn('?name=Pantera')), 2);
+			queryApi2.execute(['?name=Pantera']);
+			assert.strictEqual(provider.subscriberCount(queryApi1.keyHashFn(['?name=Pantera'])), 2);
 		});
 
 		it('update the state when provided', async () => {
@@ -51,22 +37,22 @@ describe('RemoteStateQuery', () => {
 				stateList.push({ ...data });
 			});
 
-			const queryApi1 = new QueryControl<string, string, Error>({
+			const queryApi1 = new QueryControl<[string], string, Error>({
 				cacheStore: cache,
-				queryFn: async key => key + '#1',
+				queryFn: async key => key[0] + '#1',
 				stateProvider: provider,
 			});
 
-			const queryApi2 = new QueryControl<string, string, Error>({
+			const queryApi2 = new QueryControl<[string], string, Error>({
 				cacheStore: cache,
-				queryFn: async key => key + '#2',
+				queryFn: async key => key[0] + '#2',
 				stateProvider: provider,
 			});
 
-			queryApi1.execute('?name=Pantera');
+			queryApi1.execute(['?name=Pantera']);
 			await waitUntil(sleepTime);
 
-			queryApi2.execute('?name=Pantera', 'no-cache');
+			queryApi2.execute(['?name=Pantera'], 'no-cache');
 			await waitUntil(sleepTime);
 
 			// queryApi1 received the state
@@ -76,7 +62,7 @@ describe('RemoteStateQuery', () => {
 				status: 'success',
 			});
 
-			queryApi1.execute('?name=Pantera', 'no-cache');
+			queryApi1.execute(['?name=Pantera'], 'no-cache');
 			await waitUntil(sleepTime);
 
 			// queryApi2 received the state

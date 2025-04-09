@@ -5,7 +5,7 @@ import { defaultKeyHashFn, DEFAULT_TTL_DURATION } from '@/Default';
 import { blackhole } from '@/Internal';
 
 export interface CacheControlInput {
-	keyHashFn?: KeyHashFn<unknown>;
+	keyHashFn?: KeyHashFn<ReadonlyArray<unknown>>;
 	/**
 	 * Cache duration.
 	 */
@@ -22,7 +22,7 @@ export interface CacheControlInput {
 
 // TODO: change class name
 export class CacheControl {
-	public readonly keyHashFn: KeyHashFn<unknown>;
+	public readonly keyHashFn: KeyHashFn<ReadonlyArray<unknown>>;
 	public readonly duration: Millisecond;
 
 	public constructor({
@@ -37,7 +37,11 @@ export class CacheControl {
 		this.stateProvider = stateProvider;
 	}
 
-	public async setValue<K, T>(key: K, data: T, duration?: Millisecond): Promise<void> {
+	public async setValue<K extends ReadonlyArray<unknown>, T>(
+		key: K,
+		data: T,
+		duration?: Millisecond
+	): Promise<void> {
 		const keyHash = this.keyHashFn(key);
 		await this.cacheStore.set(keyHash, data, duration ?? this.duration).catch(blackhole);
 		this.stateProvider?.publish(keyHash, {
@@ -47,7 +51,7 @@ export class CacheControl {
 		});
 	}
 
-	public async getValue<K, T>(key: K): Promise<T | undefined> {
+	public async getValue<K extends ReadonlyArray<unknown>, T>(key: K): Promise<T | undefined> {
 		const keyHash = this.keyHashFn(key);
 		return (await this.cacheStore.get(keyHash).catch(blackhole)) as T | undefined;
 	}

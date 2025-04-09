@@ -24,7 +24,7 @@ import {
 } from '@/Default';
 import { blackhole, nullpromise } from '@/Internal';
 
-export interface QueryControlInput<K, T, E = unknown> {
+export interface QueryControlInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	/**
 	 * Cache store.
 	 */
@@ -110,7 +110,7 @@ function boxNextQueryFn<T, E>(
 	return () => query;
 }
 
-export class QueryControl<K, T, E = unknown> {
+export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	public readonly keyHashFn: KeyHashFn<K>;
 	public readonly retry: number;
 	public readonly retryDelay: RetryDelay<E>;
@@ -219,6 +219,10 @@ export class QueryControl<K, T, E = unknown> {
 
 	public dispose(): void {
 		this.subscriberHandle?.unsubscribe();
+	}
+
+	public [Symbol.dispose](): void {
+		this.dispose();
 	}
 
 	private async makeQueryNoCache(key: K, ctl: AbortController): Promise<QueryState<T, E>> {

@@ -60,28 +60,35 @@ export function immediateRetryDelay(): number {
 	return 0;
 }
 
-export type QuerySharpFn = (key: string) => Promise<string>;
+export type TestQueryFn = (keys: [string, ...Array<string>]) => Promise<string>;
 
 /**
  * @description Query function for tests that resturns data if a hash (pound, sharp) symbol ('#') is found.
- * @param key - key string
+ * @param keys - key string
  * @returns promise with data result
  */
-export async function testQuery(key: string): Promise<string> {
-	const index = key.indexOf('#');
-	if (index === -1) throw new Error('invalid_key');
+export async function testQuery(keys: [string, ...Array<string>]): Promise<string> {
+	const key = keys[0];
+	if (!key.startsWith('key#')) {
+		throw new Error('invalid_key');
+	}
 
-	return 'data#' + key.slice(index + 1);
+	let value = 'data#' + key.slice(4);
+	if (keys.length > 1) {
+		value += ':' + keys.slice(1).join(':');
+	}
+
+	return value;
 }
 
 /**
  * @description Make a delayed test query function
  * @param delay - wait time in milliseconds
- * @returns Delayed `querySharpFn`
+ * @returns Delayed {@link testQuery}
  */
-export function makeDelayedTestQuery(delay: number): QuerySharpFn {
-	return async (key: string): Promise<string> => {
+export function makeDelayedTestQuery(delay: number): TestQueryFn {
+	return async (keys: [string, ...Array<string>]): Promise<string> => {
 		await waitUntil(delay);
-		return await testQuery(key);
+		return await testQuery(keys);
 	};
 }
