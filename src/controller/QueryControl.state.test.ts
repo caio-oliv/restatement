@@ -6,10 +6,10 @@ import { immediateRetryDelay, makeDelayedTestQuery, testQuery } from '@/controll
 describe('QueryControl state transition / no-cache query', () => {
 	// success
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -42,10 +42,10 @@ describe('QueryControl state transition / no-cache query', () => {
 
 	// error
 	it('start the query state as "idle" and change to "error" after failed execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -78,10 +78,10 @@ describe('QueryControl state transition / no-cache query', () => {
 
 	// loading
 	it('start the query state as "idle" and change to "loading" after start of execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -124,10 +124,10 @@ describe('QueryControl state transition / no-cache query', () => {
 
 	// success to loading to success
 	it('start the query state as "success" and change to "loading" and to "success" after successful execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -188,10 +188,10 @@ describe('QueryControl state transition / no-cache query', () => {
 
 	// success to loading to error
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -252,10 +252,10 @@ describe('QueryControl state transition / no-cache query', () => {
 
 	// error to loading to success
 	it('start the query state as "error" and change to "loading" and to "success" after successful execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -316,10 +316,10 @@ describe('QueryControl state transition / no-cache query', () => {
 
 	// error to loading to error
 	it('start the query state as "error" and change to "loading" and to "error" after failed execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -384,10 +384,10 @@ describe('QueryControl state transition / no-cache query', () => {
 describe('QueryControl state transition / fresh query', () => {
 	// success from query
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -420,10 +420,10 @@ describe('QueryControl state transition / fresh query', () => {
 
 	// success from cache
 	it('start the query state as "idle" and change to "success" after result from cache', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -435,7 +435,7 @@ describe('QueryControl state transition / fresh query', () => {
 			status: 'idle',
 		});
 
-		await cacheStore.set(defaultKeyHashFn(['key#1']), 'data#1', 30_000);
+		await cache.set(defaultKeyHashFn(['key#1']), 'data#1', 30_000);
 
 		const result = await queryApi.execute(['key#1'], 'fresh');
 
@@ -458,10 +458,10 @@ describe('QueryControl state transition / fresh query', () => {
 
 	// error
 	it('start the query state as "idle" and change to "error" after failed execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -494,10 +494,10 @@ describe('QueryControl state transition / fresh query', () => {
 
 	// loading
 	it('start the query state as "idle" and change to "loading" after start of execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -544,10 +544,10 @@ describe('QueryControl state transition / fresh query', () => {
 
 	// success to loading to success from query
 	it('start the query state as "success" and change to "loading" and to "success" after successful execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -615,10 +615,10 @@ describe('QueryControl state transition / fresh query', () => {
 
 	// success to success from cache
 	it('start the query state as "success" and change to "success" after result from cache', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -673,10 +673,10 @@ describe('QueryControl state transition / fresh query', () => {
 
 	// success to loading to error
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -741,10 +741,10 @@ describe('QueryControl state transition / fresh query', () => {
 
 	// error to loading to success from query
 	it('start the query state as "error" and change to "loading" and to "success" after successful execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -809,10 +809,10 @@ describe('QueryControl state transition / fresh query', () => {
 
 	// error to success from cache
 	it('start the query state as "error" and change to "success" after result from cache', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -844,7 +844,7 @@ describe('QueryControl state transition / fresh query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		await cacheStore.set(defaultKeyHashFn(['key#2']), 'data#2', 30_000);
+		await cache.set(defaultKeyHashFn(['key#2']), 'data#2', 30_000);
 
 		const result2Promise = queryApi.execute(['key#2'], 'fresh');
 
@@ -871,10 +871,10 @@ describe('QueryControl state transition / fresh query', () => {
 
 	// error to loading to error
 	it('start the query state as "error" and change to "loading" and to "error" after failed execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -941,10 +941,10 @@ describe('QueryControl state transition / fresh query', () => {
 describe('QueryControl state transition / stale query', () => {
 	// success from query
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -977,10 +977,10 @@ describe('QueryControl state transition / stale query', () => {
 
 	// success from cache
 	it('start the query state as "idle" and change to "success" after result from cache', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -992,7 +992,7 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		cacheStore.set(defaultKeyHashFn(['key#1']), 'data#1', 30_000);
+		cache.set(defaultKeyHashFn(['key#1']), 'data#1', 30_000);
 
 		const result = await queryApi.execute(['key#1'], 'stale');
 
@@ -1015,10 +1015,10 @@ describe('QueryControl state transition / stale query', () => {
 
 	// stale to success from background query
 	it('start the query state as "idle" and change to "stale" and to "success" after background query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1032,7 +1032,7 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		await cacheStore.set(defaultKeyHashFn(['key#1']), 'stale_data#1', 200);
+		await cache.set(defaultKeyHashFn(['key#1']), 'stale_data#1', 200);
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(50));
 
@@ -1077,10 +1077,10 @@ describe('QueryControl state transition / stale query', () => {
 
 	// stale to error from background query
 	it('start the query state as "idle" and change to "stale" and to "error" after background query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1094,7 +1094,7 @@ describe('QueryControl state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		await cacheStore.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', 200);
+		await cache.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', 200);
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(50));
 
@@ -1139,10 +1139,10 @@ describe('QueryControl state transition / stale query', () => {
 
 	// error
 	it('start the query state as "idle" and change to "error" after failed execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1175,10 +1175,10 @@ describe('QueryControl state transition / stale query', () => {
 
 	// loading
 	it('start the query state as "idle" and change to "loading" after start of execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1225,10 +1225,10 @@ describe('QueryControl state transition / stale query', () => {
 
 	// success to loading to success from query
 	it('start the query state as "success" and change to "loading" and to "success" after successful execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1260,7 +1260,7 @@ describe('QueryControl state transition / stale query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		await cacheStore.delete(defaultKeyHashFn(['key#1']));
+		await cache.delete(defaultKeyHashFn(['key#1']));
 
 		const result2Promise = queryApi.execute(['key#1'], 'stale');
 
@@ -1295,10 +1295,10 @@ describe('QueryControl state transition / stale query', () => {
 
 	// success to success from cache
 	it('start the query state as "success" and change to "success" after result from cache', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1353,10 +1353,10 @@ describe('QueryControl state transition / stale query', () => {
 
 	// success to stale to success from background query
 	it('start the query state as "idle" and change to "stale" and to "success" after background query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1388,7 +1388,7 @@ describe('QueryControl state transition / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn(['key#1']), 'stale_data#1', 200);
+		await cache.set(defaultKeyHashFn(['key#1']), 'stale_data#1', 200);
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(50));
 
@@ -1433,10 +1433,10 @@ describe('QueryControl state transition / stale query', () => {
 
 	// success to stale to error from background query
 	it('start the query state as "idle" and change to "stale" and to "error" after background query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1468,7 +1468,7 @@ describe('QueryControl state transition / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', 200);
+		await cache.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', 200);
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(50));
 
@@ -1513,10 +1513,10 @@ describe('QueryControl state transition / stale query', () => {
 
 	// success to loading to error
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1548,7 +1548,7 @@ describe('QueryControl state transition / stale query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		await cacheStore.delete(defaultKeyHashFn(['key#1']));
+		await cache.delete(defaultKeyHashFn(['key#1']));
 
 		const result2Promise = queryApi.execute(['invalid_key'], 'stale');
 
@@ -1583,10 +1583,10 @@ describe('QueryControl state transition / stale query', () => {
 
 	// error to loading to success from query
 	it('start the query state as "error" and change to "loading" and to "success" after successful execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1651,10 +1651,10 @@ describe('QueryControl state transition / stale query', () => {
 
 	// error to success from cache
 	it('start the query state as "error" and change to "loading" and to "success" after result from cache', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1686,7 +1686,7 @@ describe('QueryControl state transition / stale query', () => {
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(100));
 
-		await cacheStore.set(defaultKeyHashFn(['key#1']), 'data#1', 10_000);
+		await cache.set(defaultKeyHashFn(['key#1']), 'data#1', 10_000);
 
 		const result2Promise = queryApi.execute(['key#1'], 'stale');
 
@@ -1713,10 +1713,10 @@ describe('QueryControl state transition / stale query', () => {
 
 	// error to stale to success from background query
 	it('start the query state as "error" and change to "stale" and to "success" after background query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1750,7 +1750,7 @@ describe('QueryControl state transition / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn(['key#1']), 'stale_data#1', 200);
+		await cache.set(defaultKeyHashFn(['key#1']), 'stale_data#1', 200);
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(50));
 
@@ -1795,10 +1795,10 @@ describe('QueryControl state transition / stale query', () => {
 
 	// error to stale to error from background query
 	it('start the query state as "error" and change to "stale" and to "error" after background query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1830,7 +1830,7 @@ describe('QueryControl state transition / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cacheStore.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', 200);
+		await cache.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', 200);
 
 		queryFn.mockImplementationOnce(makeDelayedTestQuery(50));
 
@@ -1875,10 +1875,10 @@ describe('QueryControl state transition / stale query', () => {
 
 	// error to loading to error
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl<[string], string, Error>({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,

@@ -5,10 +5,10 @@ import { DEFAULT_TTL_DURATION, defaultKeyHashFn, QueryControl, waitUntil } from 
 
 describe('QueryControl cache usage / no-cache query', () => {
 	it('fill the cache when making a query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -16,16 +16,16 @@ describe('QueryControl cache usage / no-cache query', () => {
 
 		await queryApi.execute(['key#1'], 'no-cache');
 
-		const value = await cacheStore.get(defaultKeyHashFn(['key#1']));
+		const value = await cache.get(defaultKeyHashFn(['key#1']));
 
 		assert.deepStrictEqual(value, 'data#1');
 	});
 
 	it('update the cache remaking the same query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -36,7 +36,7 @@ describe('QueryControl cache usage / no-cache query', () => {
 		await queryApi.execute(['key#1'], 'no-cache');
 
 		{
-			const entry = (await cacheStore.getEntry(defaultKeyHashFn(['key#1'])))!;
+			const entry = (await cache.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
 			assert.isTrue(entry.remain_ttl <= 1_000);
@@ -48,7 +48,7 @@ describe('QueryControl cache usage / no-cache query', () => {
 		await waitUntil(50);
 
 		{
-			const entry = (await cacheStore.getEntry(defaultKeyHashFn(['key#1'])))!;
+			const entry = (await cache.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
 			assert.isTrue(entry.remain_ttl <= 950);
@@ -59,7 +59,7 @@ describe('QueryControl cache usage / no-cache query', () => {
 		await queryApi.execute(['key#1'], 'no-cache');
 
 		{
-			const entry = (await cacheStore.getEntry(defaultKeyHashFn(['key#1'])))!;
+			const entry = (await cache.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
 			assert.isTrue(entry.remain_ttl <= 1_000);
@@ -70,10 +70,10 @@ describe('QueryControl cache usage / no-cache query', () => {
 	});
 
 	it('remove the cache with a failed query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -86,23 +86,23 @@ describe('QueryControl cache usage / no-cache query', () => {
 		await queryApi.execute(['invalid_1'], 'no-cache');
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid_1']));
+			const value = await cache.get(defaultKeyHashFn(['invalid_1']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
 		await queryApi.execute(['invalid_1'], 'no-cache');
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid_1']));
+			const value = await cache.get(defaultKeyHashFn(['invalid_1']));
 			assert.deepStrictEqual(value, undefined);
 		}
 	});
 
 	it('not remove the cache with a failed query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -116,14 +116,14 @@ describe('QueryControl cache usage / no-cache query', () => {
 		await queryApi.execute(['invalid_1'], 'no-cache');
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid_1']));
+			const value = await cache.get(defaultKeyHashFn(['invalid_1']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
 		await queryApi.execute(['invalid_1'], 'no-cache');
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid_1']));
+			const value = await cache.get(defaultKeyHashFn(['invalid_1']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 	});
@@ -131,10 +131,10 @@ describe('QueryControl cache usage / no-cache query', () => {
 
 describe('QueryControl cache usage / fresh query', () => {
 	it('fill the cache when making a query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -142,16 +142,16 @@ describe('QueryControl cache usage / fresh query', () => {
 
 		await queryApi.execute(['key#1'], 'fresh');
 
-		const value = await cacheStore.get(defaultKeyHashFn(['key#1']));
+		const value = await cache.get(defaultKeyHashFn(['key#1']));
 
 		assert.deepStrictEqual(value, 'data#1');
 	});
 
 	it('update the cache remaking the same query when the cache is not fresh', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -162,7 +162,7 @@ describe('QueryControl cache usage / fresh query', () => {
 		await queryApi.execute(['key#1'], 'fresh');
 
 		{
-			const entry = (await cacheStore.getEntry(defaultKeyHashFn(['key#1'])))!;
+			const entry = (await cache.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
 			assert.isTrue(entry.remain_ttl <= 1_000);
@@ -174,7 +174,7 @@ describe('QueryControl cache usage / fresh query', () => {
 		await waitUntil(50);
 
 		{
-			const entry = (await cacheStore.getEntry(defaultKeyHashFn(['key#1'])))!;
+			const entry = (await cache.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
 			assert.isTrue(entry.remain_ttl <= 950);
@@ -185,7 +185,7 @@ describe('QueryControl cache usage / fresh query', () => {
 		await queryApi.execute(['key#1'], 'fresh');
 
 		{
-			const entry = (await cacheStore.getEntry(defaultKeyHashFn(['key#1'])))!;
+			const entry = (await cache.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
 			assert.isTrue(entry.remain_ttl <= 1_000);
@@ -196,10 +196,10 @@ describe('QueryControl cache usage / fresh query', () => {
 	});
 
 	it('remove the cache with a failed query when the cache is not fresh', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -212,7 +212,7 @@ describe('QueryControl cache usage / fresh query', () => {
 		await queryApi.execute(['invalid'], 'fresh');
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid']));
+			const value = await cache.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
@@ -221,42 +221,42 @@ describe('QueryControl cache usage / fresh query', () => {
 		await queryApi.execute(['invalid'], 'fresh');
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid']));
+			const value = await cache.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, undefined);
 		}
 	});
 
 	it('remove the cache with a failed query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
 			fresh: 0,
 		});
 
-		await cacheStore.set(defaultKeyHashFn(['invalid']), 'valid_result', DEFAULT_TTL_DURATION);
+		await cache.set(defaultKeyHashFn(['invalid']), 'valid_result', DEFAULT_TTL_DURATION);
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid']));
+			const value = await cache.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
 		await queryApi.execute(['invalid'], 'fresh');
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid']));
+			const value = await cache.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, undefined);
 		}
 	});
 
 	it('not remove the cache with a failed query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -264,17 +264,17 @@ describe('QueryControl cache usage / fresh query', () => {
 			keepCacheOnError: () => true,
 		});
 
-		await cacheStore.set(defaultKeyHashFn(['invalid']), 'valid_result', DEFAULT_TTL_DURATION);
+		await cache.set(defaultKeyHashFn(['invalid']), 'valid_result', DEFAULT_TTL_DURATION);
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid']));
+			const value = await cache.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
 		await queryApi.execute(['invalid'], 'fresh');
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid']));
+			const value = await cache.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 	});
@@ -282,10 +282,10 @@ describe('QueryControl cache usage / fresh query', () => {
 
 describe('QueryControl cache usage / stale query', () => {
 	it('fill the cache when making a query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -293,16 +293,16 @@ describe('QueryControl cache usage / stale query', () => {
 
 		await queryApi.execute(['key#1'], 'stale');
 
-		const value = await cacheStore.get(defaultKeyHashFn(['key#1']));
+		const value = await cache.get(defaultKeyHashFn(['key#1']));
 
 		assert.deepStrictEqual(value, 'data#1');
 	});
 
 	it('update the cache remaking the same query when the cache is stale', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -313,7 +313,7 @@ describe('QueryControl cache usage / stale query', () => {
 		await queryApi.execute(['key#1'], 'stale');
 
 		{
-			const entry = (await cacheStore.getEntry(defaultKeyHashFn(['key#1'])))!;
+			const entry = (await cache.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
 			assert.isTrue(entry.remain_ttl <= 1_000);
@@ -325,7 +325,7 @@ describe('QueryControl cache usage / stale query', () => {
 		await waitUntil(50);
 
 		{
-			const entry = (await cacheStore.getEntry(defaultKeyHashFn(['key#1'])))!;
+			const entry = (await cache.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
 			assert.isTrue(entry.remain_ttl <= 950);
@@ -337,7 +337,7 @@ describe('QueryControl cache usage / stale query', () => {
 		await result.next();
 
 		{
-			const entry = (await cacheStore.getEntry(defaultKeyHashFn(['key#1'])))!;
+			const entry = (await cache.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
 			assert.isTrue(entry.remain_ttl <= 1_000);
@@ -348,10 +348,10 @@ describe('QueryControl cache usage / stale query', () => {
 	});
 
 	it('remove the cache with a failed query when the cache is stale', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -364,7 +364,7 @@ describe('QueryControl cache usage / stale query', () => {
 		await queryApi.execute(['invalid'], 'stale');
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid']));
+			const value = await cache.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
@@ -372,26 +372,26 @@ describe('QueryControl cache usage / stale query', () => {
 		await result.next();
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid']));
+			const value = await cache.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, undefined);
 		}
 	});
 
 	it('remove the cache with a failed query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
 			fresh: 0,
 		});
 
-		await cacheStore.set(defaultKeyHashFn(['invalid']), 'valid_result', DEFAULT_TTL_DURATION);
+		await cache.set(defaultKeyHashFn(['invalid']), 'valid_result', DEFAULT_TTL_DURATION);
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid']));
+			const value = await cache.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
@@ -399,16 +399,16 @@ describe('QueryControl cache usage / stale query', () => {
 		await result.next();
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid']));
+			const value = await cache.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, undefined);
 		}
 	});
 
 	it('not remove the cache with a failed query', async () => {
-		const cacheStore = makeCache<string>();
+		const cache = makeCache<string>();
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -416,10 +416,10 @@ describe('QueryControl cache usage / stale query', () => {
 			keepCacheOnError: () => true,
 		});
 
-		await cacheStore.set(defaultKeyHashFn(['invalid']), 'valid_result', DEFAULT_TTL_DURATION);
+		await cache.set(defaultKeyHashFn(['invalid']), 'valid_result', DEFAULT_TTL_DURATION);
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid']));
+			const value = await cache.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
@@ -427,7 +427,7 @@ describe('QueryControl cache usage / stale query', () => {
 		await result.next();
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid']));
+			const value = await cache.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 	});
@@ -435,11 +435,11 @@ describe('QueryControl cache usage / stale query', () => {
 
 describe('QueryControl cache exception handling', () => {
 	it('handle exception when getting a cache entry', async () => {
-		const cacheStore = makeCache<string>();
-		const cacheSpy = vi.spyOn(cacheStore, 'getEntry');
+		const cache = makeCache<string>();
+		const cacheSpy = vi.spyOn(cache, 'getEntry');
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore: cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -448,7 +448,7 @@ describe('QueryControl cache exception handling', () => {
 		await queryApi.execute(['key#1'], 'stale');
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['key#1']));
+			const value = await cache.get(defaultKeyHashFn(['key#1']));
 			assert.deepStrictEqual(value, 'data#1');
 		}
 
@@ -465,7 +465,7 @@ describe('QueryControl cache exception handling', () => {
 		});
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['key#1']));
+			const value = await cache.get(defaultKeyHashFn(['key#1']));
 			assert.deepStrictEqual(value, 'data#1');
 		}
 
@@ -473,11 +473,11 @@ describe('QueryControl cache exception handling', () => {
 	});
 
 	it('handle exception when setting a cache entry', async () => {
-		const cacheStore = makeCache<string>();
-		const cacheSpy = vi.spyOn(cacheStore, 'set');
+		const cache = makeCache<string>();
+		const cacheSpy = vi.spyOn(cache, 'set');
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore: cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -488,7 +488,7 @@ describe('QueryControl cache exception handling', () => {
 		await queryApi.execute(['key#1'], 'stale');
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['key#1']));
+			const value = await cache.get(defaultKeyHashFn(['key#1']));
 			assert.deepStrictEqual(value, undefined);
 		}
 
@@ -503,7 +503,7 @@ describe('QueryControl cache exception handling', () => {
 		});
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['key#1']));
+			const value = await cache.get(defaultKeyHashFn(['key#1']));
 			assert.deepStrictEqual(value, 'data#1');
 		}
 
@@ -511,11 +511,11 @@ describe('QueryControl cache exception handling', () => {
 	});
 
 	it('handle exception when deleting a cache entry', async () => {
-		const cacheStore = makeCache<string>();
-		const cacheSpy = vi.spyOn(cacheStore, 'delete');
+		const cache = makeCache<string>();
+		const cacheSpy = vi.spyOn(cache, 'delete');
 		const queryFn = vi.fn(testQuery);
 		const queryApi = new QueryControl({
-			cacheStore: cacheStore,
+			cache,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -528,7 +528,7 @@ describe('QueryControl cache exception handling', () => {
 		await queryApi.execute(['invalid_1'], 'stale');
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid_1']));
+			const value = await cache.get(defaultKeyHashFn(['invalid_1']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
@@ -543,7 +543,7 @@ describe('QueryControl cache exception handling', () => {
 		});
 
 		{
-			const value = await cacheStore.get(defaultKeyHashFn(['invalid_1']));
+			const value = await cache.get(defaultKeyHashFn(['invalid_1']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 

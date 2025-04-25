@@ -4,6 +4,8 @@ import type {
 	DataHandler,
 	ErrorHandler,
 	MutationControlHandler,
+	MutationDataHandler,
+	MutationErrorHandler,
 	MutationStateHandler,
 	QueryControlHandler,
 	QueryStateHandler,
@@ -36,8 +38,8 @@ export function mockQueryControlHandler<T, E = unknown>(): MockQueryControlHandl
 
 export interface MockMutationControlHandler<T, E> extends MutationControlHandler<T, E> {
 	stateFn: Mock<MutationStateHandler<T, E>>;
-	dataFn: Mock<DataHandler<T>>;
-	errorFn: Mock<ErrorHandler<E>>;
+	dataFn: Mock<MutationDataHandler<T>>;
+	errorFn: Mock<MutationErrorHandler<E>>;
 }
 
 /**
