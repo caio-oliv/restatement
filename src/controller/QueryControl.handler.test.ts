@@ -181,7 +181,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 
 		await queryApi.execute(['key#1'], 'no-cache');
 
-		expect(handler.dataFn).toHaveBeenCalledTimes(2);
+		expect(handler.dataFn).toHaveBeenCalledTimes(3);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
@@ -276,7 +276,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 
 		await queryApi.execute(['invalid_1'], 'no-cache');
 
-		expect(handler.dataFn).toHaveBeenCalledTimes(1);
+		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
@@ -728,7 +728,7 @@ describe('QueryControl handler execution / fresh query', () => {
 
 		await queryApi.execute(['key#1'], 'fresh');
 
-		expect(handler.dataFn).toHaveBeenCalledTimes(2);
+		expect(handler.dataFn).toHaveBeenCalledTimes(3);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
@@ -905,7 +905,7 @@ describe('QueryControl handler execution / fresh query', () => {
 
 		await queryApi.execute(['invalid_1'], 'fresh');
 
-		expect(handler.dataFn).toHaveBeenCalledTimes(1);
+		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
@@ -1671,7 +1671,7 @@ describe('QueryControl handler execution / stale query', () => {
 
 		await queryApi.execute(['key#1'], 'stale');
 
-		expect(handler.dataFn).toHaveBeenCalledTimes(2);
+		expect(handler.dataFn).toHaveBeenCalledTimes(3);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
@@ -2076,7 +2076,7 @@ describe('QueryControl handler execution / stale query', () => {
 
 		await queryApi.execute(['invalid_1'], 'stale');
 
-		expect(handler.dataFn).toHaveBeenCalledTimes(1);
+		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
@@ -2680,7 +2680,7 @@ describe('QueryControl handler exception handling', () => {
 
 		await queryApi.execute(['invalid'], 'no-cache');
 
-		expect(handler.dataFn).toHaveBeenCalledTimes(1);
+		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
@@ -2779,7 +2779,7 @@ describe('QueryControl handler exception handling', () => {
 
 		await queryApi.execute(['invalid'], 'fresh');
 
-		expect(handler.dataFn).toHaveBeenCalledTimes(1);
+		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
@@ -2820,11 +2820,16 @@ describe('QueryControl handler exception handling', () => {
 
 		await queryApi.execute(['key#1'], 'fresh');
 
-		expect(handler.dataFn).toHaveBeenCalledTimes(2);
+		expect(handler.dataFn).toHaveBeenCalledTimes(3);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(5);
 
 		expect(handler.dataFn).toHaveBeenNthCalledWith(2, 'data#1', {
+			cache: 'fresh',
+			origin: 'control',
+			source: 'query',
+		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(3, 'data#1', {
 			cache: 'fresh',
 			origin: 'control',
 			source: 'cache',
@@ -2906,7 +2911,7 @@ describe('QueryControl handler exception handling', () => {
 
 		await queryApi.execute(['invalid'], 'stale');
 
-		expect(handler.dataFn).toHaveBeenCalledTimes(1);
+		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
@@ -2947,11 +2952,16 @@ describe('QueryControl handler exception handling', () => {
 
 		await queryApi.execute(['key#1'], 'stale');
 
-		expect(handler.dataFn).toHaveBeenCalledTimes(2);
+		expect(handler.dataFn).toHaveBeenCalledTimes(3);
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(5);
 
 		expect(handler.dataFn).toHaveBeenNthCalledWith(2, 'data#1', {
+			cache: 'stale',
+			origin: 'control',
+			source: 'query',
+		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(3, 'data#1', {
 			cache: 'stale',
 			origin: 'control',
 			source: 'cache',

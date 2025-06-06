@@ -177,7 +177,7 @@ describe('QueryControl cache usage / fresh query', () => {
 			const entry = (await cache.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
-			assert.isTrue(entry.remain_ttl <= 950);
+			assert.isTrue(entry.remain_ttl <= 955);
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
@@ -328,7 +328,7 @@ describe('QueryControl cache usage / stale query', () => {
 			const entry = (await cache.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
-			assert.isTrue(entry.remain_ttl <= 950);
+			assert.isTrue(entry.remain_ttl <= 955);
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}

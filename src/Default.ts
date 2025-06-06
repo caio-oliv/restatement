@@ -1,9 +1,3 @@
-import type {
-	MutationState,
-	QueryState,
-	MutationControlHandler,
-	QueryControlHandler,
-} from '@/Type';
 import { JitterExponentialBackoffTimer } from '@/TimerModule';
 import { jsonStringifyObjectSorter } from '@/Internal';
 
@@ -26,6 +20,15 @@ export function defaultKeyHashFn<T extends ReadonlyArray<unknown>>(key: T): stri
 }
 
 /**
+ * Default implementation of the query state filter function.
+ * Allows any provided state.
+ * @returns `true`
+ */
+export function defaultStateFilterFn(): boolean {
+	return true;
+}
+
+/**
  * @description Default function to verify if the cache of a previous successful result
  * is gonna be kept when the operation results in an error.
  * @param _ operation error
@@ -34,52 +37,4 @@ export function defaultKeyHashFn<T extends ReadonlyArray<unknown>>(key: T): stri
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function defaultKeepCacheOnError<T = unknown>(_: T): boolean {
 	return false;
-}
-
-/**
- * @description Function that produces the default query state.
- * @returns default query state
- */
-export function defaultQueryState<T, E>(): QueryState<T, E> {
-	return {
-		data: null,
-		error: null,
-		status: 'idle',
-	};
-}
-
-/**
- * @description Function that produces the default query handlers.
- * @returns default query handlers
- */
-export function defaultQueryHandler<T, E>(): QueryControlHandler<T, E> {
-	return {
-		dataFn: undefined,
-		errorFn: undefined,
-		stateFn: undefined,
-	};
-}
-
-/**
- * @description Function that produces the default mutation state.
- * @returns default mutation state
- */
-export function defaultMutationState<T, E>(): MutationState<T, E> {
-	return {
-		data: null,
-		error: null,
-		status: 'idle',
-	};
-}
-
-/**
- * @description Function that produces the default mutation handlers.
- * @returns default mutation handlers
- */
-export function defaultMutationHandler<T, E>(): MutationControlHandler<T, E> {
-	return {
-		stateFn: undefined,
-		dataFn: undefined,
-		errorFn: undefined,
-	};
 }

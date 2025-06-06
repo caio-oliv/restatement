@@ -1,6 +1,6 @@
 import type { CacheStore } from '@/Cache';
 import { type RetryDelay, type RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
-import { type PubSub, SubscriberHandle } from '@/PubSub';
+import { DummySubscriber, type PubSub, type Subscriber, SubscriberHandle } from '@/PubSub';
 import type {
 	QueryFn,
 	KeyHashFn,
@@ -10,9 +10,10 @@ import type {
 	KeepCacheOnError,
 	Millisecond,
 	QueryExecutorResult,
-	NextQueryState,
 	QueryProviderState,
 	QueryStateMetadata,
+	QueryStatePromise,
+	QueryStateFilterFn,
 } from '@/Type';
 import {
 	defaultKeyHashFn,
@@ -21,12 +22,15 @@ import {
 	defaultKeepCacheOnError,
 	DEFAULT_FRESH_DURATION,
 	DEFAULT_TTL_DURATION,
-	defaultQueryHandler,
-	defaultQueryState,
+	defaultStateFilterFn,
 } from '@/Default';
-import { blackhole, nullpromise } from '@/Internal';
+import { blackhole, makeObservablePromise, nullpromise } from '@/Internal';
 
 export interface QueryControlInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
+	/**
+	 * Idle state placeholder.
+	 */
+	placeholder?: T | null;
 	/**
 	 * Cache store.
 	 */
@@ -91,12 +95,16 @@ export interface QueryControlInput<K extends ReadonlyArray<unknown>, T, E = unkn
 	 */
 	handler?: QueryControlHandler<T, E>;
 	/**
+	 * Query state filter function
+	 */
+	stateFilterFn?: QueryStateFilterFn<T, E>;
+	/**
 	 * State provider.
 	 */
-	provider?: PubSub<QueryProviderState<T, E>> | null;
+	provider?: PubSubQueryProvider<T, E> | null;
 }
 
-type NextQueryResultFn<T, E> = () => Promise<NextQueryState<T, E>>;
+export type PubSubQueryProvider<T, E> = PubSub<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
 
 interface QueryProviderInternalState<T, E> {
 	readonly state: QueryState<T, E>;
@@ -105,18 +113,9 @@ interface QueryProviderInternalState<T, E> {
 
 type QueryStateNoCacheSource = 'query' | 'background-query';
 
-/**
- * @description Wraps the next query function of the query executor result
- * @param query next query promise
- * @returns next query result function
- */
-function boxNextQueryFn<T, E>(
-	query: Promise<QueryState<T, E>> | null = null
-): NextQueryResultFn<T, E> {
-	if (query === null) {
-		return nullpromise;
-	}
-	return () => query;
+interface KeyPair<K extends ReadonlyArray<unknown>> {
+	readonly key: K;
+	readonly hash: string;
 }
 
 export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
@@ -137,6 +136,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	public readonly ttl: Millisecond;
 
 	public constructor({
+		placeholder = null,
 		cache,
 		queryFn,
 		keyHashFn = defaultKeyHashFn,
@@ -146,9 +146,11 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		keepCacheOnError = defaultKeepCacheOnError,
 		fresh = DEFAULT_FRESH_DURATION,
 		ttl = DEFAULT_TTL_DURATION,
-		handler = defaultQueryHandler(),
+		handler = { dataFn: undefined, errorFn: undefined, stateFn: undefined },
+		stateFilterFn = defaultStateFilterFn,
 		provider = null,
 	}: QueryControlInput<K, T, E>) {
+		this.#placeholder = placeholder;
 		this.#cache = cache;
 		this.keyHashFn = keyHashFn;
 		this.#queryFn = queryFn;
@@ -158,11 +160,12 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		this.retry = retry;
 		this.fresh = fresh;
 		this.ttl = ttl;
-		this.#state = defaultQueryState();
+		this.#state = { data: this.#placeholder, error: null, status: 'idle' };
 		this.#handler = handler;
+		this.#stateFilterFn = stateFilterFn;
 		this.#subscriber = provider
 			? new SubscriberHandle(this.#updateState.bind(this), provider)
-			: null;
+			: new DummySubscriber();
 	}
 
 	public async execute(
@@ -170,76 +173,49 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		cache: QueryCache = 'stale',
 		ctl: AbortController = new AbortController()
 	): Promise<QueryExecutorResult<T, E>> {
-		const keyHash = this.keyHashFn(key);
-		this.#subscriber?.useTopic(keyHash);
+		const hash = this.keyHashFn(key);
+		this.#subscriber.useTopic(hash);
 
 		if (cache === 'no-cache') {
-			const state = await this.#makeQueryNoCache(key, cache, ctl);
-			return { state, next: boxNextQueryFn() };
+			// eslint-disable-next-line @typescript-eslint/return-await
+			return this.#tryCurrentPromiseOrRunQuery({ key, hash }, cache, ctl);
 		}
 
-		const entry = await this.#cache.getEntry(keyHash).catch(blackhole);
+		const entry = await this.#cache.getEntry(hash).catch(blackhole);
 		if (entry === undefined) {
-			const state = await this.#makeQueryNoCache(key, cache, ctl);
-			return { state, next: boxNextQueryFn() };
+			// eslint-disable-next-line @typescript-eslint/return-await
+			return this.#tryCurrentPromiseOrRunQuery({ key, hash }, cache, ctl);
 		}
 
 		if ((cache === 'fresh' || cache === 'stale') && entry.ttl - entry.remain_ttl < this.fresh) {
 			// Fresh from cache (less time than fresh duration).
-			const state: QueryState<T, E> = {
-				status: 'success',
-				error: null,
-				data: entry.data,
-			};
-			this.#updateState(keyHash, {
-				state,
-				metadata: {
-					origin: 'control',
-					source: 'cache',
-					cache,
-				},
-			});
-			this.#subscriber?.publish(keyHash, {
-				state,
-				metadata: {
-					origin: 'provider',
-					source: 'cache',
-					cache,
-				},
-			});
-			return { state, next: boxNextQueryFn() };
+			const state: QueryState<T, E> = { status: 'success', error: null, data: entry.data };
+			this.#updateState(hash, { state, metadata: { origin: 'control', source: 'cache', cache } });
+			return { state, next: nullpromise };
 		}
 
 		if (cache === 'stale') {
 			// Stale from cache (greater time than fresh duration).
-			const state: QueryState<T, E> = {
-				status: 'stale',
-				error: null,
-				data: entry.data,
-			};
-			this.#updateState(keyHash, {
-				state,
-				metadata: { origin: 'control', source: 'cache', cache },
-			});
-			this.#subscriber?.publish(keyHash, {
-				state,
-				metadata: { origin: 'provider', source: 'cache', cache },
-			});
-			/**
-			 * `runQuery` should run in the background, so it's promise
-			 * **must not** be awaited.
-			 */
-			const queryPromise = this.#runQuery(key, cache, 'background-query', ctl);
-			return { state, next: boxNextQueryFn(queryPromise) };
+			const state: QueryState<T, E> = { status: 'stale', error: null, data: entry.data };
+			this.#updateState(hash, { state, metadata: { origin: 'control', source: 'cache', cache } });
+
+			// eslint-disable-next-line @typescript-eslint/return-await
+			return this.#tryCurrentPromiseOrRunBackgroundQuery(state, { key, hash }, cache, ctl);
 		}
 
-		const state = await this.#makeQueryNoCache(key, cache, ctl);
-		return { state, next: boxNextQueryFn() };
+		// eslint-disable-next-line @typescript-eslint/return-await
+		return this.#tryCurrentPromiseOrRunQuery({ key, hash }, cache, ctl);
 	}
 
 	public use(key: K): void {
-		const keyHash = this.keyHashFn(key);
-		this.#subscriber?.useTopic(keyHash);
+		const hash = this.keyHashFn(key);
+		this.#subscriber.useTopic(hash);
+		this.#state = { data: this.#placeholder, error: null, status: 'idle' };
+	}
+
+	public reset(): void {
+		this.#subscriber.unsubscribe();
+		this.#state = { data: this.#placeholder, error: null, status: 'idle' };
 	}
 
 	/**
@@ -251,36 +227,62 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	}
 
 	public dispose(): void {
-		this.#subscriber?.unsubscribe();
+		this.#subscriber.unsubscribe();
 	}
 
 	public [Symbol.dispose](): void {
 		this.dispose();
 	}
 
-	async #makeQueryNoCache(
-		key: K,
+	async #tryCurrentPromiseOrRunQuery(
+		{ key, hash }: KeyPair<K>,
 		cache: QueryCache,
 		ctl: AbortController
-	): Promise<QueryState<T, E>> {
-		const state: QueryState<T, E> = {
-			status: 'loading',
-			data: this.#state.data,
-			error: null,
-		};
-		this.#state = state;
-		this.#handler
-			.stateFn?.(this.#state, {
-				origin: 'control',
-				source: 'query',
-				cache,
-			})
-			?.catch(blackhole);
-		this.#subscriber?.publish(this.keyHashFn(key), {
-			state,
-			metadata: { origin: 'provider', source: 'query', cache },
-		});
-		return await this.#runQuery(key, cache, 'query', ctl);
+	): Promise<QueryExecutorResult<T, E>> {
+		const state: QueryState<T, E> = { status: 'loading', data: this.#state.data, error: null };
+		const metadata: QueryStateMetadata = { origin: 'control', source: 'query', cache };
+
+		this.#updateState(hash, { state, metadata });
+
+		const currPromise = this.#subscriber.getCurrentState();
+		if (currPromise?.status === 'pending') {
+			currPromise.then((state: QueryState<T, E>) => {
+				this.#updateState(hash, { state, metadata: { origin: 'control', source: 'query', cache } });
+			});
+
+			return { state: await currPromise, next: nullpromise };
+		}
+
+		const promise = this.#runQuery({ key, hash }, cache, 'query', ctl);
+		this.#subscriber.setCurrentState(makeObservablePromise(promise));
+		return { state: await promise, next: nullpromise };
+	}
+
+	async #tryCurrentPromiseOrRunBackgroundQuery(
+		state: QueryState<T, E>,
+		{ key, hash }: KeyPair<K>,
+		cache: QueryCache,
+		ctl: AbortController
+	): Promise<QueryExecutorResult<T, E>> {
+		const currPromise = this.#subscriber.getCurrentState();
+		if (currPromise?.status === 'pending') {
+			currPromise.then((state: QueryState<T, E>) => {
+				this.#updateState(hash, {
+					state,
+					metadata: { origin: 'control', source: 'background-query', cache },
+				});
+			});
+
+			return { state, next: () => currPromise };
+		}
+
+		/**
+		 * `runQuery` should run in the background, so it's promise
+		 * **must not** be awaited.
+		 */
+		const queryPromise = this.#runQuery({ key, hash }, cache, 'background-query', ctl);
+		this.#subscriber.setCurrentState(makeObservablePromise(queryPromise));
+		return { state, next: () => queryPromise };
 	}
 
 	/**
@@ -305,14 +307,16 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	 * // not be `await`'ed
 	 * queryCtl.runQuery(key, ctl);
 	 * ```
-	 * @param key query function input
+	 * @param key key pair (key value, hash)
+	 * @param key.key query function input
+	 * @param key.hash key hash string
 	 * @param cache query cache directive
 	 * @param source query source
 	 * @param ctl abort controller
 	 * @returns query state
 	 */
 	async #runQuery(
-		key: K,
+		{ key, hash }: KeyPair<K>,
 		cache: QueryCache,
 		source: QueryStateNoCacheSource,
 		ctl: AbortController
@@ -324,56 +328,52 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 				this.retry,
 				this.#retryHandleFn
 			);
-			return (await this.#fetchResolve(ok, key, cache, source).catch(blackhole)) ?? this.getState();
+			return (
+				(await this.#fetchResolve(ok, hash, cache, source).catch(blackhole)) ?? this.getState()
+			);
 		} catch (err: unknown) {
-			return (await this.#fetchReject(err, key, cache, source).catch(blackhole)) ?? this.getState();
+			return (
+				(await this.#fetchReject(err, hash, cache, source).catch(blackhole)) ?? this.getState()
+			);
 		}
 	}
 
 	async #fetchResolve(
 		data: T,
-		key: K,
+		hash: string,
 		cache: QueryCache,
 		source: QueryStateNoCacheSource
 	): Promise<QueryState<T, E>> {
-		const keyHash = this.keyHashFn(key);
-		const state: QueryState<T, E> = {
-			status: 'success',
-			error: null,
-			data,
-		};
-		await this.#cache.set(keyHash, data, this.ttl).catch(blackhole);
-		this.#updateState(keyHash, { state, metadata: { origin: 'control', source, cache } });
-		this.#subscriber?.publish(keyHash, { state, metadata: { origin: 'provider', source, cache } });
+		const state: QueryState<T, E> = { status: 'success', error: null, data };
+		await this.#cache.set(hash, data, this.ttl).catch(blackhole);
+		this.#updateState(hash, { state, metadata: { origin: 'control', source, cache } });
 		return state;
 	}
 
 	async #fetchReject(
 		err: unknown,
-		key: K,
+		hash: string,
 		cache: QueryCache,
 		source: QueryStateNoCacheSource
 	): Promise<QueryState<T, E>> {
-		const keyHash = this.keyHashFn(key);
-		const state: QueryState<T, E> = {
-			status: 'error',
-			error: err as E,
-			data: null,
-		};
+		const state: QueryState<T, E> = { status: 'error', error: err as E, data: null };
 		if (!this.#keepCacheOnError(err as E)) {
-			await this.#cache.delete(keyHash).catch(blackhole);
+			await this.#cache.delete(hash).catch(blackhole);
 		}
-		this.#updateState(keyHash, { state, metadata: { origin: 'control', source, cache } });
-		this.#subscriber?.publish(keyHash, { state, metadata: { origin: 'provider', source, cache } });
+		this.#updateState(hash, { state, metadata: { origin: 'control', source, cache } });
 		return state;
 	}
 
-	#updateState(_: string, { state, metadata }: QueryProviderInternalState<T, E>): void {
+	#updateState(hash: string, { state, metadata }: QueryProviderInternalState<T, E>): void {
+		if (this.#subscriber.currentTopic() !== hash) {
+			return;
+		}
+
+		if (!this.#stateFilterFn({ current: this.#state, next: state, metadata })) {
+			return;
+		}
+
 		this.#state = state;
-		// TODO: filter the provided state
-		// if (!this.filterStateFn(state, metadata)) {
-		// 	return;
-		// }
 
 		if (this.#state.data !== null) {
 			this.#handler.dataFn?.(this.#state.data, metadata)?.catch(blackhole);
@@ -382,13 +382,22 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 			this.#handler.errorFn?.(this.#state.error, metadata)?.catch(blackhole);
 		}
 		this.#handler.stateFn?.(this.#state, metadata)?.catch(blackhole);
+
+		if (metadata.origin === 'control') {
+			this.#subscriber.publishTopic(hash, {
+				state: this.#state,
+				metadata: { origin: 'provider', source: metadata.source, cache: metadata.cache },
+			});
+		}
 	}
 
 	#state: QueryState<T, E>;
+	readonly #placeholder: T | null;
 	readonly #cache: CacheStore<string, T>;
+	readonly #subscriber: Subscriber<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
 	readonly #handler: QueryControlHandler<T, E>;
-	readonly #subscriber: SubscriberHandle<QueryProviderState<T, E>> | null;
 	readonly #queryFn: QueryFn<K, T>;
+	readonly #stateFilterFn: QueryStateFilterFn<T, E>;
 	readonly #keepCacheOnError: KeepCacheOnError<E>;
 	readonly #retryHandleFn: RetryHandlerFn | null;
 }

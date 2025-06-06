@@ -167,4 +167,63 @@ describe('lru-cache package integration', () => {
 		assert.strictEqual(await adapter.get('bike'), undefined);
 		assert.strictEqual(await adapter.get('truck'), undefined);
 	});
+
+	it('delete entries matching a key prefix', async () => {
+		const options: LRUCache.Options<string, number, unknown> = {
+			max: 500,
+			...REQUIRED_LRU_CACHE_OPTIONS,
+		};
+
+		const cache = new LRUCache<string, number>(options);
+		const adapter = new LRUCacheAdapter(cache);
+
+		await adapter.set('/boot', 100, 10_000);
+		await adapter.set('/etc', 100, 10_000);
+		await adapter.set('/etc/sudoers', 100, 10_000);
+		await adapter.set('/etc/passwd', 100, 10_000);
+		await adapter.set('/etc/group', 100, 10_000);
+		await adapter.set('/etc/hostname', 100, 10_000);
+		await adapter.set('/etc/systemd', 100, 10_000);
+		await adapter.set('/etc/systemd/journald.conf', 100, 10_000);
+		await adapter.set('/etc/systemd/networkd.conf', 100, 10_000);
+		await adapter.set('/etc/systemd/resolved.conf', 100, 10_000);
+		await adapter.set('/etc/systemd/user.conf', 100, 10_000);
+		await adapter.set('/home', 100, 10_000);
+		await adapter.set('/home/bob', 100, 10_000);
+		await adapter.set('/home/alice', 100, 10_000);
+
+		await adapter.deletePrefix('/etc/systemd/resolved.conf');
+
+		assert.strictEqual(await adapter.get('/etc/systemd'), 100);
+		assert.strictEqual(await adapter.get('/etc/systemd/journald.conf'), 100);
+		assert.strictEqual(await adapter.get('/etc/systemd/networkd.conf'), 100);
+		assert.strictEqual(await adapter.get('/etc/systemd/resolved.conf'), undefined);
+		assert.strictEqual(await adapter.get('/etc/systemd/user.conf'), 100);
+
+		await adapter.deletePrefix('/etc/systemd');
+
+		assert.strictEqual(await adapter.get('/etc/systemd'), undefined);
+		assert.strictEqual(await adapter.get('/etc/systemd/journald.conf'), undefined);
+		assert.strictEqual(await adapter.get('/etc/systemd/networkd.conf'), undefined);
+		assert.strictEqual(await adapter.get('/etc/systemd/resolved.conf'), undefined);
+		assert.strictEqual(await adapter.get('/etc/systemd/user.conf'), undefined);
+
+		assert.strictEqual(await adapter.get('/etc/sudoers'), 100);
+		assert.strictEqual(await adapter.get('/etc/passwd'), 100);
+		assert.strictEqual(await adapter.get('/etc/group'), 100);
+		assert.strictEqual(await adapter.get('/etc/hostname'), 100);
+
+		await adapter.deletePrefix('/etc');
+
+		assert.strictEqual(await adapter.get('/etc'), undefined);
+		assert.strictEqual(await adapter.get('/etc/sudoers'), undefined);
+		assert.strictEqual(await adapter.get('/etc/passwd'), undefined);
+		assert.strictEqual(await adapter.get('/etc/group'), undefined);
+		assert.strictEqual(await adapter.get('/etc/hostname'), undefined);
+
+		assert.strictEqual(await adapter.get('/boot'), 100);
+		assert.strictEqual(await adapter.get('/home'), 100);
+		assert.strictEqual(await adapter.get('/home/bob'), 100);
+		assert.strictEqual(await adapter.get('/home/alice'), 100);
+	});
 });

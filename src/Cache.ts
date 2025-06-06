@@ -36,4 +36,9 @@ export interface CacheStore<K, V> {
 	 * @param key Unique key.
 	 */
 	delete(key: K): Promise<void>;
+	/**
+	 * Delete all entries that starts with a prefix.
+	 * @param prefix Key prefix
+	 */
+	deletePrefix(prefix: K): Promise<void>;
 }

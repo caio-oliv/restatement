@@ -1,32 +1,34 @@
-export type Listener<T> = (topic: string, data: T) => void;
+import { syncPromiseResolver } from '@/Internal';
+
+export type Listener<T> = (topic: string, data: T) => void | Promise<void>;
 
 export type UnsubscribeHandle = () => void;
 
-interface ListenerState<T> {
+interface ListenerState<T, S> {
 	/**
 	 * Function listeners
 	 */
-	listeners: Set<Listener<T>>;
+	readonly listeners: Set<Listener<T>>;
 	/**
-	 * Latest data published.
+	 * Shared state between listeners.
 	 */
-	data: T | null;
+	state: S | null;
 }
 
 /**
  * @description Make default {@link ListenerState}
  * @returns default {@link ListenerState}
  */
-function makeListenerState<T>(): ListenerState<T> {
+function makeListenerState<T, S>(): ListenerState<T, S> {
 	return {
-		data: null,
 		listeners: new Set(),
+		state: null,
 	};
 }
 
-export class PubSub<T> {
+export class PubSub<T, S> {
 	public constructor() {
-		this.#listenerMap = new Map<string, ListenerState<T>>();
+		this.#listenerMap = new Map<string, ListenerState<T, S>>();
 	}
 
 	public subscribe(topic: string, listener: Listener<T>): UnsubscribeHandle {
@@ -37,7 +39,9 @@ export class PubSub<T> {
 	}
 
 	public unsubscribe(topic: string, listener: Listener<T>): void {
-		const state = this.#listenerMap.get(topic) ?? makeListenerState();
+		const state = this.#listenerMap.get(topic);
+		if (!state) return;
+
 		state.listeners.delete(listener);
 		if (state.listeners.size === 0) this.#listenerMap.delete(topic);
 	}
@@ -47,17 +51,30 @@ export class PubSub<T> {
 	}
 
 	public publish(topic: string, data: T, ignore: Array<Listener<T>> = []): void {
-		const state = this.#listenerMap.get(topic) ?? makeListenerState();
-		state.data = data;
-		for (const listener of state.listeners.keys()) {
+		const state = this.#listenerMap.get(topic);
+		if (!state) return;
+
+		for (const listener of state.listeners) {
 			if (ignore.includes(listener)) continue;
-			listener(topic, data);
+			syncPromiseResolver(() => listener(topic, data));
 		}
 	}
 
-	public latestValue(topic: string): T | null {
-		const state = this.#listenerMap.get(topic) ?? makeListenerState();
-		return state.data;
+	public getState(topic: string): S | null {
+		const state = this.#listenerMap.get(topic);
+		if (!state) return null;
+
+		return state.state;
+	}
+
+	public setState(topic: string, state: S): boolean {
+		const lState = this.#listenerMap.get(topic);
+		if (!lState) {
+			return false;
+		}
+		lState.state = state;
+		this.#listenerMap.set(topic, lState);
+		return true;
 	}
 
 	public topics(): IteratorObject<string, BuiltinIteratorReturn> {
@@ -68,13 +85,26 @@ export class PubSub<T> {
 		return this.#listenerMap.get(topic)?.listeners.size ?? 0;
 	}
 
-	readonly #listenerMap: Map<string, ListenerState<T>>;
+	readonly #listenerMap: Map<string, ListenerState<T, S>>;
 }
 
-export class SubscriberHandle<T> {
+export interface Subscriber<T, S> {
+	useTopic(topic: string | null): void;
+	currentTopic(): string | null;
+
+	getCurrentState(): S | null;
+	setCurrentState(state: S): boolean;
+
+	publish(data: T): boolean;
+	publishTopic(topic: string, data: T): void;
+
+	unsubscribe(): void;
+}
+
+export class SubscriberHandle<T, S> implements Subscriber<T, S> {
 	public readonly listener: Listener<T>;
 
-	public constructor(listener: Listener<T>, provider: PubSub<T>) {
+	public constructor(listener: Listener<T>, provider: PubSub<T, S>) {
 		this.#topic = null;
 		this.listener = listener;
 		this.#provider = provider;
@@ -96,11 +126,19 @@ export class SubscriberHandle<T> {
 		return this.#topic;
 	}
 
-	public publish(topic: string, data: T): void {
-		this.#provider.publish(topic, data, [this.listener]);
+	public getCurrentState(): S | null {
+		if (this.#topic === null) return null;
+
+		return this.#provider.getState(this.#topic);
 	}
 
-	public publishCurrentTopic(data: T): boolean {
+	public setCurrentState(state: S): boolean {
+		if (this.#topic === null) return false;
+
+		return this.#provider.setState(this.#topic, state);
+	}
+
+	public publish(data: T): boolean {
 		if (!this.#topic) {
 			return false;
 		}
@@ -109,10 +147,8 @@ export class SubscriberHandle<T> {
 		return true;
 	}
 
-	public currentValue(): T | null {
-		if (this.#topic === null) return null;
-
-		return this.#provider.latestValue(this.#topic);
+	public publishTopic(topic: string, data: T): void {
+		this.#provider.publish(topic, data, [this.listener]);
 	}
 
 	public unsubscribe(): void {
@@ -125,5 +161,45 @@ export class SubscriberHandle<T> {
 	}
 
 	#topic: string | null;
-	readonly #provider: PubSub<T>;
+	readonly #provider: PubSub<T, S>;
+}
+
+export class DummySubscriber<T, S> implements Subscriber<T, S> {
+	public constructor() {
+		this.#topic = null;
+	}
+
+	public useTopic(topic: string | null): void {
+		this.#topic = topic;
+	}
+
+	public currentTopic(): string | null {
+		return this.#topic;
+	}
+
+	// eslint-disable-next-line class-methods-use-this, @typescript-eslint/class-methods-use-this
+	public getCurrentState(): S | null {
+		return null;
+	}
+
+	// eslint-disable-next-line class-methods-use-this, @typescript-eslint/class-methods-use-this, @typescript-eslint/no-unused-vars
+	public setCurrentState(_state: S): boolean {
+		return false;
+	}
+
+	// eslint-disable-next-line class-methods-use-this, @typescript-eslint/class-methods-use-this, @typescript-eslint/no-unused-vars
+	public publish(_data: T): boolean {
+		return false;
+	}
+
+	// eslint-disable-next-line class-methods-use-this, @typescript-eslint/class-methods-use-this, @typescript-eslint/no-unused-vars
+	public publishTopic(_topic: string, _data: T): void {
+		return;
+	}
+
+	public unsubscribe(): void {
+		this.#topic = null;
+	}
+
+	#topic: string | null;
 }

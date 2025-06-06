@@ -51,11 +51,14 @@ namespace LRUCache {
 		noDeleteOnStaleGet?: boolean;
 	}
 
+	export type ForEachFn<V, K> = (v: V, k: K, self: LRUCache.LRUCache<K, V>) => void;
+
 	export interface LRUCache<K, V> {
 		info(key: K): LRUCacheEntry<V> | undefined;
 		get(k: K, getOptions?: GetOptions<V>): V | undefined;
 		set(k: K, v: V | undefined, setOptions?: SetOptions<V>): LRUCache<K, V>;
 		delete(k: K): boolean;
+		forEach(fn: ForEachFn<V, K>, thisp?: this): void;
 	}
 }
 
@@ -95,5 +98,13 @@ export class LRUCacheAdapter<K = unknown, V = unknown> implements CacheStore<K, 
 
 	public async delete(key: K): Promise<void> {
 		this.cache.delete(key);
+	}
+
+	public async deletePrefix(prefix: K): Promise<void> {
+		this.cache.forEach((_value, key, instance) => {
+			if ((key as string).startsWith(prefix as string)) {
+				instance.delete(key);
+			}
+		});
 	}
 }

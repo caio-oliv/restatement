@@ -1,9 +1,9 @@
 import { assert, describe, expect, it, vi } from 'vitest';
-import { type Listener, PubSub, SubscriberHandle } from '@/lib';
+import { DummySubscriber, type Listener, PubSub, SubscriberHandle } from '@/lib';
 
 describe('PubSub (un)subscribe', () => {
 	it('subscribe to a topic', () => {
-		const pubsub = new PubSub<string>();
+		const pubsub = new PubSub<string, string>();
 		const listener: Listener<string> = vi.fn();
 
 		pubsub.subscribe('event#1', listener);
@@ -14,7 +14,7 @@ describe('PubSub (un)subscribe', () => {
 	});
 
 	it('subscribe to a topic and unsubscribe with returned handler', () => {
-		const pubsub = new PubSub<string>();
+		const pubsub = new PubSub<string, string>();
 		const listener: Listener<string> = vi.fn();
 
 		const unsubHandle = pubsub.subscribe('event#1', listener);
@@ -31,7 +31,7 @@ describe('PubSub (un)subscribe', () => {
 	});
 
 	it('subscribe to a topic and unsubscribe from it manually', () => {
-		const pubsub = new PubSub<string>();
+		const pubsub = new PubSub<string, string>();
 		const listener: Listener<string> = vi.fn();
 
 		pubsub.subscribe('event#1', listener);
@@ -48,7 +48,7 @@ describe('PubSub (un)subscribe', () => {
 	});
 
 	it('subscribe to a topic twice with the same listener', () => {
-		const pubsub = new PubSub<string>();
+		const pubsub = new PubSub<string, string>();
 		const listener: Listener<string> = vi.fn();
 
 		{
@@ -75,7 +75,7 @@ describe('PubSub (un)subscribe', () => {
 	});
 
 	it('subscribe to two topics with the same listener', () => {
-		const pubsub = new PubSub<string>();
+		const pubsub = new PubSub<string, string>();
 		const listener: Listener<string> = vi.fn();
 
 		{
@@ -109,48 +109,27 @@ describe('PubSub (un)subscribe', () => {
 		}
 	});
 
-	it('subscribe to a topic and return the default latest value', () => {
-		const pubsub = new PubSub<string>();
-		const listener: Listener<string> = vi.fn();
-
-		const unsubHandle = pubsub.subscribe('event#1', listener);
-
-		assert.deepStrictEqual(pubsub.subscriberCount('event#1'), 1);
-		assert.deepStrictEqual(pubsub.latestValue('event#1'), null);
-
-		expect(listener).toBeCalledTimes(0);
-
-		unsubHandle();
-
-		assert.deepStrictEqual(pubsub.subscriberCount('event#1'), 0);
-		assert.deepStrictEqual(pubsub.latestValue('event#1'), null);
-
-		expect(listener).toBeCalledTimes(0);
-	});
-
 	it('unsubscribe from a topic that does not exist', () => {
-		const pubsub = new PubSub<string>();
+		const pubsub = new PubSub<string, string>();
 		const listener: Listener<string> = vi.fn();
 
 		pubsub.unsubscribe('event#1', listener);
 
 		assert.deepStrictEqual(pubsub.subscriberCount('event#1'), 0);
-		assert.deepStrictEqual(pubsub.latestValue('event#1'), null);
 
 		expect(listener).toBeCalledTimes(0);
 	});
 
 	it('unsubscribeAll from a topic that does not exist', () => {
-		const pubsub = new PubSub<string>();
+		const pubsub = new PubSub<string, string>();
 
 		pubsub.unsubscribeAll('event#1');
 
 		assert.deepStrictEqual(pubsub.subscriberCount('event#1'), 0);
-		assert.deepStrictEqual(pubsub.latestValue('event#1'), null);
 	});
 
 	it('unsubscribeAll listeners', () => {
-		const pubsub = new PubSub<string>();
+		const pubsub = new PubSub<string, string>();
 		const listener1: Listener<string> = vi.fn();
 		const listener2: Listener<string> = vi.fn();
 		const listener3: Listener<string> = vi.fn();
@@ -160,18 +139,16 @@ describe('PubSub (un)subscribe', () => {
 		pubsub.subscribe('event#1', listener3);
 
 		assert.deepStrictEqual(pubsub.subscriberCount('event#1'), 3);
-		assert.deepStrictEqual(pubsub.latestValue('event#1'), null);
 
 		pubsub.unsubscribeAll('event#1');
 
 		assert.deepStrictEqual(pubsub.subscriberCount('event#1'), 0);
-		assert.deepStrictEqual(pubsub.latestValue('event#1'), null);
 	});
 });
 
 describe('PubSub publish', () => {
 	it('publish to a topic with one listener', () => {
-		const pubsub = new PubSub<string>();
+		const pubsub = new PubSub();
 		const listener = vi.fn();
 
 		pubsub.subscribe('event#1', listener);
@@ -182,7 +159,7 @@ describe('PubSub publish', () => {
 	});
 
 	it('publish to a topic with multiple listeners', () => {
-		const pubsub = new PubSub<string>();
+		const pubsub = new PubSub();
 		const listener1 = vi.fn();
 		const listener2 = vi.fn();
 		const listener3 = vi.fn();
@@ -199,7 +176,7 @@ describe('PubSub publish', () => {
 	});
 
 	it('publish to a topic with multiple listeners ignoring the last one', () => {
-		const pubsub = new PubSub<string>();
+		const pubsub = new PubSub();
 		const listener1 = vi.fn();
 		const listener2 = vi.fn();
 		const listener3 = vi.fn();
@@ -219,36 +196,34 @@ describe('PubSub publish', () => {
 	});
 
 	it('publish to a topic that does not exist', () => {
-		const pubsub = new PubSub<string>();
+		const pubsub = new PubSub();
 
 		pubsub.publish('event#1', 'message-1');
 
 		assert.deepStrictEqual(pubsub.subscriberCount('event#1'), 0);
-		assert.deepStrictEqual(pubsub.latestValue('event#1'), null);
 	});
+});
 
-	it('get the latest value published into a topic', () => {
-		const pubsub = new PubSub<string>();
+describe('PubSub shared state', () => {
+	it('set the state of a topic', () => {
+		const pubsub = new PubSub<string, string>();
 		const listener = vi.fn();
 
 		pubsub.subscribe('event#1', listener);
 
-		assert.deepStrictEqual(pubsub.subscriberCount('event#1'), 1);
+		const setted = pubsub.setState('event#1', 'state1');
 
-		{
-			pubsub.publish('event#1', 'message-1');
+		assert.strictEqual(setted, true);
+		assert.strictEqual(pubsub.getState('event#1'), 'state1');
+	});
 
-			assert.deepStrictEqual(pubsub.latestValue('event#1'), 'message-1');
+	it('not set the state of a topic that does not exist', () => {
+		const pubsub = new PubSub<string, string>();
 
-			expect(listener).toHaveBeenNthCalledWith(1, 'event#1', 'message-1');
-		}
-		{
-			pubsub.publish('event#1', 'message-99');
+		const setted = pubsub.setState('event#1', 'state1');
 
-			assert.deepStrictEqual(pubsub.latestValue('event#1'), 'message-99');
-
-			expect(listener).toHaveBeenNthCalledWith(2, 'event#1', 'message-99');
-		}
+		assert.strictEqual(setted, false);
+		assert.strictEqual(pubsub.getState('event#1'), null);
 	});
 });
 
@@ -259,7 +234,6 @@ describe('SubscriberHandle (un)subscribe', () => {
 		const handle = new SubscriberHandle(listener, pubsub);
 
 		assert.strictEqual(handle.currentTopic(), null);
-		assert.strictEqual(handle.currentValue(), null);
 
 		assert.deepStrictEqual(Array.from(pubsub.topics()), []);
 	});
@@ -292,6 +266,21 @@ describe('SubscriberHandle (un)subscribe', () => {
 			assert.strictEqual(handle.currentTopic(), null);
 			assert.deepStrictEqual(Array.from(pubsub.topics()), []);
 		}
+	});
+
+	it('unsubscribe to a topic when disposed', () => {
+		const pubsub = new PubSub();
+		const listener = vi.fn();
+
+		{
+			using handle = new SubscriberHandle(listener, pubsub);
+			handle.useTopic('event#1');
+
+			assert.strictEqual(handle.currentTopic(), 'event#1');
+			assert.deepStrictEqual(Array.from(pubsub.topics()), ['event#1']);
+		}
+
+		assert.deepStrictEqual(Array.from(pubsub.topics()), []);
 	});
 
 	it('unsubscribe without a topic', () => {
@@ -336,21 +325,19 @@ describe('SubscriberHandle publish', () => {
 
 		handle.useTopic('event#1');
 
-		handle.publishCurrentTopic('message-1');
+		handle.publish('message-1');
 
 		assert.deepStrictEqual(handle.currentTopic(), 'event#1');
-		assert.deepStrictEqual(handle.currentValue(), 'message-1');
 	});
 
 	it('not publish to the current unprovided topic', () => {
 		const pubsub = new PubSub();
 		const handle = new SubscriberHandle(vi.fn(), pubsub);
 
-		const published = handle.publishCurrentTopic('message-1');
+		const published = handle.publish('message-1');
 		assert.strictEqual(published, false);
 
 		assert.deepStrictEqual(handle.currentTopic(), null);
-		assert.deepStrictEqual(handle.currentValue(), null);
 	});
 
 	it('publish to the current topic not calling the listener from the subscriber handle', () => {
@@ -367,21 +354,15 @@ describe('SubscriberHandle publish', () => {
 		assert.deepStrictEqual(handle2.currentTopic(), 'event#1');
 
 		{
-			const published = handle1.publishCurrentTopic('message-1');
+			const published = handle1.publish('message-1');
 			assert.strictEqual(published, true);
-
-			assert.deepStrictEqual(handle1.currentValue(), 'message-1');
-			assert.deepStrictEqual(handle2.currentValue(), 'message-1');
 
 			expect(handle1.listener).toHaveBeenCalledTimes(0);
 			expect(handle2.listener).toHaveBeenCalledTimes(1);
 		}
 		{
-			const published = handle2.publishCurrentTopic('message-2');
+			const published = handle2.publish('message-2');
 			assert.strictEqual(published, true);
-
-			assert.deepStrictEqual(handle1.currentValue(), 'message-2');
-			assert.deepStrictEqual(handle2.currentValue(), 'message-2');
 
 			expect(handle1.listener).toHaveBeenCalledTimes(1);
 			expect(handle2.listener).toHaveBeenCalledTimes(1);
@@ -402,22 +383,63 @@ describe('SubscriberHandle publish', () => {
 		assert.deepStrictEqual(handle2.currentTopic(), 'event#1');
 
 		{
-			handle1.publish('event#1', 'message-1');
-
-			assert.deepStrictEqual(handle1.currentValue(), 'message-1');
-			assert.deepStrictEqual(handle2.currentValue(), 'message-1');
+			handle1.publishTopic('event#1', 'message-1');
 
 			expect(handle1.listener).toHaveBeenCalledTimes(0);
 			expect(handle2.listener).toHaveBeenCalledTimes(1);
 		}
 		{
-			handle2.publish('event#1', 'message-2');
-
-			assert.deepStrictEqual(handle1.currentValue(), 'message-2');
-			assert.deepStrictEqual(handle2.currentValue(), 'message-2');
+			handle2.publishTopic('event#1', 'message-2');
 
 			expect(handle1.listener).toHaveBeenCalledTimes(1);
 			expect(handle2.listener).toHaveBeenCalledTimes(1);
 		}
+	});
+});
+
+describe('SubscriberHandle shared state', () => {
+	it('set the state of a topic', () => {
+		const pubsub = new PubSub();
+		const handle = new SubscriberHandle(vi.fn(), pubsub);
+
+		handle.useTopic('event#1');
+
+		const setted = handle.setCurrentState('state1');
+
+		assert.strictEqual(setted, true);
+		assert.strictEqual(handle.getCurrentState(), 'state1');
+	});
+
+	it('not set the state of a topic that does not exist', () => {
+		const pubsub = new PubSub();
+		const handle = new SubscriberHandle(vi.fn(), pubsub);
+
+		const setted = handle.setCurrentState('state1');
+
+		assert.strictEqual(setted, false);
+		assert.strictEqual(handle.getCurrentState(), null);
+	});
+});
+
+describe('DummySubscriber', () => {
+	it('DummySubscriber assertions', () => {
+		const sub = new DummySubscriber<number, string>();
+
+		sub.useTopic('topic#2');
+
+		assert.deepStrictEqual(sub.currentTopic(), 'topic#2');
+
+		assert.deepStrictEqual(sub.setCurrentState('try'), false);
+		assert.deepStrictEqual(sub.getCurrentState(), null);
+
+		assert.deepStrictEqual(sub.publish(10), false);
+
+		sub.useTopic('topic#1');
+
+		assert.deepStrictEqual(sub.currentTopic(), 'topic#1');
+
+		sub.unsubscribe();
+
+		assert.deepStrictEqual(sub.currentTopic(), null);
 	});
 });

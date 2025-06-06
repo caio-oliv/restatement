@@ -1,10 +1,9 @@
+import type { ObservablePromise, PromiseStatus } from '@/Type';
+
 /**
- * @description Empty function that takes one parameter.
- * Ideal for `promise.catch()` cases where the promise beign waited **must not** throw.
- * @param _ any parameter
+ * Empty function
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function blackhole<T>(_: T): void {
+export function blackhole(): void {
 	// empty function
 }
 
@@ -84,4 +83,35 @@ export function jsonStringifyObjectSorter(_key: string, value: unknown): unknown
 	}
 
 	return sortObjectByKeys(value as object);
+}
+
+/**
+ * Augments a promise object to provide the current promise status as a property.
+ * @param query promise object
+ * @returns observable promise
+ */
+export function makeObservablePromise<T>(query: Promise<T>): ObservablePromise<T> {
+	(query as { status: PromiseStatus } & Promise<T>).status = 'pending';
+	query.then(
+		() => {
+			(query as { status: PromiseStatus } & Promise<T>).status = 'fulfilled';
+		},
+		() => {
+			(query as { status: PromiseStatus } & Promise<T>).status = 'rejected';
+		}
+	);
+
+	return query as ObservablePromise<T>;
+}
+
+/**
+ * Execute a promise in background and immediately returns
+ * @param func async function
+ */
+export function syncPromiseResolver<Fn extends () => void | Promise<void>>(func: Fn): void {
+	try {
+		func()?.catch(blackhole);
+	} catch {
+		/* no-op */
+	}
 }

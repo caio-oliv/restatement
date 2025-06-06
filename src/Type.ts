@@ -26,9 +26,8 @@ export type KeyHashFn<K extends ReadonlyArray<unknown>> = (key: K) => string;
 
 export type KeepCacheOnError<E> = (err: E) => boolean;
 
-export interface IdleQueryState {
-	// TODO: add data placeholder into idle state
-	readonly data: null;
+export interface IdleQueryState<T> {
+	readonly data: T | null;
 	readonly error: null;
 	readonly status: 'idle';
 }
@@ -58,7 +57,7 @@ export interface ErrorQueryState<E> {
 }
 
 export type QueryState<T, E> =
-	| IdleQueryState
+	| IdleQueryState<T>
 	| LoadingQueryState<T>
 	| StaleQueryState<T>
 	| SuccessQueryState<T>
@@ -82,6 +81,22 @@ export interface QueryProviderState<T, E> {
 	readonly state: QueryState<T, E>;
 	readonly metadata: QueryProviderStateMetadata;
 }
+
+export type PromiseStatus = 'pending' | 'fulfilled' | 'rejected';
+
+export interface ObservablePromise<T> extends Promise<T> {
+	readonly status: PromiseStatus;
+}
+
+export type QueryStatePromise<T, E> = ObservablePromise<QueryState<T, E>>;
+
+export interface QueryStateFilterInfo<T, E> {
+	readonly current: QueryState<T, E>;
+	readonly next: QueryState<T, E>;
+	readonly metadata: QueryStateMetadata;
+}
+
+export type QueryStateFilterFn<T, E> = (info: QueryStateFilterInfo<T, E>) => boolean;
 
 export type QueryStateHandler<T, E> = (
 	state: QueryState<T, E>,

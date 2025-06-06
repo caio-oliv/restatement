@@ -3,6 +3,75 @@ import { defaultKeyHashFn, QueryControl, waitUntil } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { immediateRetryDelay, makeDelayedTestQuery, testQuery } from '@/controller/Control.mock';
 
+describe('QueryControl state transition / reset query', () => {
+	it('reset query state to idle', async () => {
+		const cache = makeCache<string>();
+		const queryFn = vi.fn(testQuery);
+		const queryApi = new QueryControl<[string], string, Error>({
+			cache,
+			queryFn,
+			retry: 0,
+			retryDelay: immediateRetryDelay,
+		});
+
+		assert.deepStrictEqual(queryApi.getState(), {
+			data: null,
+			error: null,
+			status: 'idle',
+		});
+
+		await queryApi.execute(['key#1'], 'no-cache');
+
+		assert.deepStrictEqual(queryApi.getState(), {
+			data: 'data#1',
+			error: null,
+			status: 'success',
+		});
+
+		queryApi.reset();
+
+		assert.deepStrictEqual(queryApi.getState(), {
+			data: null,
+			error: null,
+			status: 'idle',
+		});
+	});
+
+	it('reset query state to idle with placeholder', async () => {
+		const cache = makeCache<string>();
+		const queryFn = vi.fn(testQuery);
+		const queryApi = new QueryControl<[string], string, Error>({
+			placeholder: '123',
+			cache,
+			queryFn,
+			retry: 0,
+			retryDelay: immediateRetryDelay,
+		});
+
+		assert.deepStrictEqual(queryApi.getState(), {
+			data: '123',
+			error: null,
+			status: 'idle',
+		});
+
+		await queryApi.execute(['key#1'], 'no-cache');
+
+		assert.deepStrictEqual(queryApi.getState(), {
+			data: 'data#1',
+			error: null,
+			status: 'success',
+		});
+
+		queryApi.reset();
+
+		assert.deepStrictEqual(queryApi.getState(), {
+			data: '123',
+			error: null,
+			status: 'idle',
+		});
+	});
+});
+
 describe('QueryControl state transition / no-cache query', () => {
 	// success
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {

@@ -17,7 +17,7 @@ export interface CacheControlInput {
 	/**
 	 * State provider.
 	 */
-	stateProvider?: PubSub<QueryState<unknown, unknown>> | null;
+	stateProvider?: PubSub<QueryState<unknown, unknown>, unknown> | null;
 }
 
 // TODO: change class name
@@ -57,5 +57,5 @@ export class CacheControl {
 	}
 
 	private readonly cacheStore: CacheStore<string, unknown>;
-	private readonly stateProvider?: PubSub<QueryState<unknown, unknown>> | null;
+	private readonly stateProvider?: PubSub<QueryState<unknown, unknown>, unknown> | null;
 }

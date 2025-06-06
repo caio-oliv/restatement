@@ -1,6 +1,6 @@
 import type { MutationFn, MutationState, MutationControlHandler } from '@/Type';
 import { type RetryDelay, retryAsyncOperation } from '@/AsyncModule';
-import { DEFAULT_RETRY_DELAY, defaultMutationHandler, defaultMutationState } from '@/Default';
+import { DEFAULT_RETRY_DELAY } from '@/Default';
 
 export interface MutationControlInput<I, T, E> {
 	mutationFn: MutationFn<I, T>;
@@ -17,16 +17,15 @@ export class MutationControl<I, T, E> {
 		mutationFn,
 		retry = 3,
 		retryDelay = DEFAULT_RETRY_DELAY.delay,
-		handler = defaultMutationHandler(),
+		handler = { stateFn: undefined, dataFn: undefined, errorFn: undefined },
 	}: MutationControlInput<I, T, E>) {
 		this.mutationFn = mutationFn;
 		this.retry = retry;
 		this.retryDelay = retryDelay;
 		this.handler = handler;
-		this.state = defaultMutationState();
+		this.state = { data: null, error: null, status: 'idle' };
 	}
 
-	// TODO: remove sync version of execute
 	public execute = (input: I, ctl: AbortController = new AbortController()): void => {
 		const state: MutationState<T, E> = {
 			status: 'loading',
