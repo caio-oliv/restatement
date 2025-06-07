@@ -6,5 +6,5 @@ export * from '@/Cache';
 export * from '@/Default';
 export * from '@/controller/QueryControl';
 export * from '@/controller/MutationControl';
-export * from '@/controller/CacheControl';
+export * from '@/controller/CacheManager';
 export * from '@/integration/lru-cache';

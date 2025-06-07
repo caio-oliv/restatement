@@ -59,7 +59,7 @@ export interface QueryControlInput<K extends ReadonlyArray<unknown>, T, E = unkn
 	/**
 	 * Retry handler function
 	 */
-	retryHandleFn?: RetryHandlerFn | null;
+	retryHandleFn?: RetryHandlerFn<E> | null;
 	/**
 	 * Use the previus cached data on error of the `queryFn`
 	 */
@@ -101,15 +101,10 @@ export interface QueryControlInput<K extends ReadonlyArray<unknown>, T, E = unkn
 	/**
 	 * State provider.
 	 */
-	provider?: PubSubQueryProvider<T, E> | null;
+	provider?: QueryControlProvider<T, E> | null;
 }
 
-export type PubSubQueryProvider<T, E> = PubSub<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
-
-interface QueryProviderInternalState<T, E> {
-	readonly state: QueryState<T, E>;
-	readonly metadata: QueryStateMetadata;
-}
+export type QueryControlProvider<T, E> = PubSub<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
 
 type QueryStateNoCacheSource = 'query' | 'background-query';
 
@@ -364,7 +359,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		return state;
 	}
 
-	#updateState(hash: string, { state, metadata }: QueryProviderInternalState<T, E>): void {
+	#updateState(hash: string, { state, metadata }: QueryProviderState<T, E>): void {
 		if (this.#subscriber.currentTopic() !== hash) {
 			return;
 		}
@@ -399,5 +394,5 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	readonly #queryFn: QueryFn<K, T>;
 	readonly #stateFilterFn: QueryStateFilterFn<T, E>;
 	readonly #keepCacheOnError: KeepCacheOnError<E>;
-	readonly #retryHandleFn: RetryHandlerFn | null;
+	readonly #retryHandleFn: RetryHandlerFn<E> | null;
 }

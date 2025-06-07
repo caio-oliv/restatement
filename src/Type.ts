@@ -73,13 +73,17 @@ export interface QueryStateMetadata {
 	readonly cache: QueryCache;
 }
 
-export interface QueryProviderStateMetadata extends QueryStateMetadata {
+export interface MutationStateMetadata {
 	readonly origin: 'provider';
+	readonly source: 'mutation';
+	readonly cache: 'none';
 }
+
+export type StateMetadata = QueryStateMetadata | MutationStateMetadata;
 
 export interface QueryProviderState<T, E> {
 	readonly state: QueryState<T, E>;
-	readonly metadata: QueryProviderStateMetadata;
+	readonly metadata: StateMetadata;
 }
 
 export type PromiseStatus = 'pending' | 'fulfilled' | 'rejected';
@@ -93,19 +97,19 @@ export type QueryStatePromise<T, E> = ObservablePromise<QueryState<T, E>>;
 export interface QueryStateFilterInfo<T, E> {
 	readonly current: QueryState<T, E>;
 	readonly next: QueryState<T, E>;
-	readonly metadata: QueryStateMetadata;
+	readonly metadata: StateMetadata;
 }
 
 export type QueryStateFilterFn<T, E> = (info: QueryStateFilterInfo<T, E>) => boolean;
 
 export type QueryStateHandler<T, E> = (
 	state: QueryState<T, E>,
-	metadata: QueryStateMetadata
+	metadata: StateMetadata
 ) => Promise<void>;
 
-export type DataHandler<T> = (data: T, metadata: QueryStateMetadata) => Promise<void>;
+export type DataHandler<T> = (data: T, metadata: StateMetadata) => Promise<void>;
 
-export type ErrorHandler<E> = (error: E, metadata: QueryStateMetadata) => Promise<void>;
+export type ErrorHandler<E> = (error: E, metadata: StateMetadata) => Promise<void>;
 
 export interface QueryControlHandler<T, E> {
 	stateFn?: QueryStateHandler<T, E>;
@@ -129,6 +133,13 @@ export interface MutationState<T, E> {
 }
 
 export type MutationFn<I, T> = (input: I, signal: AbortSignal) => Promise<T>;
+
+export interface MutationStateFilterInfo<T, E> {
+	readonly current: MutationState<T, E>;
+	readonly next: MutationState<T, E>;
+}
+
+export type MutationStateFilterFn<T, E> = (info: MutationStateFilterInfo<T, E>) => boolean;
 
 export type MutationStateHandler<T, E> = (state: MutationState<T, E>) => Promise<void>;
 

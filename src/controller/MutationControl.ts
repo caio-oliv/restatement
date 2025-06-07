@@ -1,12 +1,20 @@
-import type { MutationFn, MutationState, MutationControlHandler } from '@/Type';
-import { type RetryDelay, retryAsyncOperation } from '@/AsyncModule';
-import { DEFAULT_RETRY_DELAY } from '@/Default';
+import type {
+	MutationFn,
+	MutationState,
+	MutationControlHandler,
+	MutationStateFilterFn,
+} from '@/Type';
+import { type RetryDelay, type RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
+import { DEFAULT_RETRY_DELAY, defaultStateFilterFn } from '@/Default';
+import { blackhole } from '@/Internal';
 
 export interface MutationControlInput<I, T, E> {
 	mutationFn: MutationFn<I, T>;
 	retry?: number;
 	retryDelay?: RetryDelay<E>;
+	retryHandleFn?: RetryHandlerFn<E> | null;
 	handler?: MutationControlHandler<T, E>;
+	stateFilterFn?: MutationStateFilterFn<T, E>;
 }
 
 export class MutationControl<I, T, E> {
@@ -15,82 +23,82 @@ export class MutationControl<I, T, E> {
 
 	public constructor({
 		mutationFn,
-		retry = 3,
+		retry = 0,
 		retryDelay = DEFAULT_RETRY_DELAY.delay,
+		retryHandleFn = null,
 		handler = { stateFn: undefined, dataFn: undefined, errorFn: undefined },
+		stateFilterFn = defaultStateFilterFn,
 	}: MutationControlInput<I, T, E>) {
-		this.mutationFn = mutationFn;
+		this.#mutationFn = mutationFn;
 		this.retry = retry;
 		this.retryDelay = retryDelay;
-		this.handler = handler;
-		this.state = { data: null, error: null, status: 'idle' };
+		this.#handler = handler;
+		this.#stateFilterFn = stateFilterFn;
+		this.#retryHandleFn = retryHandleFn;
+		this.#state = { data: null, error: null, status: 'idle' };
 	}
 
-	public execute = (input: I, ctl: AbortController = new AbortController()): void => {
-		const state: MutationState<T, E> = {
-			status: 'loading',
-			data: this.state.data,
-			error: this.state.error,
-		};
-		this.state = state;
-		this.handler.stateFn?.(this.state);
-		retryAsyncOperation(() => this.mutationFn(input, ctl.signal), this.retryDelay, this.retry)
-			.then(this.mutationResolve)
-			.catch(this.mutationReject);
-	};
-
-	public executeAsync = async (
+	public async execute(
 		input: I,
 		ctl: AbortController = new AbortController()
-	): Promise<T | E> => {
+	): Promise<MutationState<T, E>> {
+		const state: MutationState<T, E> = { status: 'loading', data: null, error: null };
+		this.#updateState(state);
+
+		// eslint-disable-next-line @typescript-eslint/return-await
+		return this.#runMutation(input, ctl);
+	}
+
+	public getState(): MutationState<T, E> {
+		return this.#state;
+	}
+
+	async #runMutation(input: I, ctl: AbortController): Promise<MutationState<T, E>> {
 		try {
-			const state: MutationState<T, E> = {
-				status: 'loading',
-				data: this.state.data,
-				error: this.state.error,
-			};
-			this.state = state;
-			this.handler.stateFn?.(this.state);
 			const data = await retryAsyncOperation(
-				() => this.mutationFn(input, ctl.signal),
+				() => this.#mutationFn(input, ctl.signal),
 				this.retryDelay,
-				this.retry
+				this.retry,
+				this.#retryHandleFn
 			);
-			this.mutationResolve(data);
-			return data;
+
+			return this.#mutationResolve(data);
 		} catch (err: unknown) {
-			this.mutationReject(err as E);
-			return err as E;
+			return this.#mutationReject(err as E);
 		}
-	};
+	}
 
-	public getState = (): MutationState<T, E> => {
-		return this.state;
-	};
+	#mutationResolve(data: T): MutationState<T, E> {
+		const state: MutationState<T, E> = { status: 'success', data, error: null };
+		this.#updateState(state);
+		return state;
+	}
 
-	private readonly mutationResolve = (data: T): void => {
-		const state: MutationState<T, E> = {
-			status: 'success',
-			data,
-			error: null,
-		};
-		this.state = state;
-		this.handler.dataFn?.(data);
-		this.handler.stateFn?.({ ...this.state });
-	};
+	#mutationReject(error: E): MutationState<T, E> {
+		const state: MutationState<T, E> = { status: 'error', data: null, error };
+		this.#updateState(state);
+		return state;
+	}
 
-	private readonly mutationReject = (error: E): void => {
-		const state: MutationState<T, E> = {
-			status: 'error',
-			data: null,
-			error,
-		};
-		this.state = state;
-		this.handler.errorFn?.(error);
-		this.handler.stateFn?.({ ...this.state });
-	};
+	#updateState(state: MutationState<T, E>): void {
+		if (!this.#stateFilterFn({ current: this.#state, next: state })) {
+			return;
+		}
 
-	private readonly handler: MutationControlHandler<T, E>;
-	private readonly mutationFn: MutationFn<I, T>;
-	private state: MutationState<T, E>;
+		this.#state = state;
+
+		if (this.#state.data !== null) {
+			this.#handler.dataFn?.(this.#state.data)?.catch(blackhole);
+		}
+		if (this.#state.error !== null) {
+			this.#handler.errorFn?.(this.#state.error)?.catch(blackhole);
+		}
+		this.#handler.stateFn?.(this.#state)?.catch(blackhole);
+	}
+
+	#state: MutationState<T, E>;
+	readonly #handler: MutationControlHandler<T, E>;
+	readonly #stateFilterFn: MutationStateFilterFn<T, E>;
+	readonly #mutationFn: MutationFn<I, T>;
+	readonly #retryHandleFn: RetryHandlerFn<E> | null;
 }

@@ -1,7 +1,7 @@
 import { JitterExponentialBackoffTimer } from '@/TimerModule';
 import { jsonStringifyObjectSorter } from '@/Internal';
 
-export const DEFAULT_RETRY = 3;
+export const DEFAULT_RETRY = 5;
 export const DEFAULT_FRESH_DURATION = 30 * 1000; // 30 seconds
 export const DEFAULT_TTL_DURATION = 3 * 60 * 1000; // 3 minutes
 export const DEFAULT_RETRY_DELAY = new JitterExponentialBackoffTimer(1000, 30 * 1000);
@@ -20,7 +20,7 @@ export function defaultKeyHashFn<T extends ReadonlyArray<unknown>>(key: T): stri
 }
 
 /**
- * Default implementation of the query state filter function.
+ * Default implementation of the query and mutation state filter function.
  * Allows any provided state.
  * @returns `true`
  */
