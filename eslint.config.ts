@@ -25,7 +25,7 @@ const testConfig: Linter.Config = {
 	rules: {
 		complexity: ['error', 20],
 		'max-depth': ['error', 5],
-		'max-lines': ['error', { max: 3000, skipBlankLines: true, skipComments: true }],
+		'max-lines': ['error', { max: 5000, skipBlankLines: true, skipComments: true }],
 		'max-lines-per-function': ['error', { max: 1500, skipBlankLines: true, skipComments: true }],
 		'max-nested-callbacks': ['error', 5],
 		'max-params': ['error', 6],

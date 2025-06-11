@@ -52,11 +52,16 @@ describe('QueryControl state provider / query watcher', () => {
 			expect(handler1.errorFn).toHaveBeenCalledTimes(0);
 			expect(handler1.stateFn).toHaveBeenCalledTimes(2);
 
-			expect(handler1.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-				cache: 'no-cache',
-				origin: 'control',
-				source: 'query',
-			} satisfies QueryStateMetadata);
+			expect(handler1.dataFn).toHaveBeenNthCalledWith(
+				1,
+				'data#1',
+				{
+					cache: 'no-cache',
+					origin: 'control',
+					source: 'query',
+				} satisfies QueryStateMetadata,
+				queryApi1.cache
+			);
 
 			expect(handler1.stateFn).toHaveBeenNthCalledWith(
 				1,
@@ -69,7 +74,8 @@ describe('QueryControl state provider / query watcher', () => {
 					cache: 'no-cache',
 					origin: 'control',
 					source: 'query',
-				} satisfies QueryStateMetadata
+				} satisfies QueryStateMetadata,
+				queryApi1.cache
 			);
 			expect(handler1.stateFn).toHaveBeenNthCalledWith(
 				2,
@@ -82,7 +88,8 @@ describe('QueryControl state provider / query watcher', () => {
 					cache: 'no-cache',
 					origin: 'control',
 					source: 'query',
-				} satisfies QueryStateMetadata
+				} satisfies QueryStateMetadata,
+				queryApi1.cache
 			);
 
 			expect(queryFn1).toHaveBeenCalledTimes(1);
@@ -93,11 +100,16 @@ describe('QueryControl state provider / query watcher', () => {
 			expect(handler2.errorFn).toHaveBeenCalledTimes(0);
 			expect(handler2.stateFn).toHaveBeenCalledTimes(2);
 
-			expect(handler2.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-				cache: 'no-cache',
-				origin: 'provider',
-				source: 'query',
-			} satisfies QueryStateMetadata);
+			expect(handler2.dataFn).toHaveBeenNthCalledWith(
+				1,
+				'data#1',
+				{
+					cache: 'no-cache',
+					origin: 'provider',
+					source: 'query',
+				} satisfies QueryStateMetadata,
+				queryApi2.cache
+			);
 
 			expect(handler2.stateFn).toHaveBeenNthCalledWith(
 				1,
@@ -110,7 +122,8 @@ describe('QueryControl state provider / query watcher', () => {
 					cache: 'no-cache',
 					origin: 'provider',
 					source: 'query',
-				} satisfies QueryStateMetadata
+				} satisfies QueryStateMetadata,
+				queryApi2.cache
 			);
 			expect(handler2.stateFn).toHaveBeenNthCalledWith(
 				2,
@@ -123,7 +136,8 @@ describe('QueryControl state provider / query watcher', () => {
 					cache: 'no-cache',
 					origin: 'provider',
 					source: 'query',
-				} satisfies QueryStateMetadata
+				} satisfies QueryStateMetadata,
+				queryApi2.cache
 			);
 
 			expect(queryFn2).toHaveBeenCalledTimes(0);
@@ -403,7 +417,8 @@ describe('QueryControl state provider', () => {
 					cache: 'fresh',
 					origin: 'control',
 					source: 'query',
-				} satisfies QueryStateMetadata
+				} satisfies QueryStateMetadata,
+				queryApi1.cache
 			);
 			expect(handler1.stateFn).toHaveBeenNthCalledWith(
 				2,
@@ -416,7 +431,8 @@ describe('QueryControl state provider', () => {
 					cache: 'fresh',
 					origin: 'control',
 					source: 'query',
-				} satisfies QueryStateMetadata
+				} satisfies QueryStateMetadata,
+				queryApi1.cache
 			);
 		}
 
@@ -434,7 +450,8 @@ describe('QueryControl state provider', () => {
 					cache: 'no-cache',
 					origin: 'control',
 					source: 'query',
-				} satisfies QueryStateMetadata
+				} satisfies QueryStateMetadata,
+				queryApi2.cache
 			);
 			expect(handler2.stateFn).toHaveBeenNthCalledWith(
 				2,
@@ -447,7 +464,8 @@ describe('QueryControl state provider', () => {
 					cache: 'no-cache',
 					origin: 'control',
 					source: 'query',
-				} satisfies QueryStateMetadata
+				} satisfies QueryStateMetadata,
+				queryApi2.cache
 			);
 		}
 
@@ -465,7 +483,8 @@ describe('QueryControl state provider', () => {
 					cache: 'stale',
 					origin: 'control',
 					source: 'cache',
-				} satisfies QueryStateMetadata
+				} satisfies QueryStateMetadata,
+				queryApi3.cache
 			);
 			expect(handler3.stateFn).toHaveBeenNthCalledWith(
 				2,
@@ -478,7 +497,8 @@ describe('QueryControl state provider', () => {
 					cache: 'stale',
 					origin: 'control',
 					source: 'background-query',
-				} satisfies QueryStateMetadata
+				} satisfies QueryStateMetadata,
+				queryApi3.cache
 			);
 		}
 

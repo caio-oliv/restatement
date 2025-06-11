@@ -32,11 +32,16 @@ describe('QueryControl handler execution / no-cache query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'no-cache',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'no-cache',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -49,7 +54,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -62,7 +68,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -90,11 +97,16 @@ describe('QueryControl handler execution / no-cache query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'no-cache',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'no-cache',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -107,7 +119,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -120,7 +133,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -144,11 +158,16 @@ describe('QueryControl handler execution / no-cache query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'no-cache',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'no-cache',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -161,7 +180,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -174,7 +194,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -185,11 +206,16 @@ describe('QueryControl handler execution / no-cache query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(2, 'data#1', {
-			cache: 'no-cache',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			2,
+			'data#1',
+			{
+				cache: 'no-cache',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -202,7 +228,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -215,7 +242,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -239,11 +267,16 @@ describe('QueryControl handler execution / no-cache query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'no-cache',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'no-cache',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -256,7 +289,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -269,7 +303,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -280,11 +315,16 @@ describe('QueryControl handler execution / no-cache query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'no-cache',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'no-cache',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -297,7 +337,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -310,7 +351,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -334,11 +376,16 @@ describe('QueryControl handler execution / no-cache query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'no-cache',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'no-cache',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -351,7 +398,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -364,7 +412,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -375,11 +424,16 @@ describe('QueryControl handler execution / no-cache query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'no-cache',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'no-cache',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -392,7 +446,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -405,7 +460,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -429,11 +485,16 @@ describe('QueryControl handler execution / no-cache query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'no-cache',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'no-cache',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -446,7 +507,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -459,7 +521,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -470,11 +533,16 @@ describe('QueryControl handler execution / no-cache query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(2);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(2, new Error('invalid_key'), {
-			cache: 'no-cache',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			2,
+			new Error('invalid_key'),
+			{
+				cache: 'no-cache',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -487,7 +555,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -500,7 +569,8 @@ describe('QueryControl handler execution / no-cache query', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -530,11 +600,16 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -547,7 +622,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -560,7 +636,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -590,11 +667,16 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(1);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'cache',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'cache',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -607,7 +689,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'cache',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(0);
@@ -635,11 +718,16 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -652,7 +740,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -665,7 +754,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -689,11 +779,16 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -706,7 +801,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -719,7 +815,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -732,11 +829,16 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(2, 'data#1', {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			2,
+			'data#1',
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -749,7 +851,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -762,7 +865,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -786,11 +890,16 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -803,7 +912,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -816,7 +926,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -827,11 +938,16 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(3);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(2, 'data#1', {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'cache',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			2,
+			'data#1',
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'cache',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -844,7 +960,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'cache',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -868,11 +985,16 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -885,7 +1007,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -898,7 +1021,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -909,11 +1033,16 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -926,7 +1055,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -939,7 +1069,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -963,11 +1094,16 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -980,7 +1116,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -993,7 +1130,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -1004,11 +1142,16 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -1021,7 +1164,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -1034,7 +1178,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -1058,11 +1203,16 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -1075,7 +1225,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -1088,7 +1239,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -1101,11 +1253,16 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(3);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'cache',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'cache',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -1118,7 +1275,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'cache',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -1142,11 +1300,16 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -1159,7 +1322,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -1172,7 +1336,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -1183,11 +1348,16 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(2);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -1200,7 +1370,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -1213,7 +1384,8 @@ describe('QueryControl handler execution / fresh query', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -1243,11 +1415,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -1260,7 +1437,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -1273,7 +1451,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -1303,11 +1482,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(1);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'cache',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'cache',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -1320,7 +1504,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'cache',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(0);
@@ -1349,11 +1534,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -1366,7 +1556,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -1379,7 +1570,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -1394,11 +1586,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(3);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(2, 'stale_data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'cache',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			2,
+			'stale_data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'cache',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -1411,7 +1608,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'cache',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		await result.next();
@@ -1420,11 +1618,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(3, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'background-query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			3,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'background-query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -1437,7 +1640,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'background-query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 	});
 
@@ -1464,11 +1668,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -1481,7 +1690,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -1494,7 +1704,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -1509,11 +1720,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(3);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(2, 'stale_data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'cache',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			2,
+			'stale_data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'cache',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -1526,7 +1742,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'cache',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		await result.next();
@@ -1535,11 +1752,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'stale',
-			origin: 'control',
-			source: 'background-query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'background-query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -1552,7 +1774,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'background-query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 	});
 
@@ -1578,11 +1801,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -1595,7 +1823,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -1608,7 +1837,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -1632,11 +1862,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -1649,7 +1884,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -1662,7 +1898,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -1675,11 +1912,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(2, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			2,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -1692,7 +1934,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -1705,7 +1948,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -1729,11 +1973,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -1746,7 +1995,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -1759,7 +2009,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -1770,11 +2021,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(3);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(2, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'cache',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			2,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'cache',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -1787,7 +2043,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'cache',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -1812,11 +2069,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -1829,7 +2091,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -1842,7 +2105,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -1857,11 +2121,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(3);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(2, 'stale_data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'cache',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			2,
+			'stale_data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'cache',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -1874,7 +2143,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'cache',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		await waitUntil(100);
@@ -1884,11 +2154,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(3, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'background-query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			3,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'background-query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -1901,7 +2176,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'background-query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -1926,11 +2202,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -1943,7 +2224,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -1956,7 +2238,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -1971,11 +2254,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(3);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(2, 'stale_data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'cache',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			2,
+			'stale_data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'cache',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -1988,7 +2276,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'cache',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		await waitUntil(100);
@@ -1998,11 +2287,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'stale',
-			origin: 'control',
-			source: 'background-query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'background-query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -2015,7 +2309,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'background-query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -2039,11 +2334,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -2056,7 +2356,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -2069,7 +2370,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -2080,11 +2382,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -2097,7 +2404,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -2110,7 +2418,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -2134,11 +2443,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -2151,7 +2465,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -2164,7 +2479,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -2175,11 +2491,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -2192,7 +2513,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -2205,7 +2527,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -2229,11 +2552,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -2246,7 +2574,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -2259,7 +2588,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -2272,11 +2602,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(3);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'cache',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'cache',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -2289,7 +2624,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'cache',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -2314,11 +2650,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -2331,7 +2672,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -2344,7 +2686,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -2359,11 +2702,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(3);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'stale_data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'cache',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'stale_data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'cache',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -2376,7 +2724,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'cache',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		await waitUntil(100);
@@ -2386,11 +2735,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(2, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'background-query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			2,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'background-query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -2403,7 +2757,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'background-query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -2428,11 +2783,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -2445,7 +2805,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -2458,7 +2819,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -2473,11 +2835,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(3);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'stale_data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'cache',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'stale_data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'cache',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -2490,7 +2857,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'cache',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		await waitUntil(100);
@@ -2500,11 +2868,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(2);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(2, new Error('invalid_key'), {
-			cache: 'stale',
-			origin: 'control',
-			source: 'background-query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			2,
+			new Error('invalid_key'),
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'background-query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -2517,7 +2890,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'background-query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -2542,11 +2916,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -2559,7 +2938,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -2572,7 +2952,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -2583,11 +2964,16 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(2);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(2, new Error('invalid_key'), {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			2,
+			new Error('invalid_key'),
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -2600,7 +2986,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -2613,7 +3000,8 @@ describe('QueryControl handler execution / stale query', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -2643,11 +3031,16 @@ describe('QueryControl handler exception handling', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'no-cache',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'no-cache',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -2660,7 +3053,8 @@ describe('QueryControl handler exception handling', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -2673,7 +3067,8 @@ describe('QueryControl handler exception handling', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -2684,11 +3079,16 @@ describe('QueryControl handler exception handling', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'no-cache',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'no-cache',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -2701,7 +3101,8 @@ describe('QueryControl handler exception handling', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -2714,7 +3115,8 @@ describe('QueryControl handler exception handling', () => {
 				cache: 'no-cache',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -2742,11 +3144,16 @@ describe('QueryControl handler exception handling', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -2759,7 +3166,8 @@ describe('QueryControl handler exception handling', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -2772,7 +3180,8 @@ describe('QueryControl handler exception handling', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -2783,11 +3192,16 @@ describe('QueryControl handler exception handling', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -2800,7 +3214,8 @@ describe('QueryControl handler exception handling', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -2813,7 +3228,8 @@ describe('QueryControl handler exception handling', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -2824,16 +3240,26 @@ describe('QueryControl handler exception handling', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(5);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(2, 'data#1', {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
-		expect(handler.dataFn).toHaveBeenNthCalledWith(3, 'data#1', {
-			cache: 'fresh',
-			origin: 'control',
-			source: 'cache',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			2,
+			'data#1',
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			3,
+			'data#1',
+			{
+				cache: 'fresh',
+				origin: 'control',
+				source: 'cache',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			5,
@@ -2846,7 +3272,8 @@ describe('QueryControl handler exception handling', () => {
 				cache: 'fresh',
 				origin: 'control',
 				source: 'cache',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -2874,11 +3301,16 @@ describe('QueryControl handler exception handling', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(1, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			1,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
@@ -2891,7 +3323,8 @@ describe('QueryControl handler exception handling', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
@@ -2904,7 +3337,8 @@ describe('QueryControl handler exception handling', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
@@ -2915,11 +3349,16 @@ describe('QueryControl handler exception handling', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(4);
 
-		expect(handler.errorFn).toHaveBeenNthCalledWith(1, new Error('invalid_key'), {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
+		expect(handler.errorFn).toHaveBeenNthCalledWith(
+			1,
+			new Error('invalid_key'),
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
@@ -2932,7 +3371,8 @@ describe('QueryControl handler exception handling', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
@@ -2945,7 +3385,8 @@ describe('QueryControl handler exception handling', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'query',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
@@ -2956,16 +3397,26 @@ describe('QueryControl handler exception handling', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(1);
 		expect(handler.stateFn).toHaveBeenCalledTimes(5);
 
-		expect(handler.dataFn).toHaveBeenNthCalledWith(2, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'query',
-		} satisfies QueryStateMetadata);
-		expect(handler.dataFn).toHaveBeenNthCalledWith(3, 'data#1', {
-			cache: 'stale',
-			origin: 'control',
-			source: 'cache',
-		} satisfies QueryStateMetadata);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			2,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'query',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
+		expect(handler.dataFn).toHaveBeenNthCalledWith(
+			3,
+			'data#1',
+			{
+				cache: 'stale',
+				origin: 'control',
+				source: 'cache',
+			} satisfies QueryStateMetadata,
+			queryApi.cache
+		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			5,
@@ -2978,7 +3429,8 @@ describe('QueryControl handler exception handling', () => {
 				cache: 'stale',
 				origin: 'control',
 				source: 'cache',
-			} satisfies QueryStateMetadata
+			} satisfies QueryStateMetadata,
+			queryApi.cache
 		);
 
 		expect(queryFn).toBeCalledTimes(2);

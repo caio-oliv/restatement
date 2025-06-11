@@ -1,4 +1,10 @@
-import type { KeyHashFn, Millisecond, QueryProviderState, QueryStatePromise } from '@/Type';
+import type {
+	CacheHandler,
+	KeyHashFn,
+	Millisecond,
+	QueryProviderState,
+	QueryStatePromise,
+} from '@/Type';
 import type { CacheStore } from '@/Cache';
 import type { PubSub } from '@/PubSub';
 import { defaultKeyHashFn, DEFAULT_TTL_DURATION } from '@/Default';
@@ -23,8 +29,12 @@ export interface CacheManagerInput {
 
 export type CacheManagerProvider<T, E> = PubSub<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
 
-export class CacheManager {
+export class CacheManager implements CacheHandler {
 	public readonly keyHashFn: KeyHashFn<ReadonlyArray<unknown>>;
+	/**
+	 * @summary Default TTL (duration)
+	 * @description Default Time To Live (duration) of cache entries set through this manager.
+	 */
 	public readonly ttl: Millisecond;
 
 	public constructor({

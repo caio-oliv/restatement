@@ -26,6 +26,13 @@ export type KeyHashFn<K extends ReadonlyArray<unknown>> = (key: K) => string;
 
 export type KeepCacheOnError<E> = (err: E) => boolean;
 
+export interface CacheHandler {
+	set<K extends ReadonlyArray<unknown>, T>(key: K, data: T, ttl?: Millisecond): Promise<void>;
+	get<K extends ReadonlyArray<unknown>, T>(key: K): Promise<T | undefined>;
+	invalidate<K extends ReadonlyArray<unknown>>(key: K): Promise<void>;
+	delete<K extends ReadonlyArray<unknown>>(key: K): Promise<void>;
+}
+
 export interface IdleQueryState<T> {
 	readonly data: T | null;
 	readonly error: null;
@@ -104,12 +111,21 @@ export type QueryStateFilterFn<T, E> = (info: QueryStateFilterInfo<T, E>) => boo
 
 export type QueryStateHandler<T, E> = (
 	state: QueryState<T, E>,
-	metadata: StateMetadata
+	metadata: StateMetadata,
+	cache: CacheHandler
 ) => Promise<void>;
 
-export type DataHandler<T> = (data: T, metadata: StateMetadata) => Promise<void>;
+export type DataHandler<T> = (
+	data: T,
+	metadata: StateMetadata,
+	cache: CacheHandler
+) => Promise<void>;
 
-export type ErrorHandler<E> = (error: E, metadata: StateMetadata) => Promise<void>;
+export type ErrorHandler<E> = (
+	error: E,
+	metadata: StateMetadata,
+	cache: CacheHandler
+) => Promise<void>;
 
 export interface QueryControlHandler<T, E> {
 	stateFn?: QueryStateHandler<T, E>;
@@ -126,11 +142,35 @@ export interface QueryExecutorResult<T, E> {
 
 export type MutationStatus = 'idle' | 'loading' | 'success' | 'error';
 
-export interface MutationState<T, E> {
+export interface IdleMutationState<T> {
 	readonly data: T | null;
-	readonly error: E | null;
-	readonly status: MutationStatus;
+	readonly error: null;
+	readonly status: 'idle';
 }
+
+export interface LoadingMutationState {
+	readonly data: null;
+	readonly error: null;
+	readonly status: 'loading';
+}
+
+export interface SuccessMutationState<T> {
+	readonly data: T;
+	readonly error: null;
+	readonly status: 'success';
+}
+
+export interface ErrorMutationState<E> {
+	readonly data: null;
+	readonly error: E | null;
+	readonly status: 'error';
+}
+
+export type MutationState<T, E> =
+	| IdleMutationState<T>
+	| LoadingMutationState
+	| SuccessMutationState<T>
+	| ErrorMutationState<E>;
 
 export type MutationFn<I, T> = (input: I, signal: AbortSignal) => Promise<T>;
 
@@ -141,11 +181,14 @@ export interface MutationStateFilterInfo<T, E> {
 
 export type MutationStateFilterFn<T, E> = (info: MutationStateFilterInfo<T, E>) => boolean;
 
-export type MutationStateHandler<T, E> = (state: MutationState<T, E>) => Promise<void>;
+export type MutationStateHandler<T, E> = (
+	state: MutationState<T, E>,
+	cache: CacheHandler
+) => Promise<void>;
 
-export type MutationDataHandler<T> = (data: T) => Promise<void>;
+export type MutationDataHandler<T> = (data: T, cache: CacheHandler) => Promise<void>;
 
-export type MutationErrorHandler<E> = (error: E) => Promise<void>;
+export type MutationErrorHandler<E> = (error: E, cache: CacheHandler) => Promise<void>;
 
 export interface MutationControlHandler<T, E> {
 	stateFn?: MutationStateHandler<T, E>;

@@ -25,6 +25,7 @@ import {
 	defaultStateFilterFn,
 } from '@/Default';
 import { blackhole, makeObservablePromise, nullpromise } from '@/Internal';
+import { CacheManager } from '@/controller/CacheManager';
 
 export interface QueryControlInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	/**
@@ -63,7 +64,7 @@ export interface QueryControlInput<K extends ReadonlyArray<unknown>, T, E = unkn
 	/**
 	 * Use the previus cached data on error of the `queryFn`
 	 */
-	keepCacheOnError?(err: E): boolean;
+	keepCacheOnError?: KeepCacheOnError<E>;
 	/**
 	 * @description Duration in which cache entries will be fresh.
 	 *
@@ -129,6 +130,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	 * Must be greater than {@link fresh} cache duration.
 	 */
 	public readonly ttl: Millisecond;
+	public readonly cache: CacheManager;
 
 	public constructor({
 		placeholder = null,
@@ -146,7 +148,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		provider = null,
 	}: QueryControlInput<K, T, E>) {
 		this.#placeholder = placeholder;
-		this.#cache = cache;
+		this.#internalCache = cache;
 		this.keyHashFn = keyHashFn;
 		this.#queryFn = queryFn;
 		this.retryDelay = retryDelay;
@@ -155,6 +157,12 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		this.retry = retry;
 		this.fresh = fresh;
 		this.ttl = ttl;
+		this.cache = new CacheManager({
+			cache,
+			keyHashFn: keyHashFn as KeyHashFn<ReadonlyArray<unknown>>,
+			provider: provider as QueryControlProvider<unknown, unknown>,
+			ttl,
+		});
 		this.#state = { data: this.#placeholder, error: null, status: 'idle' };
 		this.#handler = handler;
 		this.#stateFilterFn = stateFilterFn;
@@ -176,7 +184,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 			return this.#tryCurrentPromiseOrRunQuery({ key, hash }, cache, ctl);
 		}
 
-		const entry = await this.#cache.getEntry(hash).catch(blackhole);
+		const entry = await this.#internalCache.getEntry(hash).catch(blackhole);
 		if (entry === undefined) {
 			// eslint-disable-next-line @typescript-eslint/return-await
 			return this.#tryCurrentPromiseOrRunQuery({ key, hash }, cache, ctl);
@@ -340,7 +348,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		source: QueryStateNoCacheSource
 	): Promise<QueryState<T, E>> {
 		const state: QueryState<T, E> = { status: 'success', error: null, data };
-		await this.#cache.set(hash, data, this.ttl).catch(blackhole);
+		await this.#internalCache.set(hash, data, this.ttl).catch(blackhole);
 		this.#updateState(hash, { state, metadata: { origin: 'control', source, cache } });
 		return state;
 	}
@@ -353,7 +361,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	): Promise<QueryState<T, E>> {
 		const state: QueryState<T, E> = { status: 'error', error: err as E, data: null };
 		if (!this.#keepCacheOnError(err as E)) {
-			await this.#cache.delete(hash).catch(blackhole);
+			await this.#internalCache.delete(hash).catch(blackhole);
 		}
 		this.#updateState(hash, { state, metadata: { origin: 'control', source, cache } });
 		return state;
@@ -371,12 +379,12 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		this.#state = state;
 
 		if (this.#state.data !== null) {
-			this.#handler.dataFn?.(this.#state.data, metadata)?.catch(blackhole);
+			this.#handler.dataFn?.(this.#state.data, metadata, this.cache)?.catch(blackhole);
 		}
 		if (this.#state.error !== null) {
-			this.#handler.errorFn?.(this.#state.error, metadata)?.catch(blackhole);
+			this.#handler.errorFn?.(this.#state.error, metadata, this.cache)?.catch(blackhole);
 		}
-		this.#handler.stateFn?.(this.#state, metadata)?.catch(blackhole);
+		this.#handler.stateFn?.(this.#state, metadata, this.cache)?.catch(blackhole);
 
 		if (metadata.origin === 'control') {
 			this.#subscriber.publishTopic(hash, {
@@ -388,7 +396,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 
 	#state: QueryState<T, E>;
 	readonly #placeholder: T | null;
-	readonly #cache: CacheStore<string, T>;
+	readonly #internalCache: CacheStore<string, T>;
 	readonly #subscriber: Subscriber<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
 	readonly #handler: QueryControlHandler<T, E>;
 	readonly #queryFn: QueryFn<K, T>;

@@ -7,9 +7,11 @@ import type {
 import { type RetryDelay, type RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
 import { DEFAULT_RETRY_DELAY, defaultStateFilterFn } from '@/Default';
 import { blackhole } from '@/Internal';
+import type { CacheManager } from '@/controller/CacheManager';
 
 export interface MutationControlInput<I, T, E> {
 	mutationFn: MutationFn<I, T>;
+	cache: CacheManager;
 	retry?: number;
 	retryDelay?: RetryDelay<E>;
 	retryHandleFn?: RetryHandlerFn<E> | null;
@@ -20,9 +22,11 @@ export interface MutationControlInput<I, T, E> {
 export class MutationControl<I, T, E> {
 	public readonly retry: number;
 	public readonly retryDelay: RetryDelay<E>;
+	public readonly cache: CacheManager;
 
 	public constructor({
 		mutationFn,
+		cache,
 		retry = 0,
 		retryDelay = DEFAULT_RETRY_DELAY.delay,
 		retryHandleFn = null,
@@ -32,6 +36,7 @@ export class MutationControl<I, T, E> {
 		this.#mutationFn = mutationFn;
 		this.retry = retry;
 		this.retryDelay = retryDelay;
+		this.cache = cache;
 		this.#handler = handler;
 		this.#stateFilterFn = stateFilterFn;
 		this.#retryHandleFn = retryHandleFn;
@@ -88,12 +93,12 @@ export class MutationControl<I, T, E> {
 		this.#state = state;
 
 		if (this.#state.data !== null) {
-			this.#handler.dataFn?.(this.#state.data)?.catch(blackhole);
+			this.#handler.dataFn?.(this.#state.data, this.cache)?.catch(blackhole);
 		}
 		if (this.#state.error !== null) {
-			this.#handler.errorFn?.(this.#state.error)?.catch(blackhole);
+			this.#handler.errorFn?.(this.#state.error, this.cache)?.catch(blackhole);
 		}
-		this.#handler.stateFn?.(this.#state)?.catch(blackhole);
+		this.#handler.stateFn?.(this.#state, this.cache)?.catch(blackhole);
 	}
 
 	#state: MutationState<T, E>;
