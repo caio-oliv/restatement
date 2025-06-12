@@ -11,9 +11,9 @@ import {
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import {
-	makeDelayedTestQuery,
+	delayedTestTransformer,
 	mockQueryControlHandler,
-	testQuery,
+	testTransformer,
 } from '@/controller/Control.mock';
 
 function blockProviderState({ metadata }: QueryStateFilterInfo<string, Error>): boolean {
@@ -22,22 +22,22 @@ function blockProviderState({ metadata }: QueryStateFilterInfo<string, Error>): 
 
 describe('QueryControl state provider / query watcher', () => {
 	it('subscribe to query changes', async () => {
-		const cache = makeCache<string>();
+		const store = makeCache<string>();
 		const provider: QueryControlProvider<string, Error> = new PubSub();
 
-		const queryFn1 = vi.fn(testQuery);
+		const queryFn1 = vi.fn(testTransformer);
 		const handler1 = mockQueryControlHandler();
 		const queryApi1 = new QueryControl<[string], string, Error>({
-			cache,
+			store,
 			provider,
 			queryFn: queryFn1,
 			handler: handler1,
 		});
 
-		const queryFn2 = vi.fn(testQuery);
+		const queryFn2 = vi.fn(testTransformer);
 		const handler2 = mockQueryControlHandler();
 		const queryApi2 = new QueryControl<[string], string, Error>({
-			cache,
+			store,
 			provider,
 			queryFn: queryFn2,
 			handler: handler2,
@@ -145,15 +145,15 @@ describe('QueryControl state provider / query watcher', () => {
 	});
 
 	it('unsubscribe to query changes when disposed', async () => {
-		const cache = makeCache<string>();
+		const store = makeCache<string>();
 		const provider: QueryControlProvider<string, Error> = new PubSub();
 
 		const topic = defaultKeyHashFn(['key#1']);
 		{
-			const queryFn = vi.fn(testQuery);
+			const queryFn = vi.fn(testTransformer);
 			const handler = mockQueryControlHandler();
 			using queryApi = new QueryControl<[string], string, Error>({
-				cache,
+				store,
 				provider,
 				queryFn: queryFn,
 				handler: handler,
@@ -170,22 +170,22 @@ describe('QueryControl state provider / query watcher', () => {
 	});
 
 	it('unsubscribe to query changes when reset', async () => {
-		const cache = makeCache<string>();
+		const store = makeCache<string>();
 		const provider: QueryControlProvider<string, Error> = new PubSub();
 
-		const queryFn1 = vi.fn(testQuery);
+		const queryFn1 = vi.fn(testTransformer);
 		const handler1 = mockQueryControlHandler();
 		const queryApi1 = new QueryControl<[string], string, Error>({
-			cache,
+			store,
 			provider,
 			queryFn: queryFn1,
 			handler: handler1,
 		});
 
-		const queryFn2 = vi.fn(testQuery);
+		const queryFn2 = vi.fn(testTransformer);
 		const handler2 = mockQueryControlHandler();
 		const queryApi2 = new QueryControl<[string], string, Error>({
-			cache,
+			store,
 			provider,
 			queryFn: queryFn2,
 			handler: handler2,
@@ -225,23 +225,23 @@ describe('QueryControl state provider / query watcher', () => {
 	});
 
 	it('unsubscribe to query changes when other key is used', async () => {
-		const cache = makeCache<string>();
+		const store = makeCache<string>();
 		const provider: QueryControlProvider<string, Error> = new PubSub();
 
-		const queryFn1 = vi.fn(testQuery);
+		const queryFn1 = vi.fn(testTransformer);
 		const handler1 = mockQueryControlHandler();
 		const queryApi1 = new QueryControl<[string], string, Error>({
-			cache,
+			store,
 			provider,
 			queryFn: queryFn1,
 			handler: handler1,
 		});
 
-		const queryFn2 = vi.fn(testQuery);
+		const queryFn2 = vi.fn(testTransformer);
 		const handler2 = mockQueryControlHandler();
 		const queryApi2 = new QueryControl<[string], string, Error>({
 			placeholder: 'placeholder',
-			cache,
+			store,
 			provider,
 			queryFn: queryFn2,
 			handler: handler2,
@@ -283,13 +283,13 @@ describe('QueryControl state provider / query watcher', () => {
 
 describe('QueryControl state provider', () => {
 	it('share query function execution', async () => {
-		const cache = makeCache<string>();
+		const store = makeCache<string>();
 		const provider: QueryControlProvider<string, Error> = new PubSub();
 
-		const queryFn1 = vi.fn(testQuery);
+		const queryFn1 = vi.fn(testTransformer);
 		const handler1 = mockQueryControlHandler();
 		const queryApi1 = new QueryControl<[string], string, Error>({
-			cache,
+			store,
 			provider,
 			queryFn: queryFn1,
 			handler: handler1,
@@ -297,10 +297,10 @@ describe('QueryControl state provider', () => {
 			ttl: 100,
 		});
 
-		const queryFn2 = vi.fn(testQuery);
+		const queryFn2 = vi.fn(testTransformer);
 		const handler2 = mockQueryControlHandler();
 		const queryApi2 = new QueryControl<[string], string, Error>({
-			cache,
+			store,
 			provider,
 			queryFn: queryFn2,
 			handler: handler2,
@@ -331,13 +331,13 @@ describe('QueryControl state provider', () => {
 	});
 
 	it('execute only one query function and share the same promise with all queries', async () => {
-		const cache = makeCache<string>();
+		const store = makeCache<string>();
 		const provider: QueryControlProvider<string, Error> = new PubSub();
 
-		const queryFn1 = vi.fn(testQuery);
+		const queryFn1 = vi.fn(testTransformer);
 		const handler1 = mockQueryControlHandler();
 		const queryApi1 = new QueryControl<[string], string, Error>({
-			cache,
+			store,
 			provider,
 			queryFn: queryFn1,
 			handler: handler1,
@@ -346,10 +346,10 @@ describe('QueryControl state provider', () => {
 			stateFilterFn: blockProviderState,
 		});
 
-		const queryFn2 = vi.fn(testQuery);
+		const queryFn2 = vi.fn(testTransformer);
 		const handler2 = mockQueryControlHandler();
 		const queryApi2 = new QueryControl<[string], string, Error>({
-			cache,
+			store,
 			provider,
 			queryFn: queryFn2,
 			handler: handler2,
@@ -358,10 +358,10 @@ describe('QueryControl state provider', () => {
 			stateFilterFn: blockProviderState,
 		});
 
-		const queryFn3 = vi.fn(testQuery);
+		const queryFn3 = vi.fn(testTransformer);
 		const handler3 = mockQueryControlHandler();
 		const queryApi3 = new QueryControl<[string], string, Error>({
-			cache,
+			store,
 			provider,
 			queryFn: queryFn3,
 			handler: handler3,
@@ -370,7 +370,7 @@ describe('QueryControl state provider', () => {
 			stateFilterFn: blockProviderState,
 		});
 
-		await cache.set(defaultKeyHashFn(['key#1']), 'data_stale#1', 100);
+		await store.set(defaultKeyHashFn(['key#1']), 'data_stale#1', 100);
 
 		await waitUntil(60);
 
@@ -527,23 +527,23 @@ describe('QueryControl state provider', () => {
 
 describe('QueryControl state provider / in-flight migration', () => {
 	it('change subscribed key withing query execution', async () => {
-		const cache = makeCache<string>();
+		const store = makeCache<string>();
 		const provider: QueryControlProvider<string, Error> = new PubSub();
 
-		const queryFn1 = vi.fn(makeDelayedTestQuery(100));
+		const queryFn1 = vi.fn(delayedTestTransformer(100));
 		const handler1 = mockQueryControlHandler();
 		const queryApi1 = new QueryControl<[string], string, Error>({
-			cache,
+			store,
 			provider,
 			queryFn: queryFn1,
 			handler: handler1,
 			stateFilterFn: blockProviderState,
 		});
 
-		const queryFn2 = vi.fn(makeDelayedTestQuery(100));
+		const queryFn2 = vi.fn(delayedTestTransformer(100));
 		const handler2 = mockQueryControlHandler();
 		const queryApi2 = new QueryControl<[string], string, Error>({
-			cache,
+			store,
 			provider,
 			queryFn: queryFn2,
 			handler: handler2,

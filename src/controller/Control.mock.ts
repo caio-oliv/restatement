@@ -62,14 +62,14 @@ export function immediateRetryDelay(): number {
 	return 0;
 }
 
-export type TestQueryFn = (keys: [string, ...Array<string>]) => Promise<string>;
+export type TestTransformerFn = (keys: [string, ...Array<string>]) => Promise<string>;
 
 /**
- * @description Query function for tests that resturns data if a hash (pound, sharp) symbol ('#') is found.
+ * @description Function for tests that returns data if a hash (pound, sharp) symbol ('#') is found.
  * @param keys - key string
  * @returns promise with data result
  */
-export async function testQuery(keys: [string, ...Array<string>]): Promise<string> {
+export async function testTransformer(keys: [string, ...Array<string>]): Promise<string> {
 	const key = keys[0];
 	if (!key.startsWith('key#')) {
 		throw new Error('invalid_key');
@@ -84,13 +84,13 @@ export async function testQuery(keys: [string, ...Array<string>]): Promise<strin
 }
 
 /**
- * @description Make a delayed test query function
+ * @description Make a delayed test transformer function
  * @param delay - wait time in milliseconds
- * @returns Delayed {@link testQuery}
+ * @returns Delayed {@link testTransformer}
  */
-export function makeDelayedTestQuery(delay: number): TestQueryFn {
+export function delayedTestTransformer(delay: number): TestTransformerFn {
 	return async (keys: [string, ...Array<string>]): Promise<string> => {
 		await waitUntil(delay);
-		return await testQuery(keys);
+		return await testTransformer(keys);
 	};
 }

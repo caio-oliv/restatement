@@ -7,15 +7,19 @@ import {
 	waitUntil,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
-import { testQuery, immediateRetryDelay, mockQueryControlHandler } from '@/controller/Control.mock';
+import {
+	testTransformer,
+	immediateRetryDelay,
+	mockQueryControlHandler,
+} from '@/controller/Control.mock';
 
 describe('QueryControl handler execution / no-cache query', () => {
 	it('idle to loading to success', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -76,11 +80,11 @@ describe('QueryControl handler execution / no-cache query', () => {
 	});
 
 	it('idle to loading to error', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -141,11 +145,11 @@ describe('QueryControl handler execution / no-cache query', () => {
 	});
 
 	it('success to loading to success', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -250,11 +254,11 @@ describe('QueryControl handler execution / no-cache query', () => {
 	});
 
 	it('success to loading to error', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -359,11 +363,11 @@ describe('QueryControl handler execution / no-cache query', () => {
 	});
 
 	it('error to loading to success', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -468,11 +472,11 @@ describe('QueryControl handler execution / no-cache query', () => {
 	});
 
 	it('error to loading to error', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -579,11 +583,11 @@ describe('QueryControl handler execution / no-cache query', () => {
 
 describe('QueryControl handler execution / fresh query', () => {
 	it('idle to loading to success from query', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -644,11 +648,11 @@ describe('QueryControl handler execution / fresh query', () => {
 	});
 
 	it('idle to success from cache', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -659,7 +663,7 @@ describe('QueryControl handler execution / fresh query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(0);
 
-		await cache.set(defaultKeyHashFn(['key#1']), 'data#1', DEFAULT_TTL_DURATION);
+		await store.set(defaultKeyHashFn(['key#1']), 'data#1', DEFAULT_TTL_DURATION);
 
 		await queryApi.execute(['key#1'], 'fresh');
 
@@ -697,11 +701,11 @@ describe('QueryControl handler execution / fresh query', () => {
 	});
 
 	it('idle to loading to error', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -762,11 +766,11 @@ describe('QueryControl handler execution / fresh query', () => {
 	});
 
 	it('success to loading to success from query', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -821,7 +825,7 @@ describe('QueryControl handler execution / fresh query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cache.delete(defaultKeyHashFn(['key#1']));
+		await store.delete(defaultKeyHashFn(['key#1']));
 
 		await queryApi.execute(['key#1'], 'fresh');
 
@@ -873,11 +877,11 @@ describe('QueryControl handler execution / fresh query', () => {
 	});
 
 	it('success to success from cache', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -968,11 +972,11 @@ describe('QueryControl handler execution / fresh query', () => {
 	});
 
 	it('success to loading to error', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1077,11 +1081,11 @@ describe('QueryControl handler execution / fresh query', () => {
 	});
 
 	it('error to loading to success from query', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1186,11 +1190,11 @@ describe('QueryControl handler execution / fresh query', () => {
 	});
 
 	it('error to success from cache', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1245,7 +1249,7 @@ describe('QueryControl handler execution / fresh query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cache.set(defaultKeyHashFn(['key#1']), 'data#1', DEFAULT_TTL_DURATION);
+		await store.set(defaultKeyHashFn(['key#1']), 'data#1', DEFAULT_TTL_DURATION);
 
 		await queryApi.execute(['key#1'], 'fresh');
 
@@ -1283,11 +1287,11 @@ describe('QueryControl handler execution / fresh query', () => {
 	});
 
 	it('error to loading to error', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1394,11 +1398,11 @@ describe('QueryControl handler execution / fresh query', () => {
 
 describe('QueryControl handler execution / stale query', () => {
 	it('idle to loading to success from query', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1459,11 +1463,11 @@ describe('QueryControl handler execution / stale query', () => {
 	});
 
 	it('idle to success from cache', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1474,7 +1478,7 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(0);
 
-		await cache.set(defaultKeyHashFn(['key#1']), 'data#1', DEFAULT_TTL_DURATION);
+		await store.set(defaultKeyHashFn(['key#1']), 'data#1', DEFAULT_TTL_DURATION);
 
 		await queryApi.execute(['key#1'], 'stale');
 
@@ -1512,11 +1516,11 @@ describe('QueryControl handler execution / stale query', () => {
 	});
 
 	it('stale to success from background query', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1576,7 +1580,7 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cache.set(defaultKeyHashFn(['key#1']), 'stale_data#1', DEFAULT_TTL_DURATION);
+		await store.set(defaultKeyHashFn(['key#1']), 'stale_data#1', DEFAULT_TTL_DURATION);
 
 		await waitUntil(70);
 
@@ -1646,11 +1650,11 @@ describe('QueryControl handler execution / stale query', () => {
 	});
 
 	it('stale to error from background query', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1710,7 +1714,7 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cache.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', DEFAULT_TTL_DURATION);
+		await store.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', DEFAULT_TTL_DURATION);
 
 		await waitUntil(70);
 
@@ -1780,11 +1784,11 @@ describe('QueryControl handler execution / stale query', () => {
 	});
 
 	it('idle to loading to error', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1845,11 +1849,11 @@ describe('QueryControl handler execution / stale query', () => {
 	});
 
 	it('success to loading to success from query', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -1904,7 +1908,7 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cache.delete(defaultKeyHashFn(['key#1']));
+		await store.delete(defaultKeyHashFn(['key#1']));
 
 		await queryApi.execute(['key#1'], 'stale');
 
@@ -1956,11 +1960,11 @@ describe('QueryControl handler execution / stale query', () => {
 	});
 
 	it('success to success from cache', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -2051,11 +2055,11 @@ describe('QueryControl handler execution / stale query', () => {
 	});
 
 	it('success to stale to success from background query', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -2111,7 +2115,7 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cache.set(defaultKeyHashFn(['key#1']), 'stale_data#1', DEFAULT_TTL_DURATION);
+		await store.set(defaultKeyHashFn(['key#1']), 'stale_data#1', DEFAULT_TTL_DURATION);
 
 		await waitUntil(70);
 
@@ -2184,11 +2188,11 @@ describe('QueryControl handler execution / stale query', () => {
 	});
 
 	it('success to stale to error from background query', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -2244,7 +2248,7 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cache.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', DEFAULT_TTL_DURATION);
+		await store.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', DEFAULT_TTL_DURATION);
 
 		await waitUntil(70);
 
@@ -2317,11 +2321,11 @@ describe('QueryControl handler execution / stale query', () => {
 	});
 
 	it('success to loading to error', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -2426,11 +2430,11 @@ describe('QueryControl handler execution / stale query', () => {
 	});
 
 	it('error to loading to success from query', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -2535,11 +2539,11 @@ describe('QueryControl handler execution / stale query', () => {
 	});
 
 	it('error to success from cache', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -2594,7 +2598,7 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cache.set(defaultKeyHashFn(['key#1']), 'data#1', DEFAULT_TTL_DURATION);
+		await store.set(defaultKeyHashFn(['key#1']), 'data#1', DEFAULT_TTL_DURATION);
 
 		await queryApi.execute(['key#1'], 'stale');
 
@@ -2632,11 +2636,11 @@ describe('QueryControl handler execution / stale query', () => {
 	});
 
 	it('error to stale to success from background query', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -2692,7 +2696,7 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cache.set(defaultKeyHashFn(['key#1']), 'stale_data#1', DEFAULT_TTL_DURATION);
+		await store.set(defaultKeyHashFn(['key#1']), 'stale_data#1', DEFAULT_TTL_DURATION);
 
 		await waitUntil(70);
 
@@ -2765,11 +2769,11 @@ describe('QueryControl handler execution / stale query', () => {
 	});
 
 	it('error to stale to error from background query', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -2825,7 +2829,7 @@ describe('QueryControl handler execution / stale query', () => {
 
 		expect(queryFn).toBeCalledTimes(1);
 
-		await cache.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', DEFAULT_TTL_DURATION);
+		await store.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', DEFAULT_TTL_DURATION);
 
 		await waitUntil(70);
 
@@ -2898,11 +2902,11 @@ describe('QueryControl handler execution / stale query', () => {
 	});
 
 	it('error to loading to error', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -3010,11 +3014,11 @@ describe('QueryControl handler execution / stale query', () => {
 
 describe('QueryControl handler exception handling', () => {
 	it('handler exception for no-cache query', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -3123,11 +3127,11 @@ describe('QueryControl handler exception handling', () => {
 	});
 
 	it('handler exception for fresh query', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
@@ -3280,11 +3284,11 @@ describe('QueryControl handler exception handling', () => {
 	});
 
 	it('handler exception for stale query', async () => {
-		const cache = makeCache<string>();
-		const queryFn = vi.fn(testQuery);
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryControlHandler<string>();
 		const queryApi = new QueryControl({
-			cache,
+			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,

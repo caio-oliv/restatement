@@ -35,7 +35,7 @@ export interface QueryControlInput<K extends ReadonlyArray<unknown>, T, E = unkn
 	/**
 	 * Cache store.
 	 */
-	cache: CacheStore<string, T>;
+	store: CacheStore<string, T>;
 	/**
 	 * Query function.
 	 *
@@ -134,7 +134,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 
 	public constructor({
 		placeholder = null,
-		cache,
+		store,
 		queryFn,
 		keyHashFn = defaultKeyHashFn,
 		retryDelay = DEFAULT_RETRY_DELAY.delay,
@@ -148,7 +148,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		provider = null,
 	}: QueryControlInput<K, T, E>) {
 		this.#placeholder = placeholder;
-		this.#internalCache = cache;
+		this.#internalCache = store;
 		this.keyHashFn = keyHashFn;
 		this.#queryFn = queryFn;
 		this.retryDelay = retryDelay;
@@ -158,7 +158,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		this.fresh = fresh;
 		this.ttl = ttl;
 		this.cache = new CacheManager({
-			cache,
+			store,
 			keyHashFn: keyHashFn as KeyHashFn<ReadonlyArray<unknown>>,
 			provider: provider as QueryControlProvider<unknown, unknown>,
 			ttl,

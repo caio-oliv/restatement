@@ -10,6 +10,7 @@ import { blackhole } from '@/Internal';
 import type { CacheManager } from '@/controller/CacheManager';
 
 export interface MutationControlInput<I, T, E> {
+	placeholder?: T | null;
 	mutationFn: MutationFn<I, T>;
 	cache: CacheManager;
 	retry?: number;
@@ -25,6 +26,7 @@ export class MutationControl<I, T, E> {
 	public readonly cache: CacheManager;
 
 	public constructor({
+		placeholder = null,
 		mutationFn,
 		cache,
 		retry = 0,
@@ -33,6 +35,7 @@ export class MutationControl<I, T, E> {
 		handler = { stateFn: undefined, dataFn: undefined, errorFn: undefined },
 		stateFilterFn = defaultStateFilterFn,
 	}: MutationControlInput<I, T, E>) {
+		this.#placeholder = placeholder;
 		this.#mutationFn = mutationFn;
 		this.retry = retry;
 		this.retryDelay = retryDelay;
@@ -40,7 +43,7 @@ export class MutationControl<I, T, E> {
 		this.#handler = handler;
 		this.#stateFilterFn = stateFilterFn;
 		this.#retryHandleFn = retryHandleFn;
-		this.#state = { data: null, error: null, status: 'idle' };
+		this.#state = { data: this.#placeholder, error: null, status: 'idle' };
 	}
 
 	public async execute(
@@ -56,6 +59,10 @@ export class MutationControl<I, T, E> {
 
 	public getState(): MutationState<T, E> {
 		return this.#state;
+	}
+
+	public reset(): void {
+		this.#state = { status: 'idle', data: this.#placeholder, error: null };
 	}
 
 	async #runMutation(input: I, ctl: AbortController): Promise<MutationState<T, E>> {
@@ -102,6 +109,7 @@ export class MutationControl<I, T, E> {
 	}
 
 	#state: MutationState<T, E>;
+	readonly #placeholder: T | null;
 	readonly #handler: MutationControlHandler<T, E>;
 	readonly #stateFilterFn: MutationStateFilterFn<T, E>;
 	readonly #mutationFn: MutationFn<I, T>;

@@ -20,7 +20,7 @@ export interface CacheManagerInput {
 	/**
 	 * Cache store.
 	 */
-	cache: CacheStore<string, unknown>;
+	store: CacheStore<string, unknown>;
 	/**
 	 * State provider.
 	 */
@@ -40,12 +40,12 @@ export class CacheManager implements CacheHandler {
 	public constructor({
 		keyHashFn = defaultKeyHashFn,
 		ttl = DEFAULT_TTL_DURATION,
-		cache,
-		provider,
+		store,
+		provider = null,
 	}: CacheManagerInput) {
 		this.keyHashFn = keyHashFn;
 		this.ttl = ttl;
-		this.#cache = cache;
+		this.#internalCache = store;
 		this.#provider = provider;
 	}
 
@@ -55,7 +55,7 @@ export class CacheManager implements CacheHandler {
 		ttl: Millisecond = this.ttl
 	): Promise<void> {
 		const hash = this.keyHashFn(key);
-		await this.#cache.set(hash, data, ttl).catch(blackhole);
+		await this.#internalCache.set(hash, data, ttl).catch(blackhole);
 		this.#provider?.publish(hash, {
 			state: { data, error: null, status: 'success' },
 			metadata: { source: 'mutation', origin: 'provider', cache: 'none' },
@@ -64,19 +64,19 @@ export class CacheManager implements CacheHandler {
 
 	public async get<K extends ReadonlyArray<unknown>, T>(key: K): Promise<T | undefined> {
 		const hash = this.keyHashFn(key);
-		return (await this.#cache.get(hash).catch(blackhole)) as T | undefined;
+		return (await this.#internalCache.get(hash).catch(blackhole)) as T | undefined;
 	}
 
 	public async delete<K extends ReadonlyArray<unknown>>(key: K): Promise<void> {
 		const hash = this.keyHashFn(key);
-		await this.#cache.delete(hash).catch(blackhole);
+		await this.#internalCache.delete(hash).catch(blackhole);
 	}
 
 	public async invalidate<K extends ReadonlyArray<unknown>>(key: K): Promise<void> {
 		const hash = this.keyHashFn(key);
-		await this.#cache.deletePrefix(hash).catch(blackhole);
+		await this.#internalCache.deletePrefix(hash).catch(blackhole);
 	}
 
-	readonly #cache: CacheStore<string, unknown>;
-	readonly #provider?: CacheManagerProvider<unknown, unknown> | null;
+	readonly #internalCache: CacheStore<string, unknown>;
+	readonly #provider: CacheManagerProvider<unknown, unknown> | null;
 }
