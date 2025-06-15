@@ -1,10 +1,10 @@
 import { syncPromiseResolver } from '@/Internal';
 
-export type Listener<T> = (topic: string, data: T) => void | Promise<void>;
+export type Listener<in T> = (topic: string, data: T) => void | Promise<void>;
 
 export type UnsubscribeHandle = () => void;
 
-interface ListenerState<T, S> {
+interface ListenerState<in T, out S> {
 	/**
 	 * Function listeners
 	 */
@@ -26,7 +26,7 @@ function makeListenerState<T, S>(): ListenerState<T, S> {
 	};
 }
 
-export class PubSub<T, S> {
+export class PubSub<in out T, out S> {
 	public constructor() {
 		this.#listenerMap = new Map<string, ListenerState<T, S>>();
 	}
@@ -88,7 +88,7 @@ export class PubSub<T, S> {
 	readonly #listenerMap: Map<string, ListenerState<T, S>>;
 }
 
-export interface Subscriber<T, S> {
+export interface Subscriber<in T, out S> {
 	useTopic(topic: string | null): void;
 	currentTopic(): string | null;
 

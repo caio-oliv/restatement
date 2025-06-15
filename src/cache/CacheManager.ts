@@ -8,7 +8,6 @@ import type {
 import type { CacheStore } from '@/cache/CacheStore';
 import type { PubSub } from '@/PubSub';
 import { defaultKeyHashFn, DEFAULT_TTL_DURATION } from '@/Default';
-import { blackhole } from '@/Internal';
 
 export interface CacheManagerInput {
 	keyHashFn?: KeyHashFn<ReadonlyArray<unknown>>;
@@ -24,7 +23,8 @@ export interface CacheManagerInput {
 	/**
 	 * State provider.
 	 */
-	provider?: CacheManagerProvider<unknown, unknown> | null;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	provider?: CacheManagerProvider<any, any> | null;
 }
 
 export type CacheManagerProvider<T, E> = PubSub<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
@@ -55,7 +55,7 @@ export class CacheManager implements CacheHandler {
 		ttl: Millisecond = this.ttl
 	): Promise<void> {
 		const hash = this.keyHashFn(key);
-		await this.#internalCache.set(hash, data, ttl).catch(blackhole);
+		await this.#internalCache.set(hash, data, ttl);
 		this.#provider?.publish(hash, {
 			state: { data, error: null, status: 'success' },
 			metadata: { source: 'mutation', origin: 'provider', cache: 'none' },
@@ -64,17 +64,17 @@ export class CacheManager implements CacheHandler {
 
 	public async get<K extends ReadonlyArray<unknown>, T>(key: K): Promise<T | undefined> {
 		const hash = this.keyHashFn(key);
-		return (await this.#internalCache.get(hash).catch(blackhole)) as T | undefined;
+		return (await this.#internalCache.get(hash)) as T | undefined;
 	}
 
 	public async delete<K extends ReadonlyArray<unknown>>(key: K): Promise<void> {
 		const hash = this.keyHashFn(key);
-		await this.#internalCache.delete(hash).catch(blackhole);
+		await this.#internalCache.delete(hash);
 	}
 
 	public async invalidate<K extends ReadonlyArray<unknown>>(key: K): Promise<void> {
 		const hash = this.keyHashFn(key);
-		await this.#internalCache.deletePrefix(hash).catch(blackhole);
+		await this.#internalCache.deletePrefix(hash);
 	}
 
 	readonly #internalCache: CacheStore<string, unknown>;
