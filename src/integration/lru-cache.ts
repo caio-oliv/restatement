@@ -1,4 +1,4 @@
-import type { CacheEntry, CacheStore } from '@/Cache';
+import type { CacheEntry, CacheStore } from '@/cache/CacheStore';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 namespace LRUCache {

@@ -5,7 +5,7 @@ import type {
 	QueryProviderState,
 	QueryStatePromise,
 } from '@/Type';
-import type { CacheStore } from '@/Cache';
+import type { CacheStore } from '@/cache/CacheStore';
 import type { PubSub } from '@/PubSub';
 import { defaultKeyHashFn, DEFAULT_TTL_DURATION } from '@/Default';
 import { blackhole } from '@/Internal';

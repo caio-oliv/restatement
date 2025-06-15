@@ -7,7 +7,7 @@ import type {
 import { type RetryDelay, type RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
 import { DEFAULT_RETRY_DELAY, defaultStateFilterFn } from '@/Default';
 import { blackhole } from '@/Internal';
-import type { CacheManager } from '@/controller/CacheManager';
+import type { CacheManager } from '@/cache/CacheManager';
 
 export interface MutationControlInput<I, T, E> {
 	placeholder?: T | null;

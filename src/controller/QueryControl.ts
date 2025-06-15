@@ -1,4 +1,4 @@
-import type { CacheStore } from '@/Cache';
+import type { CacheStore } from '@/cache/CacheStore';
 import { type RetryDelay, type RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
 import { DummySubscriber, type PubSub, type Subscriber, SubscriberHandle } from '@/PubSub';
 import type {
@@ -25,7 +25,7 @@ import {
 	defaultStateFilterFn,
 } from '@/Default';
 import { blackhole, makeObservablePromise, nullpromise } from '@/Internal';
-import { CacheManager } from '@/controller/CacheManager';
+import { CacheManager } from '@/cache/CacheManager';
 
 export interface QueryControlInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	/**

@@ -1,5 +1,5 @@
 import { LRUCache } from 'lru-cache';
-import type { CacheStore } from '@/Cache';
+import type { CacheStore } from '@/cache/CacheStore';
 import { LRUCacheAdapter, REQUIRED_LRU_CACHE_OPTIONS } from '@/integration/lru-cache';
 
 /**
