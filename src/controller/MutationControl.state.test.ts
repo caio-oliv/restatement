@@ -1,5 +1,5 @@
 import { assert, describe, it, vi } from 'vitest';
-import { CacheManager, MutationControl } from '@/lib';
+import { CacheManager, type MutationStateFilterInfo, MutationControl } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { testTransformer } from '@/controller/Control.mock';
 
@@ -243,6 +243,80 @@ describe('MutationControl state transition / reset query', () => {
 		assert.deepStrictEqual(mutationCtl.getState(), {
 			status: 'success',
 			data: 'data#test',
+			error: null,
+		});
+	});
+});
+
+describe('MutationControl state transition / filter', () => {
+	it('filter out "loading" state', async () => {
+		const store = makeCache<string>();
+		const cache = new CacheManager({ store });
+		const mutationFn = vi.fn(testTransformer);
+		function stateFilterFn<T, E>({ next }: MutationStateFilterInfo<T, E>): boolean {
+			return next.status !== 'loading';
+		}
+		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, stateFilterFn });
+
+		const mutationPromise1 = mutationCtl.execute(['key#test']);
+
+		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: null, error: null });
+
+		await mutationPromise1;
+
+		assert.deepStrictEqual(mutationCtl.getState(), {
+			status: 'success',
+			data: 'data#test',
+			error: null,
+		});
+
+		const mutationPromise2 = mutationCtl.execute(['err']);
+
+		assert.deepStrictEqual(mutationCtl.getState(), {
+			status: 'success',
+			data: 'data#test',
+			error: null,
+		});
+
+		await mutationPromise2;
+
+		assert.deepStrictEqual(mutationCtl.getState(), {
+			status: 'error',
+			data: null,
+			error: new Error('invalid_key'),
+		});
+	});
+
+	it('filter out "error" state', async () => {
+		const store = makeCache<string>();
+		const cache = new CacheManager({ store });
+		const mutationFn = vi.fn(testTransformer);
+		function stateFilterFn<T, E>({ next }: MutationStateFilterInfo<T, E>): boolean {
+			return next.status !== 'error';
+		}
+		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, stateFilterFn });
+
+		const mutationPromise1 = mutationCtl.execute(['key#test']);
+
+		assert.deepStrictEqual(mutationCtl.getState(), { status: 'loading', data: null, error: null });
+
+		await mutationPromise1;
+
+		assert.deepStrictEqual(mutationCtl.getState(), {
+			status: 'success',
+			data: 'data#test',
+			error: null,
+		});
+
+		const mutationPromise2 = mutationCtl.execute(['err']);
+
+		assert.deepStrictEqual(mutationCtl.getState(), { status: 'loading', data: null, error: null });
+
+		await mutationPromise2;
+
+		assert.deepStrictEqual(mutationCtl.getState(), {
+			status: 'loading',
+			data: null,
 			error: null,
 		});
 	});

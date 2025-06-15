@@ -28,7 +28,7 @@ export interface MockQueryControlHandler<T, E> extends QueryControlHandler<T, E>
  * @description Mock the {@link QueryControlHandler} functions
  * @returns mock of `QueryControlHandler`
  */
-export function mockQueryControlHandler<T, E = unknown>(): MockQueryControlHandler<T, E> {
+export function mockQueryHandler<T, E = unknown>(): MockQueryControlHandler<T, E> {
 	return {
 		dataFn: vi.fn(emptypromise),
 		errorFn: vi.fn(emptypromise),
@@ -46,7 +46,7 @@ export interface MockMutationControlHandler<T, E> extends MutationControlHandler
  * @description Mock the {@link MutationControlHandler} functions
  * @returns mock of `MutationControlHandler`
  */
-export function mockMutationControlHandler<T, E = unknown>(): MockMutationControlHandler<T, E> {
+export function mockMutationHandler<T, E = unknown>(): MockMutationControlHandler<T, E> {
 	return {
 		dataFn: vi.fn(emptypromise),
 		errorFn: vi.fn(emptypromise),
