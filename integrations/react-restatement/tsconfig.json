@@ -1,5 +1,5 @@
 {
-	"extends": ["../../tsconfig.json"],
+	"extends": ["../../rules.tsconfig.json"],
 	"compilerOptions": {
 		"composite": true,
 		"incremental": true,
@@ -10,7 +10,9 @@
 		"paths": {
 			"@/*": ["./*"],
 			"@test/*": ["./../test/*"]
-		}
+		},
+
+		"jsx": "preserve"
 	},
 	"include": ["src/**/*", "test/**/*"],
 	"exclude": ["node_modules/**", "dist/**", "coverage/**"]
