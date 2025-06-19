@@ -7,4 +7,5 @@ export * from '@/cache/CacheStore';
 export * from '@/cache/CacheManager';
 export * from '@/controller/QueryControl';
 export * from '@/controller/MutationControl';
+export * from '@/ConfigManager';
 export * from '@/integration/lru-cache';
