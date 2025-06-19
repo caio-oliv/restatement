@@ -1,4 +1,5 @@
 {
+	"references": [{ "path": "integrations/react-restatement" }],
 	"compilerOptions": {
 		"incremental": false,
 		"target": "es2022",
@@ -53,10 +54,10 @@
 	"include": [
 		"src/**/*",
 		"test/**/*",
-		"rollup.config.ts",
+		"rollup.config.js",
 		"eslint.config.ts",
 		"vite.config.ts",
 		"vitest.e2e.config.ts"
 	],
-	"exclude": ["node_modules/**", "dist/**", "coverage/**"]
+	"exclude": ["node_modules/**", "dist/**", "coverage/**", "integreations/**"]
 }
