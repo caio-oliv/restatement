@@ -107,7 +107,7 @@ export interface QueryStateFilterInfo<T, E> {
 	readonly metadata: StateMetadata;
 }
 
-export type QueryStateFilterFn<T, E> = (info: QueryStateFilterInfo<T, E>) => boolean;
+export type QueryFilterFn<T, E> = (info: QueryStateFilterInfo<T, E>) => boolean;
 
 export type QueryStateHandler<T, E> = (
 	state: QueryState<T, E>,
@@ -179,7 +179,7 @@ export interface MutationStateFilterInfo<T, E> {
 	readonly next: MutationState<T, E>;
 }
 
-export type MutationStateFilterFn<T, E> = (info: MutationStateFilterInfo<T, E>) => boolean;
+export type MutationFilterFn<T, E> = (info: MutationStateFilterInfo<T, E>) => boolean;
 
 export type MutationStateHandler<T, E> = (
 	state: MutationState<T, E>,

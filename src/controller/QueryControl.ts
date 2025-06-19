@@ -13,7 +13,7 @@ import type {
 	QueryProviderState,
 	QueryStateMetadata,
 	QueryStatePromise,
-	QueryStateFilterFn,
+	QueryFilterFn,
 } from '@/Type';
 import {
 	defaultKeyHashFn,
@@ -22,7 +22,7 @@ import {
 	defaultKeepCacheOnError,
 	DEFAULT_FRESH_DURATION,
 	DEFAULT_TTL_DURATION,
-	defaultStateFilterFn,
+	defaultFilterFn,
 } from '@/Default';
 import { blackhole, makeObservablePromise, nullpromise } from '@/Internal';
 import { CacheManager } from '@/cache/CacheManager';
@@ -98,7 +98,7 @@ export interface QueryControlInput<K extends ReadonlyArray<unknown>, T, E = unkn
 	/**
 	 * Query state filter function
 	 */
-	stateFilterFn?: QueryStateFilterFn<T, E>;
+	filterFn?: QueryFilterFn<T, E>;
 	/**
 	 * State provider.
 	 */
@@ -144,7 +144,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		fresh = DEFAULT_FRESH_DURATION,
 		ttl = DEFAULT_TTL_DURATION,
 		handler = { dataFn: undefined, errorFn: undefined, stateFn: undefined },
-		stateFilterFn = defaultStateFilterFn,
+		filterFn = defaultFilterFn,
 		provider = null,
 	}: QueryControlInput<K, T, E>) {
 		this.#placeholder = placeholder;
@@ -165,7 +165,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		});
 		this.#state = { data: this.#placeholder, error: null, status: 'idle' };
 		this.#handler = handler;
-		this.#stateFilterFn = stateFilterFn;
+		this.#filterFn = filterFn;
 		this.#subscriber = provider
 			? new SubscriberHandle(this.#updateState.bind(this), provider)
 			: new DummySubscriber();
@@ -372,7 +372,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 			return;
 		}
 
-		if (!this.#stateFilterFn({ current: this.#state, next: state, metadata })) {
+		if (!this.#filterFn({ current: this.#state, next: state, metadata })) {
 			return;
 		}
 
@@ -400,7 +400,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	readonly #subscriber: Subscriber<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
 	readonly #handler: QueryControlHandler<T, E>;
 	readonly #queryFn: QueryFn<K, T>;
-	readonly #stateFilterFn: QueryStateFilterFn<T, E>;
+	readonly #filterFn: QueryFilterFn<T, E>;
 	readonly #keepCacheOnError: KeepCacheOnError<E>;
 	readonly #retryHandleFn: RetryHandlerFn<E> | null;
 }

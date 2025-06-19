@@ -1,11 +1,6 @@
-import type {
-	MutationFn,
-	MutationState,
-	MutationControlHandler,
-	MutationStateFilterFn,
-} from '@/Type';
+import type { MutationFn, MutationState, MutationControlHandler, MutationFilterFn } from '@/Type';
 import { type RetryDelay, type RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
-import { DEFAULT_RETRY_DELAY, defaultStateFilterFn } from '@/Default';
+import { DEFAULT_RETRY_DELAY, defaultFilterFn } from '@/Default';
 import { blackhole } from '@/Internal';
 import type { CacheManager } from '@/cache/CacheManager';
 
@@ -17,7 +12,7 @@ export interface MutationControlInput<I, T, E> {
 	retryDelay?: RetryDelay<E>;
 	retryHandleFn?: RetryHandlerFn<E> | null;
 	handler?: MutationControlHandler<T, E>;
-	stateFilterFn?: MutationStateFilterFn<T, E>;
+	filterFn?: MutationFilterFn<T, E>;
 }
 
 export class MutationControl<I, T, E> {
@@ -33,7 +28,7 @@ export class MutationControl<I, T, E> {
 		retryDelay = DEFAULT_RETRY_DELAY.delay,
 		retryHandleFn = null,
 		handler = { stateFn: undefined, dataFn: undefined, errorFn: undefined },
-		stateFilterFn = defaultStateFilterFn,
+		filterFn = defaultFilterFn,
 	}: MutationControlInput<I, T, E>) {
 		this.#placeholder = placeholder;
 		this.#mutationFn = mutationFn;
@@ -41,7 +36,7 @@ export class MutationControl<I, T, E> {
 		this.retryDelay = retryDelay;
 		this.cache = cache;
 		this.#handler = handler;
-		this.#stateFilterFn = stateFilterFn;
+		this.#filterFn = filterFn;
 		this.#retryHandleFn = retryHandleFn;
 		this.#state = { data: this.#placeholder, error: null, status: 'idle' };
 	}
@@ -93,7 +88,7 @@ export class MutationControl<I, T, E> {
 	}
 
 	#updateState(state: MutationState<T, E>): void {
-		if (!this.#stateFilterFn({ current: this.#state, next: state })) {
+		if (!this.#filterFn({ current: this.#state, next: state })) {
 			return;
 		}
 
@@ -111,7 +106,7 @@ export class MutationControl<I, T, E> {
 	#state: MutationState<T, E>;
 	readonly #placeholder: T | null;
 	readonly #handler: MutationControlHandler<T, E>;
-	readonly #stateFilterFn: MutationStateFilterFn<T, E>;
+	readonly #filterFn: MutationFilterFn<T, E>;
 	readonly #mutationFn: MutationFn<I, T>;
 	readonly #retryHandleFn: RetryHandlerFn<E> | null;
 }

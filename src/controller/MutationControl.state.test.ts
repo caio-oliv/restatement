@@ -253,10 +253,10 @@ describe('MutationControl state transition / filter', () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
-		function stateFilterFn<T, E>({ next }: MutationStateFilterInfo<T, E>): boolean {
+		function filterFn<T, E>({ next }: MutationStateFilterInfo<T, E>): boolean {
 			return next.status !== 'loading';
 		}
-		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, stateFilterFn });
+		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, filterFn });
 
 		const mutationPromise1 = mutationCtl.execute(['key#test']);
 
@@ -291,10 +291,10 @@ describe('MutationControl state transition / filter', () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
-		function stateFilterFn<T, E>({ next }: MutationStateFilterInfo<T, E>): boolean {
+		function filterFn<T, E>({ next }: MutationStateFilterInfo<T, E>): boolean {
 			return next.status !== 'error';
 		}
-		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, stateFilterFn });
+		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, filterFn });
 
 		const mutationPromise1 = mutationCtl.execute(['key#test']);
 

@@ -343,7 +343,7 @@ describe('QueryControl state provider', () => {
 			handler: handler1,
 			fresh: 50,
 			ttl: 100,
-			stateFilterFn: blockProviderState,
+			filterFn: blockProviderState,
 		});
 
 		const queryFn2 = vi.fn(testTransformer);
@@ -355,7 +355,7 @@ describe('QueryControl state provider', () => {
 			handler: handler2,
 			fresh: 50,
 			ttl: 100,
-			stateFilterFn: blockProviderState,
+			filterFn: blockProviderState,
 		});
 
 		const queryFn3 = vi.fn(testTransformer);
@@ -367,7 +367,7 @@ describe('QueryControl state provider', () => {
 			handler: handler3,
 			fresh: 50,
 			ttl: 100,
-			stateFilterFn: blockProviderState,
+			filterFn: blockProviderState,
 		});
 
 		await store.set(defaultKeyHashFn(['key#1']), 'data_stale#1', 100);
@@ -537,7 +537,7 @@ describe('QueryControl state provider / in-flight migration', () => {
 			provider,
 			queryFn: queryFn1,
 			handler: handler1,
-			stateFilterFn: blockProviderState,
+			filterFn: blockProviderState,
 		});
 
 		const queryFn2 = vi.fn(delayedTestTransformer(100));
@@ -547,7 +547,7 @@ describe('QueryControl state provider / in-flight migration', () => {
 			provider,
 			queryFn: queryFn2,
 			handler: handler2,
-			stateFilterFn: blockProviderState,
+			filterFn: blockProviderState,
 		});
 
 		const resultPromise1 = queryApi1.execute(['key#1'], 'no-cache');

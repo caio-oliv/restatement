@@ -24,7 +24,7 @@ export function defaultKeyHashFn<T extends ReadonlyArray<unknown>>(key: T): stri
  * Allows any provided state.
  * @returns `true`
  */
-export function defaultStateFilterFn(): boolean {
+export function defaultFilterFn(): boolean {
 	return true;
 }
 
