@@ -32,7 +32,7 @@
 	],
 	"scripts": {
 		"check:type": "tsc --noEmit",
-		"check:lint": "eslint",
+		"check:lint": "eslint --ignore-pattern 'integrations/**'",
 		"check:all": "run-z check test build",
 		"check": "run-z check:type,check:lint",
 		"build:js": "rollup --config rollup.config.js",

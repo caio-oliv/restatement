@@ -1,10 +1,11 @@
 import { assert, describe, expect, it, vi } from 'vitest';
-import { defaultKeyHashFn, QueryControl, waitUntil } from '@/lib';
+import { defaultKeyHashFn, QueryControl, waitUntil, type InitialStateMetadata } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import {
 	immediateRetryDelay,
 	delayedTestTransformer,
 	testTransformer,
+	mockQueryHandler,
 } from '@/controller/Control.mock';
 
 describe('QueryControl state transition / reset query', () => {
@@ -44,12 +45,14 @@ describe('QueryControl state transition / reset query', () => {
 	it('reset query state to idle with placeholder', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
+		const handler = mockQueryHandler<string>();
 		const queryApi = new QueryControl<[string], string, Error>({
 			placeholder: '123',
 			store,
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
+			handler,
 		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
@@ -66,13 +69,167 @@ describe('QueryControl state transition / reset query', () => {
 			status: 'success',
 		});
 
-		queryApi.reset();
+		queryApi.reset('state');
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: '123',
 			error: null,
 			status: 'idle',
 		});
+
+		expect(handler.dataFn).toHaveBeenCalledTimes(2);
+		expect(handler.errorFn).toHaveBeenCalledTimes(0);
+		expect(handler.stateFn).toHaveBeenCalledTimes(2);
+	});
+
+	it('reset query state to idle and call the state handler', async () => {
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
+		const handler = mockQueryHandler<string>();
+		const queryApi = new QueryControl<[string], string, Error>({
+			placeholder: '123',
+			store,
+			queryFn,
+			retry: 0,
+			retryDelay: immediateRetryDelay,
+			handler,
+		});
+
+		assert.deepStrictEqual(queryApi.getState(), {
+			data: '123',
+			error: null,
+			status: 'idle',
+		});
+
+		await queryApi.execute(['key#1'], 'no-cache');
+
+		assert.deepStrictEqual(queryApi.getState(), {
+			data: 'data#1',
+			error: null,
+			status: 'success',
+		});
+
+		queryApi.reset('handler');
+
+		assert.deepStrictEqual(queryApi.getState(), {
+			data: '123',
+			error: null,
+			status: 'idle',
+		});
+
+		expect(handler.dataFn).toHaveBeenCalledTimes(2);
+		expect(handler.errorFn).toHaveBeenCalledTimes(0);
+		expect(handler.stateFn).toHaveBeenCalledTimes(3);
+
+		expect(handler.stateFn).toHaveBeenNthCalledWith(
+			3,
+			{
+				data: '123',
+				error: null,
+				status: 'idle',
+			},
+			{
+				cache: 'none',
+				origin: 'control',
+				source: 'initialization',
+			} satisfies InitialStateMetadata,
+			queryApi.cache
+		);
+	});
+});
+
+describe('QueryControl state transition / reset query', () => {
+	it('reset the state when using another key', async () => {
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
+		const handler = mockQueryHandler<string>();
+		const queryApi = new QueryControl<[string], string, Error>({
+			store,
+			queryFn,
+			retry: 0,
+			retryDelay: immediateRetryDelay,
+			handler,
+		});
+
+		assert.deepStrictEqual(queryApi.getState(), {
+			data: null,
+			error: null,
+			status: 'idle',
+		});
+
+		await queryApi.execute(['key#1'], 'no-cache');
+
+		assert.deepStrictEqual(queryApi.getState(), {
+			data: 'data#1',
+			error: null,
+			status: 'success',
+		});
+
+		queryApi.use(['key#2']);
+
+		assert.deepStrictEqual(queryApi.getState(), {
+			data: null,
+			error: null,
+			status: 'idle',
+		});
+
+		expect(handler.dataFn).toHaveBeenCalledTimes(1);
+		expect(handler.errorFn).toHaveBeenCalledTimes(0);
+		expect(handler.stateFn).toHaveBeenCalledTimes(2);
+	});
+
+	it('reset the state when using another key and call the state handler', async () => {
+		const store = makeCache<string>();
+		const queryFn = vi.fn(testTransformer);
+		const handler = mockQueryHandler<string>();
+		const queryApi = new QueryControl<[string], string, Error>({
+			store,
+			queryFn,
+			retry: 0,
+			retryDelay: immediateRetryDelay,
+			handler,
+		});
+
+		assert.deepStrictEqual(queryApi.getState(), {
+			data: null,
+			error: null,
+			status: 'idle',
+		});
+
+		await queryApi.execute(['key#1'], 'no-cache');
+
+		assert.deepStrictEqual(queryApi.getState(), {
+			data: 'data#1',
+			error: null,
+			status: 'success',
+		});
+
+		queryApi.use(['key#2'], 'handler');
+
+		assert.deepStrictEqual(queryApi.getState(), {
+			data: null,
+			error: null,
+			status: 'idle',
+		});
+
+		expect(handler.dataFn).toHaveBeenCalledTimes(1);
+		expect(handler.errorFn).toHaveBeenCalledTimes(0);
+		expect(handler.stateFn).toHaveBeenCalledTimes(3);
+
+		expect(handler.stateFn).toHaveBeenNthCalledWith(
+			3,
+			{
+				data: null,
+				error: null,
+				status: 'idle',
+			},
+			{
+				cache: 'none',
+				origin: 'control',
+				source: 'initialization',
+			} satisfies InitialStateMetadata,
+			queryApi.cache
+		);
 	});
 });
 

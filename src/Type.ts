@@ -80,13 +80,19 @@ export interface QueryStateMetadata {
 	readonly cache: QueryCache;
 }
 
+export interface InitialStateMetadata {
+	readonly origin: 'control';
+	readonly source: 'initialization';
+	readonly cache: 'none';
+}
+
 export interface MutationStateMetadata {
 	readonly origin: 'provider';
 	readonly source: 'mutation';
 	readonly cache: 'none';
 }
 
-export type StateMetadata = QueryStateMetadata | MutationStateMetadata;
+export type StateMetadata = QueryStateMetadata | MutationStateMetadata | InitialStateMetadata;
 
 export interface QueryProviderState<T, E> {
 	readonly state: QueryState<T, E>;

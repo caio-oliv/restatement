@@ -114,6 +114,8 @@ interface KeyPair<K extends ReadonlyArray<unknown>> {
 	readonly hash: string;
 }
 
+export type QueryResetTarget = 'state' | 'handler';
+
 export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	public readonly keyHashFn: KeyHashFn<K>;
 	public readonly retry: number;
@@ -210,15 +212,35 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		return this.#tryCurrentPromiseOrRunQuery({ key, hash }, cache, ctl);
 	}
 
-	public use(key: K): void {
+	public use(key: K, target: QueryResetTarget = 'state'): void {
 		const hash = this.keyHashFn(key);
 		this.#subscriber.useTopic(hash);
 		this.#state = { data: this.#placeholder, error: null, status: 'idle' };
+
+		if (target === 'handler') {
+			this.#handler
+				.stateFn?.(
+					this.#state,
+					{ cache: 'none', origin: 'control', source: 'initialization' },
+					this.cache
+				)
+				?.catch(blackhole);
+		}
 	}
 
-	public reset(): void {
+	public reset(target: QueryResetTarget = 'state'): void {
 		this.#subscriber.unsubscribe();
 		this.#state = { data: this.#placeholder, error: null, status: 'idle' };
+
+		if (target === 'handler') {
+			this.#handler
+				.stateFn?.(
+					this.#state,
+					{ cache: 'none', origin: 'control', source: 'initialization' },
+					this.cache
+				)
+				?.catch(blackhole);
+		}
 	}
 
 	/**
@@ -389,7 +411,11 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		if (metadata.origin === 'control') {
 			this.#subscriber.publishTopic(hash, {
 				state: this.#state,
-				metadata: { origin: 'provider', source: metadata.source, cache: metadata.cache },
+				metadata: {
+					origin: 'provider',
+					source: metadata.source,
+					cache: metadata.cache,
+				} as QueryStateMetadata,
 			});
 		}
 	}

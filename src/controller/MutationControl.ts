@@ -15,6 +15,8 @@ export interface MutationControlInput<I, T, E> {
 	filterFn?: MutationFilterFn<T, E>;
 }
 
+export type MutationResetTarget = 'state' | 'handler';
+
 export class MutationControl<I, T, E> {
 	public readonly retry: number;
 	public readonly retryDelay: RetryDelay<E>;
@@ -56,8 +58,12 @@ export class MutationControl<I, T, E> {
 		return this.#state;
 	}
 
-	public reset(): void {
+	public reset(target: MutationResetTarget = 'state'): void {
 		this.#state = { status: 'idle', data: this.#placeholder, error: null };
+
+		if (target === 'handler') {
+			this.#handler.stateFn?.(this.#state, this.cache)?.catch(blackhole);
+		}
 	}
 
 	async #runMutation(input: I, ctl: AbortController): Promise<MutationState<T, E>> {
