@@ -108,7 +108,7 @@ describe('QueryControl cache usage / no-cache query', () => {
 			retryDelay: immediateRetryDelay,
 			fresh: 100,
 			ttl: 1_000,
-			keepCacheOnError: () => true,
+			keepCacheOnErrorFn: () => true,
 		});
 
 		queryFn.mockResolvedValueOnce('valid_result');
@@ -261,7 +261,7 @@ describe('QueryControl cache usage / fresh query', () => {
 			retry: 0,
 			retryDelay: immediateRetryDelay,
 			fresh: 0,
-			keepCacheOnError: () => true,
+			keepCacheOnErrorFn: () => true,
 		});
 
 		await store.set(defaultKeyHashFn(['invalid']), 'valid_result', DEFAULT_TTL_DURATION);
@@ -413,7 +413,7 @@ describe('QueryControl cache usage / stale query', () => {
 			retry: 0,
 			retryDelay: immediateRetryDelay,
 			fresh: 0,
-			keepCacheOnError: () => true,
+			keepCacheOnErrorFn: () => true,
 		});
 
 		await store.set(defaultKeyHashFn(['invalid']), 'valid_result', DEFAULT_TTL_DURATION);

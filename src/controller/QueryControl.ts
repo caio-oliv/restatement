@@ -7,7 +7,7 @@ import type {
 	QueryControlHandler,
 	QueryState,
 	QueryCache,
-	KeepCacheOnError,
+	KeepCacheOnErrorFn,
 	Millisecond,
 	QueryExecutorResult,
 	QueryProviderState,
@@ -19,7 +19,7 @@ import {
 	defaultKeyHashFn,
 	DEFAULT_RETRY_DELAY,
 	DEFAULT_RETRY,
-	defaultKeepCacheOnError,
+	defaultKeepCacheOnErrorFn,
 	DEFAULT_FRESH_DURATION,
 	DEFAULT_TTL_DURATION,
 	defaultFilterFn,
@@ -64,7 +64,7 @@ export interface QueryControlInput<K extends ReadonlyArray<unknown>, T, E = unkn
 	/**
 	 * Use the previus cached data on error of the `queryFn`
 	 */
-	keepCacheOnError?: KeepCacheOnError<E>;
+	keepCacheOnErrorFn?: KeepCacheOnErrorFn<E>;
 	/**
 	 * @description Duration in which cache entries will be fresh.
 	 *
@@ -142,7 +142,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		retryDelay = DEFAULT_RETRY_DELAY.delay,
 		retry = DEFAULT_RETRY,
 		retryHandleFn = null,
-		keepCacheOnError = defaultKeepCacheOnError,
+		keepCacheOnErrorFn = defaultKeepCacheOnErrorFn,
 		fresh = DEFAULT_FRESH_DURATION,
 		ttl = DEFAULT_TTL_DURATION,
 		handler = { dataFn: undefined, errorFn: undefined, stateFn: undefined },
@@ -154,7 +154,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		this.keyHashFn = keyHashFn;
 		this.#queryFn = queryFn;
 		this.retryDelay = retryDelay;
-		this.#keepCacheOnError = keepCacheOnError;
+		this.#keepCacheOnErrorFn = keepCacheOnErrorFn;
 		this.#retryHandleFn = retryHandleFn;
 		this.retry = retry;
 		this.fresh = fresh;
@@ -382,7 +382,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		source: QueryStateNoCacheSource
 	): Promise<QueryState<T, E>> {
 		const state: QueryState<T, E> = { status: 'error', error: err as E, data: null };
-		if (!this.#keepCacheOnError(err as E)) {
+		if (!this.#keepCacheOnErrorFn(err as E)) {
 			await this.#internalCache.delete(hash).catch(blackhole);
 		}
 		this.#updateState(hash, { state, metadata: { origin: 'control', source, cache } });
@@ -427,6 +427,6 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	readonly #handler: QueryControlHandler<T, E>;
 	readonly #queryFn: QueryFn<K, T>;
 	readonly #filterFn: QueryFilterFn<T, E>;
-	readonly #keepCacheOnError: KeepCacheOnError<E>;
+	readonly #keepCacheOnErrorFn: KeepCacheOnErrorFn<E>;
 	readonly #retryHandleFn: RetryHandlerFn<E> | null;
 }

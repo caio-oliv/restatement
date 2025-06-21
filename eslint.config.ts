@@ -21,7 +21,7 @@ const jsonConfig: Linter.Config = {
 
 const testConfig: Linter.Config = {
 	name: 'restatement/test',
-	files: ['**/*.test.ts'],
+	files: ['**/*.test.{ts,tsx}'],
 	rules: {
 		complexity: ['error', 20],
 		'max-depth': ['error', 5],
@@ -56,7 +56,7 @@ const projectConfig: Linter.Config = {
 			tsconfigRootDir: rootUrl.pathname,
 		},
 	},
-	files: ['**/*.js', '**/*.ts'],
+	files: ['**/*.{js,ts,tsx}'],
 	rules: {
 		'no-constructor-return': 'off', // using @typescript-eslint version
 		'no-useless-constructor': 'off', // using @typescript-eslint version

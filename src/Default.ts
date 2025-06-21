@@ -35,6 +35,6 @@ export function defaultFilterFn(): boolean {
  * @returns true if the cache is gonna be kept
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function defaultKeepCacheOnError<T = unknown>(_: T): boolean {
+export function defaultKeepCacheOnErrorFn<T = unknown>(_: T): boolean {
 	return false;
 }

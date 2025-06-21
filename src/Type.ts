@@ -24,7 +24,7 @@ export type QueryFn<K extends ReadonlyArray<unknown>, T> = (
 
 export type KeyHashFn<K extends ReadonlyArray<unknown>> = (key: K) => string;
 
-export type KeepCacheOnError<E> = (err: E) => boolean;
+export type KeepCacheOnErrorFn<E> = (err: E) => boolean;
 
 export interface CacheHandler {
 	set<K extends ReadonlyArray<unknown>, T>(key: K, data: T, ttl?: Millisecond): Promise<void>;

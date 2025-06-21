@@ -1,5 +1,5 @@
 import type {
-	KeepCacheOnError,
+	KeepCacheOnErrorFn,
 	KeyHashFn,
 	Millisecond,
 	MutationControlHandler,
@@ -28,7 +28,7 @@ export interface RestatementConfig<E = unknown> {
 	readonly cache: CacheConfig;
 	readonly provider: QueryControlProvider<unknown, E>;
 	readonly keyHashFn: KeyHashFn<ReadonlyArray<unknown>>;
-	readonly keepCacheOnError: KeepCacheOnError<E>;
+	readonly keepCacheOnErrorFn: KeepCacheOnErrorFn<E>;
 
 	readonly query: RetryConfig<E>;
 	readonly mutation: RetryConfig<E>;
@@ -65,7 +65,7 @@ export type CustomQueryControlInput<K extends ReadonlyArray<unknown>, T, E = unk
 	| 'placeholder'
 	| 'fresh'
 	| 'ttl'
-	| 'keepCacheOnError'
+	| 'keepCacheOnErrorFn'
 	| 'filterFn'
 	| 'retry'
 	| 'retryDelay'
@@ -88,7 +88,7 @@ export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>
 		store: config.cache.store as CacheStore<string, T>,
 		fresh: custom.fresh ?? config.cache.fresh,
 		ttl: custom.ttl ?? config.cache.ttl,
-		keepCacheOnError: custom.keepCacheOnError ?? config.keepCacheOnError,
+		keepCacheOnErrorFn: custom.keepCacheOnErrorFn ?? config.keepCacheOnErrorFn,
 		keyHashFn: config.keyHashFn,
 		provider: config.provider as QueryControlProvider<T, E>,
 		retry: custom.retry ?? config.query.retry,
