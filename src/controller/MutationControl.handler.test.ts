@@ -9,7 +9,7 @@ describe('MutationControl handler execution', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
-		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, handler });
+		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, ...handler });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: null, error: null });
 
@@ -42,7 +42,7 @@ describe('MutationControl handler execution', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
-		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, handler });
+		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, ...handler });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: null, error: null });
 
@@ -75,7 +75,7 @@ describe('MutationControl handler execution', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
-		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, handler });
+		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, ...handler });
 
 		await mutationCtl.execute(['key#valid']);
 
@@ -108,7 +108,7 @@ describe('MutationControl handler execution', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
-		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, handler });
+		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, ...handler });
 
 		await mutationCtl.execute(['key#valid']);
 
@@ -141,7 +141,7 @@ describe('MutationControl handler execution', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
-		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, handler });
+		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, ...handler });
 
 		await mutationCtl.execute(['invalid']);
 
@@ -174,7 +174,7 @@ describe('MutationControl handler execution', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
-		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, handler });
+		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, ...handler });
 
 		await mutationCtl.execute(['invalid']);
 
@@ -207,7 +207,7 @@ describe('MutationControl handler execution', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
-		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, handler });
+		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, ...handler });
 
 		await mutationCtl.execute(['key#valid']);
 
@@ -229,7 +229,7 @@ describe('MutationControl handler execution', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
-		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, handler });
+		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, ...handler });
 
 		await mutationCtl.execute(['key#valid']);
 
@@ -257,7 +257,7 @@ describe('MutationControl handler execution', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
-		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, handler });
+		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, ...handler });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: null, error: null });
 
@@ -305,7 +305,7 @@ describe('MutationControl handler exception handling', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
-		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, handler });
+		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, ...handler });
 
 		handler.dataFn.mockRejectedValue(new Error('broken_data_handler'));
 		handler.errorFn.mockRejectedValue(new Error('broken_error_handler'));
@@ -342,7 +342,7 @@ describe('MutationControl handler exception handling', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
-		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, handler });
+		const mutationCtl = new MutationControl({ cache, mutationFn, retry: 0, ...handler });
 
 		handler.dataFn.mockRejectedValue(new Error('broken_data_handler'));
 		handler.errorFn.mockRejectedValue(new Error('broken_error_handler'));

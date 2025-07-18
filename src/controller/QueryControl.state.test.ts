@@ -52,7 +52,7 @@ describe('QueryControl state transition / reset query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
@@ -92,7 +92,7 @@ describe('QueryControl state transition / reset query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
@@ -148,7 +148,7 @@ describe('QueryControl state transition / reset query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
@@ -187,7 +187,7 @@ describe('QueryControl state transition / reset query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		assert.deepStrictEqual(queryApi.getState(), {

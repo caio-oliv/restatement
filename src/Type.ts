@@ -134,9 +134,9 @@ export type ErrorHandler<E> = (
 ) => Promise<void>;
 
 export interface QueryControlHandler<T, E> {
-	stateFn?: QueryStateHandler<T, E>;
-	dataFn?: DataHandler<T>;
-	errorFn?: ErrorHandler<E>;
+	stateFn: QueryStateHandler<T, E> | null;
+	dataFn: DataHandler<T> | null;
+	errorFn: ErrorHandler<E> | null;
 }
 
 export type NextQueryState<T, E> = QueryState<T, E> | null;
@@ -197,7 +197,7 @@ export type MutationDataHandler<T> = (data: T, cache: CacheHandler) => Promise<v
 export type MutationErrorHandler<E> = (error: E, cache: CacheHandler) => Promise<void>;
 
 export interface MutationControlHandler<T, E> {
-	stateFn?: MutationStateHandler<T, E>;
-	dataFn?: MutationDataHandler<T>;
-	errorFn?: MutationErrorHandler<E>;
+	stateFn: MutationStateHandler<T, E> | null;
+	dataFn: MutationDataHandler<T> | null;
+	errorFn: MutationErrorHandler<E> | null;
 }

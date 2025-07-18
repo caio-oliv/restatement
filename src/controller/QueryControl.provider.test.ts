@@ -31,7 +31,7 @@ describe('QueryControl state provider / query watcher', () => {
 			store,
 			provider,
 			queryFn: queryFn1,
-			handler: handler1,
+			...handler1,
 		});
 
 		const queryFn2 = vi.fn(testTransformer);
@@ -40,7 +40,7 @@ describe('QueryControl state provider / query watcher', () => {
 			store,
 			provider,
 			queryFn: queryFn2,
-			handler: handler2,
+			...handler2,
 		});
 
 		queryApi2.use(['key#1']);
@@ -156,7 +156,7 @@ describe('QueryControl state provider / query watcher', () => {
 				store,
 				provider,
 				queryFn: queryFn,
-				handler: handler,
+				...handler,
 			});
 
 			queryApi.use(['key#1']);
@@ -179,7 +179,7 @@ describe('QueryControl state provider / query watcher', () => {
 			store,
 			provider,
 			queryFn: queryFn1,
-			handler: handler1,
+			...handler1,
 		});
 
 		const queryFn2 = vi.fn(testTransformer);
@@ -188,7 +188,7 @@ describe('QueryControl state provider / query watcher', () => {
 			store,
 			provider,
 			queryFn: queryFn2,
-			handler: handler2,
+			...handler2,
 		});
 
 		queryApi2.use(['key#1']);
@@ -234,7 +234,7 @@ describe('QueryControl state provider / query watcher', () => {
 			store,
 			provider,
 			queryFn: queryFn1,
-			handler: handler1,
+			...handler1,
 		});
 
 		const queryFn2 = vi.fn(testTransformer);
@@ -244,7 +244,7 @@ describe('QueryControl state provider / query watcher', () => {
 			store,
 			provider,
 			queryFn: queryFn2,
-			handler: handler2,
+			...handler2,
 		});
 
 		queryApi2.use(['key#1']);
@@ -292,7 +292,7 @@ describe('QueryControl state provider', () => {
 			store,
 			provider,
 			queryFn: queryFn1,
-			handler: handler1,
+			...handler1,
 			fresh: 50,
 			ttl: 100,
 		});
@@ -303,7 +303,7 @@ describe('QueryControl state provider', () => {
 			store,
 			provider,
 			queryFn: queryFn2,
-			handler: handler2,
+			...handler2,
 			fresh: 50,
 			ttl: 100,
 		});
@@ -340,7 +340,7 @@ describe('QueryControl state provider', () => {
 			store,
 			provider,
 			queryFn: queryFn1,
-			handler: handler1,
+			...handler1,
 			fresh: 50,
 			ttl: 100,
 			filterFn: blockProviderState,
@@ -352,7 +352,7 @@ describe('QueryControl state provider', () => {
 			store,
 			provider,
 			queryFn: queryFn2,
-			handler: handler2,
+			...handler2,
 			fresh: 50,
 			ttl: 100,
 			filterFn: blockProviderState,
@@ -364,7 +364,7 @@ describe('QueryControl state provider', () => {
 			store,
 			provider,
 			queryFn: queryFn3,
-			handler: handler3,
+			...handler3,
 			fresh: 50,
 			ttl: 100,
 			filterFn: blockProviderState,
@@ -536,7 +536,7 @@ describe('QueryControl state provider / in-flight migration', () => {
 			store,
 			provider,
 			queryFn: queryFn1,
-			handler: handler1,
+			...handler1,
 			filterFn: blockProviderState,
 		});
 
@@ -546,7 +546,7 @@ describe('QueryControl state provider / in-flight migration', () => {
 			store,
 			provider,
 			queryFn: queryFn2,
-			handler: handler2,
+			...handler2,
 			filterFn: blockProviderState,
 		});
 

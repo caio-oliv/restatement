@@ -4,7 +4,6 @@ import { DummySubscriber, type PubSub, type Subscriber, SubscriberHandle } from 
 import type {
 	QueryFn,
 	KeyHashFn,
-	QueryControlHandler,
 	QueryState,
 	QueryCache,
 	KeepCacheOnErrorFn,
@@ -14,6 +13,9 @@ import type {
 	QueryStateMetadata,
 	QueryStatePromise,
 	QueryFilterFn,
+	ErrorHandler,
+	DataHandler,
+	QueryStateHandler,
 } from '@/Type';
 import {
 	defaultKeyHashFn,
@@ -92,9 +94,17 @@ export interface QueryControlInput<K extends ReadonlyArray<unknown>, T, E = unkn
 	 */
 	ttl?: Millisecond;
 	/**
-	 * Update handlers.
+	 * @summary Query state handler
 	 */
-	handler?: QueryControlHandler<T, E>;
+	stateFn?: QueryStateHandler<T, E> | null;
+	/**
+	 * @summary Query data handler
+	 */
+	dataFn?: DataHandler<T> | null;
+	/**
+	 * @summary Query error handler
+	 */
+	errorFn?: ErrorHandler<E> | null;
 	/**
 	 * Query state filter function
 	 */
@@ -117,9 +127,45 @@ interface KeyPair<K extends ReadonlyArray<unknown>> {
 export type QueryResetTarget = 'state' | 'handler';
 
 export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
+	/**
+	 * @summary Key hash function.
+	 * @description Hash function that produces a unique key string based on the query input.
+	 */
 	public readonly keyHashFn: KeyHashFn<K>;
+	/**
+	 * @summary Query function.
+	 * @description Query function that takes as arguments the input and produces a result asynchronously
+	 */
+	public queryFn: QueryFn<K, T>;
+	/**
+	 * @summary Query state filter function.
+	 */
+	public filterFn: QueryFilterFn<T, E>;
+	/**
+	 * @summary Keep cache on error function.
+	 */
+	public keepCacheOnErrorFn: KeepCacheOnErrorFn<E>;
+	/**
+	 * @summary Retry handler function.
+	 */
+	public retryHandleFn: RetryHandlerFn<E> | null;
+
+	/**
+	 * @summary State handler function.
+	 */
+	public stateFn: QueryStateHandler<T, E> | null;
+	/**
+	 * @summary Data handler function.
+	 */
+	public dataFn: DataHandler<T> | null;
+	/**
+	 * @summary Error handler function.
+	 */
+	public errorFn: ErrorHandler<E> | null;
+
 	public readonly retry: number;
 	public readonly retryDelay: RetryDelay<E>;
+
 	/**
 	 * @description Duration in which cache entries will be fresh.
 	 *
@@ -132,6 +178,9 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	 * Must be greater than {@link fresh} cache duration.
 	 */
 	public readonly ttl: Millisecond;
+	/**
+	 * @description Interface to manage cache entries based on query keys
+	 */
 	public readonly cache: CacheManager;
 
 	public constructor({
@@ -145,17 +194,19 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		keepCacheOnErrorFn = defaultKeepCacheOnErrorFn,
 		fresh = DEFAULT_FRESH_DURATION,
 		ttl = DEFAULT_TTL_DURATION,
-		handler = { dataFn: undefined, errorFn: undefined, stateFn: undefined },
 		filterFn = defaultFilterFn,
+		stateFn = null,
+		dataFn = null,
+		errorFn = null,
 		provider = null,
 	}: QueryControlInput<K, T, E>) {
 		this.#placeholder = placeholder;
 		this.#internalCache = store;
 		this.keyHashFn = keyHashFn;
-		this.#queryFn = queryFn;
+		this.queryFn = queryFn;
 		this.retryDelay = retryDelay;
-		this.#keepCacheOnErrorFn = keepCacheOnErrorFn;
-		this.#retryHandleFn = retryHandleFn;
+		this.keepCacheOnErrorFn = keepCacheOnErrorFn;
+		this.retryHandleFn = retryHandleFn;
 		this.retry = retry;
 		this.fresh = fresh;
 		this.ttl = ttl;
@@ -166,8 +217,10 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 			ttl,
 		});
 		this.#state = { data: this.#placeholder, error: null, status: 'idle' };
-		this.#handler = handler;
-		this.#filterFn = filterFn;
+		this.stateFn = stateFn;
+		this.dataFn = dataFn;
+		this.errorFn = errorFn;
+		this.filterFn = filterFn;
 		this.#subscriber = provider
 			? new SubscriberHandle(this.#updateState.bind(this), provider)
 			: new DummySubscriber();
@@ -218,13 +271,11 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		this.#state = { data: this.#placeholder, error: null, status: 'idle' };
 
 		if (target === 'handler') {
-			this.#handler
-				.stateFn?.(
-					this.#state,
-					{ cache: 'none', origin: 'control', source: 'initialization' },
-					this.cache
-				)
-				?.catch(blackhole);
+			this.stateFn?.(
+				this.#state,
+				{ cache: 'none', origin: 'control', source: 'initialization' },
+				this.cache
+			)?.catch(blackhole);
 		}
 	}
 
@@ -233,13 +284,11 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		this.#state = { data: this.#placeholder, error: null, status: 'idle' };
 
 		if (target === 'handler') {
-			this.#handler
-				.stateFn?.(
-					this.#state,
-					{ cache: 'none', origin: 'control', source: 'initialization' },
-					this.cache
-				)
-				?.catch(blackhole);
+			this.stateFn?.(
+				this.#state,
+				{ cache: 'none', origin: 'control', source: 'initialization' },
+				this.cache
+			)?.catch(blackhole);
 		}
 	}
 
@@ -347,11 +396,12 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		ctl: AbortController
 	): Promise<QueryState<T, E>> {
 		try {
+			const localQueryFn = this.queryFn;
 			const ok = await retryAsyncOperation(
-				() => this.#queryFn(key, ctl.signal),
+				() => localQueryFn(key, ctl.signal),
 				this.retryDelay,
 				this.retry,
-				this.#retryHandleFn
+				this.retryHandleFn
 			);
 			return (
 				(await this.#fetchResolve(ok, hash, cache, source).catch(blackhole)) ?? this.getState()
@@ -382,7 +432,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		source: QueryStateNoCacheSource
 	): Promise<QueryState<T, E>> {
 		const state: QueryState<T, E> = { status: 'error', error: err as E, data: null };
-		if (!this.#keepCacheOnErrorFn(err as E)) {
+		if (!this.keepCacheOnErrorFn(err as E)) {
 			await this.#internalCache.delete(hash).catch(blackhole);
 		}
 		this.#updateState(hash, { state, metadata: { origin: 'control', source, cache } });
@@ -394,19 +444,19 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 			return;
 		}
 
-		if (!this.#filterFn({ current: this.#state, next: state, metadata })) {
+		if (!this.filterFn({ current: this.#state, next: state, metadata })) {
 			return;
 		}
 
 		this.#state = state;
 
 		if (this.#state.data !== null) {
-			this.#handler.dataFn?.(this.#state.data, metadata, this.cache)?.catch(blackhole);
+			this.dataFn?.(this.#state.data, metadata, this.cache)?.catch(blackhole);
 		}
 		if (this.#state.error !== null) {
-			this.#handler.errorFn?.(this.#state.error, metadata, this.cache)?.catch(blackhole);
+			this.errorFn?.(this.#state.error, metadata, this.cache)?.catch(blackhole);
 		}
-		this.#handler.stateFn?.(this.#state, metadata, this.cache)?.catch(blackhole);
+		this.stateFn?.(this.#state, metadata, this.cache)?.catch(blackhole);
 
 		if (metadata.origin === 'control') {
 			this.#subscriber.publishTopic(hash, {
@@ -424,9 +474,4 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	readonly #placeholder: T | null;
 	readonly #internalCache: CacheStore<string, T>;
 	readonly #subscriber: Subscriber<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
-	readonly #handler: QueryControlHandler<T, E>;
-	readonly #queryFn: QueryFn<K, T>;
-	readonly #filterFn: QueryFilterFn<T, E>;
-	readonly #keepCacheOnErrorFn: KeepCacheOnErrorFn<E>;
-	readonly #retryHandleFn: RetryHandlerFn<E> | null;
 }

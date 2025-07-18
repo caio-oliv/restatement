@@ -19,7 +19,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
@@ -84,7 +84,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
@@ -149,7 +149,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		await queryApi.execute(['key#1'], 'no-cache');
@@ -258,7 +258,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		await queryApi.execute(['key#1'], 'no-cache');
@@ -367,7 +367,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		await queryApi.execute(['invalid_1'], 'no-cache');
@@ -476,7 +476,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		await queryApi.execute(['invalid_1'], 'no-cache');
@@ -587,7 +587,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
@@ -652,7 +652,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
@@ -705,7 +705,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
@@ -770,7 +770,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		await queryApi.execute(['key#1'], 'fresh');
@@ -881,7 +881,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		await queryApi.execute(['key#1'], 'fresh');
@@ -976,7 +976,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		await queryApi.execute(['key#1'], 'fresh');
@@ -1085,7 +1085,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		await queryApi.execute(['invalid_1'], 'fresh');
@@ -1194,7 +1194,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		await queryApi.execute(['invalid_1'], 'fresh');
@@ -1291,7 +1291,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		await queryApi.execute(['invalid_1'], 'fresh');
@@ -1402,7 +1402,7 @@ describe('QueryControl handler execution / stale query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
@@ -1467,7 +1467,7 @@ describe('QueryControl handler execution / stale query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
@@ -1520,7 +1520,7 @@ describe('QueryControl handler execution / stale query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 			fresh: 50,
 		});
 
@@ -1654,7 +1654,7 @@ describe('QueryControl handler execution / stale query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 			fresh: 50,
 		});
 
@@ -1788,7 +1788,7 @@ describe('QueryControl handler execution / stale query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
@@ -1853,7 +1853,7 @@ describe('QueryControl handler execution / stale query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		await queryApi.execute(['key#1'], 'stale');
@@ -1964,7 +1964,7 @@ describe('QueryControl handler execution / stale query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		await queryApi.execute(['key#1'], 'stale');
@@ -2059,7 +2059,7 @@ describe('QueryControl handler execution / stale query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 			fresh: 50,
 		});
 
@@ -2192,7 +2192,7 @@ describe('QueryControl handler execution / stale query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 			fresh: 50,
 		});
 
@@ -2325,7 +2325,7 @@ describe('QueryControl handler execution / stale query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		await queryApi.execute(['key#1'], 'stale');
@@ -2434,7 +2434,7 @@ describe('QueryControl handler execution / stale query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		await queryApi.execute(['invalid_1'], 'stale');
@@ -2543,7 +2543,7 @@ describe('QueryControl handler execution / stale query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		await queryApi.execute(['invalid_1'], 'stale');
@@ -2640,7 +2640,7 @@ describe('QueryControl handler execution / stale query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 			fresh: 50,
 		});
 
@@ -2773,7 +2773,7 @@ describe('QueryControl handler execution / stale query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 			fresh: 50,
 		});
 
@@ -2906,7 +2906,7 @@ describe('QueryControl handler execution / stale query', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 			fresh: 50,
 		});
 
@@ -3018,7 +3018,7 @@ describe('QueryControl handler exception handling', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		handler.dataFn.mockRejectedValue(new Error('broken_data_handler'));
@@ -3131,7 +3131,7 @@ describe('QueryControl handler exception handling', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		handler.dataFn.mockRejectedValue(new Error('broken_data_handler'));
@@ -3288,7 +3288,7 @@ describe('QueryControl handler exception handling', () => {
 			queryFn,
 			retry: 0,
 			retryDelay: immediateRetryDelay,
-			handler,
+			...handler,
 		});
 
 		handler.dataFn.mockRejectedValue(new Error('broken_data_handler'));

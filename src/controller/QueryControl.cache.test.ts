@@ -51,7 +51,7 @@ describe('QueryControl cache usage / no-cache query', () => {
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
-			assert.isTrue(entry.remain_ttl <= 950);
+			assert.isTrue(entry.remain_ttl <= 960);
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}

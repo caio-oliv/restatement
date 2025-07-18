@@ -1,4 +1,11 @@
-import type { MutationFn, MutationState, MutationControlHandler, MutationFilterFn } from '@/Type';
+import type {
+	MutationFn,
+	MutationState,
+	MutationFilterFn,
+	MutationStateHandler,
+	MutationDataHandler,
+	MutationErrorHandler,
+} from '@/Type';
 import { type RetryDelay, type RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
 import { DEFAULT_RETRY_DELAY, defaultFilterFn } from '@/Default';
 import { blackhole } from '@/Internal';
@@ -11,8 +18,10 @@ export interface MutationControlInput<I, T, E> {
 	retry?: number;
 	retryDelay?: RetryDelay<E>;
 	retryHandleFn?: RetryHandlerFn<E> | null;
-	handler?: MutationControlHandler<T, E>;
 	filterFn?: MutationFilterFn<T, E>;
+	stateFn?: MutationStateHandler<T, E> | null;
+	dataFn?: MutationDataHandler<T> | null;
+	errorFn?: MutationErrorHandler<E> | null;
 }
 
 export type MutationResetTarget = 'state' | 'handler';
@@ -21,6 +30,9 @@ export class MutationControl<I, T, E> {
 	public readonly retry: number;
 	public readonly retryDelay: RetryDelay<E>;
 	public readonly cache: CacheManager;
+	public readonly stateFn: MutationStateHandler<T, E> | null;
+	public readonly dataFn: MutationDataHandler<T> | null;
+	public readonly errorFn: MutationErrorHandler<E> | null;
 
 	public constructor({
 		placeholder = null,
@@ -29,17 +41,21 @@ export class MutationControl<I, T, E> {
 		retry = 0,
 		retryDelay = DEFAULT_RETRY_DELAY.delay,
 		retryHandleFn = null,
-		handler = { stateFn: undefined, dataFn: undefined, errorFn: undefined },
 		filterFn = defaultFilterFn,
+		stateFn = null,
+		dataFn = null,
+		errorFn = null,
 	}: MutationControlInput<I, T, E>) {
 		this.#placeholder = placeholder;
 		this.#mutationFn = mutationFn;
 		this.retry = retry;
 		this.retryDelay = retryDelay;
-		this.cache = cache;
-		this.#handler = handler;
-		this.#filterFn = filterFn;
 		this.#retryHandleFn = retryHandleFn;
+		this.cache = cache;
+		this.#filterFn = filterFn;
+		this.stateFn = stateFn;
+		this.dataFn = dataFn;
+		this.errorFn = errorFn;
 		this.#state = { data: this.#placeholder, error: null, status: 'idle' };
 	}
 
@@ -62,7 +78,7 @@ export class MutationControl<I, T, E> {
 		this.#state = { status: 'idle', data: this.#placeholder, error: null };
 
 		if (target === 'handler') {
-			this.#handler.stateFn?.(this.#state, this.cache)?.catch(blackhole);
+			this.stateFn?.(this.#state, this.cache)?.catch(blackhole);
 		}
 	}
 
@@ -101,17 +117,16 @@ export class MutationControl<I, T, E> {
 		this.#state = state;
 
 		if (this.#state.data !== null) {
-			this.#handler.dataFn?.(this.#state.data, this.cache)?.catch(blackhole);
+			this.dataFn?.(this.#state.data, this.cache)?.catch(blackhole);
 		}
 		if (this.#state.error !== null) {
-			this.#handler.errorFn?.(this.#state.error, this.cache)?.catch(blackhole);
+			this.errorFn?.(this.#state.error, this.cache)?.catch(blackhole);
 		}
-		this.#handler.stateFn?.(this.#state, this.cache)?.catch(blackhole);
+		this.stateFn?.(this.#state, this.cache)?.catch(blackhole);
 	}
 
 	#state: MutationState<T, E>;
 	readonly #placeholder: T | null;
-	readonly #handler: MutationControlHandler<T, E>;
 	readonly #filterFn: MutationFilterFn<T, E>;
 	readonly #mutationFn: MutationFn<I, T>;
 	readonly #retryHandleFn: RetryHandlerFn<E> | null;

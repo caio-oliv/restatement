@@ -1,10 +1,4 @@
-import type {
-	KeepCacheOnErrorFn,
-	KeyHashFn,
-	Millisecond,
-	MutationControlHandler,
-	QueryControlHandler,
-} from '@/Type';
+import type { KeepCacheOnErrorFn, KeyHashFn, Millisecond } from '@/Type';
 import type { CacheStore } from '@/cache/CacheStore';
 import type { RetryDelay, RetryHandlerFn } from '@/AsyncModule';
 import type { MutationControlInput } from '@/controller/MutationControl';
@@ -70,8 +64,10 @@ export type CustomQueryControlInput<K extends ReadonlyArray<unknown>, T, E = unk
 	| 'retry'
 	| 'retryDelay'
 	| 'retryHandleFn'
-> &
-	QueryControlHandler<T, E>;
+	| 'stateFn'
+	| 'dataFn'
+	| 'errorFn'
+>;
 
 /**
  * Make QueryControl input based on the global config
@@ -94,7 +90,9 @@ export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>
 		retry: custom.retry ?? config.query.retry,
 		retryDelay: custom.retryDelay ?? config.query.retryDelay,
 		retryHandleFn: custom.retryHandleFn ?? config.query.retryHandler,
-		handler: { dataFn: custom.dataFn, errorFn: custom.errorFn, stateFn: custom.stateFn },
+		dataFn: custom.dataFn ?? null,
+		errorFn: custom.errorFn ?? null,
+		stateFn: custom.stateFn ?? null,
 		placeholder: custom.placeholder ?? null,
 		filterFn: custom.filterFn ?? defaultFilterFn,
 	};
@@ -102,9 +100,16 @@ export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>
 
 export type CustomMutationControlInput<I, T, E> = Pick<
 	MutationControlInput<I, T, E>,
-	'mutationFn' | 'placeholder' | 'filterFn' | 'retry' | 'retryDelay' | 'retryHandleFn'
-> &
-	MutationControlHandler<T, E>;
+	| 'mutationFn'
+	| 'placeholder'
+	| 'filterFn'
+	| 'retry'
+	| 'retryDelay'
+	| 'retryHandleFn'
+	| 'stateFn'
+	| 'dataFn'
+	| 'errorFn'
+>;
 
 /**
  * Make MutationControl input based on the global config
@@ -122,8 +127,10 @@ export function makeMutationInput<I, T, E = unknown>(
 		retry: custom.retry ?? config.mutation.retry,
 		retryDelay: custom.retryDelay ?? config.mutation.retryDelay,
 		retryHandleFn: custom.retryHandleFn ?? config.mutation.retryHandler,
-		handler: { dataFn: custom.dataFn, errorFn: custom.errorFn, stateFn: custom.stateFn },
 		filterFn: custom.filterFn ?? defaultFilterFn,
+		dataFn: custom.dataFn ?? null,
+		errorFn: custom.errorFn ?? null,
+		stateFn: custom.stateFn ?? null,
 		placeholder: custom.placeholder ?? null,
 	};
 }
