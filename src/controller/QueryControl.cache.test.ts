@@ -8,7 +8,7 @@ import {
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { testTransformer } from '@/controller/Control.mock';
-import { mockBackoffTimer } from '@/TimerModdule.mock';
+import { mockBackoffTimer } from '@/core/BackoffTimer.mock';
 
 describe('QueryControl cache usage / no-cache query', () => {
 	it('fill the cache when making a query', async () => {

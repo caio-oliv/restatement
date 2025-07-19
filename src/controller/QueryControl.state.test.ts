@@ -12,7 +12,7 @@ import {
 	testTransformer,
 	mockQueryHandler,
 } from '@/controller/Control.mock';
-import { mockBackoffTimer } from '@/TimerModdule.mock';
+import { mockBackoffTimer } from '@/core/BackoffTimer.mock';
 
 describe('QueryControl state transition / reset query', () => {
 	it('reset query state to idle', async () => {

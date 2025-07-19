@@ -5,12 +5,11 @@ import type {
 	MutationStateHandler,
 	MutationDataHandler,
 	MutationErrorHandler,
-} from '@/Type';
-import { type RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
+} from '@/core/Type';
+import { execAsyncOperation, type RetryHandlerFn, type RetryPolicy } from '@/core/RetryPolicy';
+import type { CacheManager } from '@/cache/CacheManager';
 import { DEFAULT_RETRY_POLICY, defaultFilterFn } from '@/Default';
 import { blackhole } from '@/Internal';
-import type { CacheManager } from '@/cache/CacheManager';
-import type { RetryPolicy } from '@/RetryPolicy';
 
 export interface MutationControlInput<I, T, E> {
 	placeholder?: T | null;
@@ -81,7 +80,7 @@ export class MutationControl<I, T, E> {
 
 	async #runMutation(input: I, ctl: AbortController): Promise<MutationState<T, E>> {
 		try {
-			const data = await retryAsyncOperation(
+			const data = await execAsyncOperation(
 				() => this.#mutationFn(input, ctl.signal),
 				this.retryPolicy,
 				this.#retryHandleFn

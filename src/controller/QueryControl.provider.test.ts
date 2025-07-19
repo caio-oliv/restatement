@@ -3,7 +3,7 @@ import {
 	type QueryState,
 	type QueryStateMetadata,
 	type QueryStateFilterInfo,
-	type QueryControlProvider,
+	type QueryProvider,
 	QueryControl,
 	PubSub,
 	defaultKeyHashFn,
@@ -23,7 +23,7 @@ function filterControlState({ metadata }: QueryStateFilterInfo<string, Error>): 
 describe('QueryControl state provider / query watcher', () => {
 	it('subscribe to query changes', async () => {
 		const store = makeCache<string>();
-		const provider: QueryControlProvider<string, Error> = new PubSub();
+		const provider: QueryProvider<string, Error> = new PubSub();
 
 		const queryFn1 = vi.fn(testTransformer);
 		const handler1 = mockQueryHandler();
@@ -146,7 +146,7 @@ describe('QueryControl state provider / query watcher', () => {
 
 	it('unsubscribe to query changes when disposed', async () => {
 		const store = makeCache<string>();
-		const provider: QueryControlProvider<string, Error> = new PubSub();
+		const provider: QueryProvider<string, Error> = new PubSub();
 
 		const topic = defaultKeyHashFn(['key#1']);
 		{
@@ -171,7 +171,7 @@ describe('QueryControl state provider / query watcher', () => {
 
 	it('unsubscribe to query changes when reset', async () => {
 		const store = makeCache<string>();
-		const provider: QueryControlProvider<string, Error> = new PubSub();
+		const provider: QueryProvider<string, Error> = new PubSub();
 
 		const queryFn1 = vi.fn(testTransformer);
 		const handler1 = mockQueryHandler();
@@ -226,7 +226,7 @@ describe('QueryControl state provider / query watcher', () => {
 
 	it('unsubscribe to query changes when other key is used', async () => {
 		const store = makeCache<string>();
-		const provider: QueryControlProvider<string, Error> = new PubSub();
+		const provider: QueryProvider<string, Error> = new PubSub();
 
 		const queryFn1 = vi.fn(testTransformer);
 		const handler1 = mockQueryHandler();
@@ -284,7 +284,7 @@ describe('QueryControl state provider / query watcher', () => {
 describe('QueryControl state provider', () => {
 	it('share query function execution', async () => {
 		const store = makeCache<string>();
-		const provider: QueryControlProvider<string, Error> = new PubSub();
+		const provider: QueryProvider<string, Error> = new PubSub();
 
 		const queryFn1 = vi.fn(testTransformer);
 		const handler1 = mockQueryHandler();
@@ -332,7 +332,7 @@ describe('QueryControl state provider', () => {
 
 	it('execute only one query function and share the same promise with all queries', async () => {
 		const store = makeCache<string>();
-		const provider: QueryControlProvider<string, Error> = new PubSub();
+		const provider: QueryProvider<string, Error> = new PubSub();
 
 		const queryFn1 = vi.fn(testTransformer);
 		const handler1 = mockQueryHandler();
@@ -528,7 +528,7 @@ describe('QueryControl state provider', () => {
 describe('QueryControl state provider / in-flight migration', () => {
 	it('change subscribed key withing query execution', async () => {
 		const store = makeCache<string>();
-		const provider: QueryControlProvider<string, Error> = new PubSub();
+		const provider: QueryProvider<string, Error> = new PubSub();
 
 		const queryFn1 = vi.fn(delayedTestTransformer(100));
 		const handler1 = mockQueryHandler();

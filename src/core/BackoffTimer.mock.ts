@@ -1,6 +1,6 @@
 import { vi, type Mock } from 'vitest';
-import type { Millisecond } from '@/Type';
-import type { BackoffTimer } from '@/TimerModule';
+import type { Millisecond } from '@/core/Type';
+import type { BackoffTimer } from '@/core/BackoffTimer';
 
 export interface BackoffTimerMock extends BackoffTimer {
 	delay: Mock<(attempt: number) => Millisecond>;

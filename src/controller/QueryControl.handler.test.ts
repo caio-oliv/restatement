@@ -9,7 +9,7 @@ import {
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { testTransformer, mockQueryHandler } from '@/controller/Control.mock';
-import { mockBackoffTimer } from '@/TimerModdule.mock';
+import { mockBackoffTimer } from '@/core/BackoffTimer.mock';
 
 describe('QueryControl handler execution / no-cache query', () => {
 	it('idle to loading to success', async () => {
@@ -1579,10 +1579,15 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(queryFn).toBeCalledTimes(1);
 
 		await store.set(defaultKeyHashFn(['key#1']), 'stale_data#1', DEFAULT_TTL_DURATION);
-
 		await waitUntil(70);
 
-		const result = await queryApi.execute(['key#1'], 'stale');
+		queryFn.mockImplementationOnce(async (...keys) => {
+			await waitUntil(10);
+			return await testTransformer(...keys);
+		});
+
+		const queryPromise = queryApi.execute(['key#1'], 'stale');
+		const result = await queryPromise;
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1645,6 +1650,8 @@ describe('QueryControl handler execution / stale query', () => {
 			} satisfies QueryStateMetadata,
 			queryApi.cache
 		);
+
+		expect(queryFn).toBeCalledTimes(2);
 	});
 
 	it('stale to error from background query', async () => {
@@ -1713,8 +1720,12 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(queryFn).toBeCalledTimes(1);
 
 		await store.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', DEFAULT_TTL_DURATION);
-
 		await waitUntil(70);
+
+		queryFn.mockImplementationOnce(async (...keys) => {
+			await waitUntil(10);
+			return await testTransformer(...keys);
+		});
 
 		const result = await queryApi.execute(['invalid_1'], 'stale');
 
@@ -1779,6 +1790,8 @@ describe('QueryControl handler execution / stale query', () => {
 			} satisfies QueryStateMetadata,
 			queryApi.cache
 		);
+
+		expect(queryFn).toBeCalledTimes(2);
 	});
 
 	it('idle to loading to error', async () => {
@@ -2114,8 +2127,12 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(queryFn).toBeCalledTimes(1);
 
 		await store.set(defaultKeyHashFn(['key#1']), 'stale_data#1', DEFAULT_TTL_DURATION);
-
 		await waitUntil(70);
+
+		queryFn.mockImplementationOnce(async (...keys) => {
+			await waitUntil(10);
+			return await testTransformer(...keys);
+		});
 
 		await queryApi.execute(['key#1'], 'stale');
 
@@ -2247,8 +2264,12 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(queryFn).toBeCalledTimes(1);
 
 		await store.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', DEFAULT_TTL_DURATION);
-
 		await waitUntil(70);
+
+		queryFn.mockImplementationOnce(async (...keys) => {
+			await waitUntil(10);
+			return await testTransformer(...keys);
+		});
 
 		await queryApi.execute(['invalid_1'], 'stale');
 
@@ -2695,8 +2716,12 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(queryFn).toBeCalledTimes(1);
 
 		await store.set(defaultKeyHashFn(['key#1']), 'stale_data#1', DEFAULT_TTL_DURATION);
-
 		await waitUntil(70);
+
+		queryFn.mockImplementationOnce(async (...keys) => {
+			await waitUntil(10);
+			return await testTransformer(...keys);
+		});
 
 		await queryApi.execute(['key#1'], 'stale');
 
@@ -2828,8 +2853,12 @@ describe('QueryControl handler execution / stale query', () => {
 		expect(queryFn).toBeCalledTimes(1);
 
 		await store.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', DEFAULT_TTL_DURATION);
-
 		await waitUntil(70);
+
+		queryFn.mockImplementationOnce(async (...keys) => {
+			await waitUntil(10);
+			return await testTransformer(...keys);
+		});
 
 		await queryApi.execute(['invalid_1'], 'stale');
 

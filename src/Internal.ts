@@ -1,4 +1,4 @@
-import type { ObservablePromise, PromiseStatus } from '@/Type';
+import type { ObservablePromise, PromiseStatus } from '@/core/Type';
 
 /**
  * Empty function

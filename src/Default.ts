@@ -1,7 +1,7 @@
-import type { Millisecond } from '@/Type';
-import { type BackoffTimer, JitterExponentialBackoffTimer } from '@/TimerModule';
+import type { Millisecond } from '@/core/Type';
+import { type BackoffTimer, JitterExponentialBackoffTimer } from '@/core/BackoffTimer';
 import { jsonStringifyObjectSorter } from '@/Internal';
-import { BasicRetryPolicy, type RetryPolicy } from '@/RetryPolicy';
+import { BasicRetryPolicy, type RetryPolicy } from '@/core/RetryPolicy';
 
 /**
  * @summary Default retry limit

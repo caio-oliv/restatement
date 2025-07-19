@@ -4,7 +4,7 @@ import type {
 	Millisecond,
 	QueryProviderState,
 	QueryStatePromise,
-} from '@/Type';
+} from '@/core/Type';
 import type { CacheStore } from '@/cache/CacheStore';
 import type { PubSub } from '@/PubSub';
 import { defaultKeyHashFn, DEFAULT_TTL_DURATION } from '@/Default';

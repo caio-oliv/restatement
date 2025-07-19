@@ -1,5 +1,4 @@
 import { vi, type Mock } from 'vitest';
-import { waitUntil } from '@/AsyncModule';
 import type {
 	DataHandler,
 	ErrorHandler,
@@ -9,7 +8,8 @@ import type {
 	MutationStateHandler,
 	QueryControlHandler,
 	QueryStateHandler,
-} from '@/Type';
+} from '@/core/Type';
+import { waitUntil } from '@/core/RetryPolicy';
 
 /**
  * Make a empty promise

@@ -1,5 +1,5 @@
 import { assert, describe, it, expect, vi } from 'vitest';
-import { retryAsyncOperation, NoRetryPolicy, type Millisecond, type OperationResult } from '@/lib';
+import { execAsyncOperation, NoRetryPolicy, type Millisecond, type OperationResult } from '@/lib';
 
 async function failedOperation(): Promise<void> {
 	throw new Error('failed');
@@ -22,7 +22,7 @@ describe('retryAsyncOperation', () => {
 	it('resolve operation', async () => {
 		const noRetry = new NoRetryPolicy();
 
-		const value = await retryAsyncOperation<string>(successOperation, noRetry);
+		const value = await execAsyncOperation<string>(successOperation, noRetry);
 
 		assert.strictEqual(value, 'OK');
 	});
@@ -35,7 +35,7 @@ describe('retryAsyncOperation', () => {
 		retryPolicy.limit = 3;
 
 		await expect(() =>
-			retryAsyncOperation(failedOperation, retryPolicy, retryHandler)
+			execAsyncOperation(failedOperation, retryPolicy, retryHandler)
 		).rejects.toThrowError(new Error('failed'));
 
 		expect(retryPolicy.delay).toHaveBeenCalledTimes(4);
@@ -51,7 +51,7 @@ describe('retryAsyncOperation', () => {
 		retryPolicy.limit = 2;
 
 		await expect(() =>
-			retryAsyncOperation(failedOperation, retryPolicy, retryHandler)
+			execAsyncOperation(failedOperation, retryPolicy, retryHandler)
 		).rejects.toThrowError(new Error('failed'));
 
 		expect(retryPolicy.delay).toHaveBeenCalledTimes(1);
@@ -74,7 +74,7 @@ describe('retryAsyncOperation', () => {
 		retryPolicy.delay.mockImplementation(attempt => (attempt <= 5 ? 20 : -1));
 		retryPolicy.limit = 5;
 
-		await expect(() => retryAsyncOperation(operation, retryPolicy, handler)).rejects.toThrowError(
+		await expect(() => execAsyncOperation(operation, retryPolicy, handler)).rejects.toThrowError(
 			new Error('failed')
 		);
 

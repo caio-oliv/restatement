@@ -7,7 +7,7 @@ import {
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { testTransformer } from '@/controller/Control.mock';
-import { mockBackoffTimer } from '@/TimerModdule.mock';
+import { mockBackoffTimer } from '@/core/BackoffTimer.mock';
 
 describe('MutationControl state transition', () => {
 	it('"idle" to "loading" to "success"', async () => {

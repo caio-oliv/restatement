@@ -2,7 +2,7 @@ import { assert, describe, expect, it, vi } from 'vitest';
 import { BasicRetryPolicy, CacheManager, MutationControl } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { mockMutationHandler, testTransformer } from '@/controller/Control.mock';
-import { mockBackoffTimer } from '@/TimerModdule.mock';
+import { mockBackoffTimer } from '@/core/BackoffTimer.mock';
 
 describe('MutationControl handler execution', () => {
 	it('"idle" to "loading" to "success"', async () => {

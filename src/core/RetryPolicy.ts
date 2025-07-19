@@ -1,7 +1,11 @@
-import { type BackoffTimer } from '@/TimerModule';
-import type { Millisecond } from '@/Type';
+import type { Millisecond } from '@/core/Type';
+import type { BackoffTimer } from '@/core/BackoffTimer';
 
 export type OperationResult = 'success' | 'fail';
+
+export type AsyncOperation<T> = () => Promise<T>;
+
+export type RetryHandlerFn<E> = (retryAttempt: number, error: E) => void;
 
 export interface RetryPolicy<E = unknown> {
 	/**
@@ -79,5 +83,50 @@ export class NoRetryPolicy implements RetryPolicy {
 	// eslint-disable-next-line class-methods-use-this, @typescript-eslint/class-methods-use-this
 	public notify(): void {
 		// no-op
+	}
+}
+
+/**
+ * @summary Wait until timeout
+ * @param time wait time in milliseconds
+ * @returns promise that will resolve after specified time.
+ */
+export function waitUntil(time: number): Promise<void> {
+	return new Promise(resolve => {
+		setTimeout(resolve, time);
+	});
+}
+
+/**
+ * @summary Execute async operation
+ * @param operation async operation
+ * @param retryPolicy retry policy
+ * @param retryHandleFn retry callback handler, called before every retry
+ * @returns promise with the result of all the retry attempts.
+ */
+export async function execAsyncOperation<T, E = unknown>(
+	operation: AsyncOperation<T>,
+	retryPolicy: RetryPolicy<E>,
+	retryHandleFn: RetryHandlerFn<E> | null = null
+): Promise<T> {
+	let retryAttempt = 0;
+	let lastError: E;
+
+	while (true) {
+		try {
+			const value = await operation();
+			retryPolicy.notify('success');
+			return value;
+		} catch (err) {
+			retryPolicy.notify('fail');
+			lastError = err as E;
+			retryAttempt += 1;
+
+			const delay = retryPolicy.delay(retryAttempt, lastError);
+			if (delay < 0) throw lastError;
+
+			await waitUntil(delay);
+			retryHandleFn?.(retryAttempt, lastError);
+		}
 	}
 }

@@ -1,4 +1,4 @@
-import type { Millisecond } from '@/Type';
+import type { Millisecond } from '@/core/Type';
 
 export interface BackoffTimer {
 	/**
@@ -58,8 +58,8 @@ export class LinearBackoffTimer implements BackoffTimer {
 export class FixedBackoffTimer implements BackoffTimer {
 	public readonly time: number;
 
-	public constructor(time: number) {
-		this.time = time;
+	public constructor(delay: number) {
+		this.time = delay;
 	}
 
 	public delay(): Millisecond {

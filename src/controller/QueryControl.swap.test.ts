@@ -3,6 +3,7 @@ import {
 	BasicRetryPolicy,
 	DEFAULT_TTL_DURATION,
 	defaultFilterFn,
+	FixedBackoffTimer,
 	QueryControl,
 	waitUntil,
 	type QueryState,
@@ -10,17 +11,14 @@ import {
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { mockQueryHandler, testTransformer } from '@/controller/Control.mock';
-import { mockBackoffTimer } from '@/TimerModdule.mock';
+import { mockBackoffTimer } from '@/core/BackoffTimer.mock';
 
 describe('QueryControl function swap / queryFn', () => {
 	it('use same queryFn on retries while swaped mid-air', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const secondQueryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(
-			3,
-			mockBackoffTimer(() => 50)
-		);
+		const retryPolicy = new BasicRetryPolicy(3, new FixedBackoffTimer(50));
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
 			queryFn,
@@ -29,7 +27,7 @@ describe('QueryControl function swap / queryFn', () => {
 
 		const queryPromise = queryCtl.execute(['error'], 'no-cache');
 
-		queryCtl.queryFn = secondQueryFn;
+		queryCtl.context.queryFn = secondQueryFn;
 
 		const result = await queryPromise;
 
@@ -52,10 +50,7 @@ describe('QueryControl function swap / queryFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const secondQueryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(
-			2,
-			mockBackoffTimer(() => 50)
-		);
+		const retryPolicy = new BasicRetryPolicy(2, new FixedBackoffTimer(50));
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
 			queryFn,
@@ -64,7 +59,7 @@ describe('QueryControl function swap / queryFn', () => {
 
 		const queryPromise = queryCtl.execute(['error'], 'no-cache');
 
-		queryCtl.queryFn = secondQueryFn;
+		queryCtl.context.queryFn = secondQueryFn;
 
 		const result = await queryPromise;
 
@@ -108,10 +103,7 @@ describe('QueryControl function swap / queryFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const secondQueryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(
-			2,
-			mockBackoffTimer(() => 50)
-		);
+		const retryPolicy = new BasicRetryPolicy(2, new FixedBackoffTimer(50));
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
 			queryFn,
@@ -120,12 +112,16 @@ describe('QueryControl function swap / queryFn', () => {
 			ttl: 100,
 		});
 
-		await store.set(queryCtl.keyHashFn(['key#updated_result']), 'stale_data', 100);
+		await store.set(queryCtl.context.keyHashFn(['key#updated_result']), 'stale_data', 100);
 		await waitUntil(70);
 
-		const queryPromise = queryCtl.execute(['key#updated_result'], 'stale');
+		secondQueryFn.mockImplementationOnce(async (...params) => {
+			await waitUntil(10);
+			return await testTransformer(...params);
+		});
 
-		queryCtl.queryFn = secondQueryFn;
+		const queryPromise = queryCtl.execute(['key#updated_result'], 'stale');
+		queryCtl.context.queryFn = secondQueryFn;
 
 		expect(queryFn).toHaveBeenCalledTimes(0);
 		expect(secondQueryFn).toHaveBeenCalledTimes(0);
@@ -167,10 +163,7 @@ describe('QueryControl function swap / queryFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const secondQueryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(
-			3,
-			mockBackoffTimer(() => 50)
-		);
+		const retryPolicy = new BasicRetryPolicy(3, new FixedBackoffTimer(50));
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
 			queryFn,
@@ -186,7 +179,7 @@ describe('QueryControl function swap / queryFn', () => {
 
 		const mainQueryPromise = queryCtl.execute(['key#main_value'], 'no-cache');
 
-		queryCtl.queryFn = secondQueryFn;
+		queryCtl.context.queryFn = secondQueryFn;
 		const secondQueryPromise = queryCtl.execute(['key#second_value'], 'no-cache');
 
 		const [mainResult, secondResult] = await Promise.all([mainQueryPromise, secondQueryPromise]);
@@ -218,10 +211,7 @@ describe('QueryControl function swap / queryFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const secondQueryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(
-			3,
-			mockBackoffTimer(() => 50)
-		);
+		const retryPolicy = new BasicRetryPolicy(3, new FixedBackoffTimer(50));
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
 			queryFn,
@@ -240,7 +230,7 @@ describe('QueryControl function swap / queryFn', () => {
 
 		const mainQueryPromise = queryCtl.execute(['key#race'], 'no-cache');
 
-		queryCtl.queryFn = secondQueryFn;
+		queryCtl.context.queryFn = secondQueryFn;
 		const secondQueryPromise = queryCtl.execute(['key#race'], 'no-cache');
 
 		const [mainResult, secondResult] = await Promise.all([mainQueryPromise, secondQueryPromise]);
@@ -279,7 +269,7 @@ describe('QueryControl function swap / filterFn', () => {
 		});
 
 		{
-			queryCtl.filterFn = ({ next }) => next.status !== 'loading';
+			queryCtl.context.filterFn = ({ next }) => next.status !== 'loading';
 
 			const result = await queryCtl.execute(['key#true'], 'no-cache');
 
@@ -295,7 +285,7 @@ describe('QueryControl function swap / filterFn', () => {
 		queryCtl.reset();
 
 		{
-			queryCtl.filterFn = defaultFilterFn;
+			queryCtl.context.filterFn = defaultFilterFn;
 
 			const result = await queryCtl.execute(['key#false'], 'no-cache');
 
@@ -349,7 +339,7 @@ describe('QueryControl function swap / filterFn', () => {
 			});
 		}
 		{
-			queryCtl.filterFn = ({ next }) => next.status !== 'error';
+			queryCtl.context.filterFn = ({ next }) => next.status !== 'error';
 
 			const result = await queryCtl.execute(['key#true'], 'no-cache');
 
@@ -391,12 +381,12 @@ describe('QueryControl function swap / filterFn', () => {
 			...handler,
 		});
 
-		await store.set(queryCtl.keyHashFn(['key#true']), 'stale_data', DEFAULT_TTL_DURATION);
+		await store.set(queryCtl.context.keyHashFn(['key#true']), 'stale_data', DEFAULT_TTL_DURATION);
 		await waitUntil(70);
 
 		const queryPromise = queryCtl.execute(['key#true'], 'stale');
 
-		queryCtl.filterFn = ({ metadata }) => metadata.source !== 'background-query';
+		queryCtl.context.filterFn = ({ metadata }) => metadata.source !== 'background-query';
 
 		const queryResult = await queryPromise;
 
@@ -461,7 +451,7 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 			...handler,
 		});
 
-		await store.set(queryCtl.keyHashFn(['key#0101']), 'cached_value', DEFAULT_TTL_DURATION);
+		await store.set(queryCtl.context.keyHashFn(['key#0101']), 'cached_value', DEFAULT_TTL_DURATION);
 		await waitUntil(110);
 
 		{
@@ -469,7 +459,7 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 
 			const queryPromise = queryCtl.execute(['key#0101'], 'no-cache');
 
-			queryCtl.keepCacheOnErrorFn = () => true;
+			queryCtl.context.keepCacheOnErrorFn = () => true;
 
 			const queryResult = await queryPromise;
 
@@ -479,14 +469,17 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 				error: new Error('manual_error_1'),
 			});
 
-			assert.deepStrictEqual(await store.get(queryCtl.keyHashFn(['key#0101'])), 'cached_value');
+			assert.deepStrictEqual(
+				await store.get(queryCtl.context.keyHashFn(['key#0101'])),
+				'cached_value'
+			);
 		}
 		{
 			queryFn.mockRejectedValueOnce(new Error('manual_error_2'));
 
 			const queryPromise = queryCtl.execute(['key#0101'], 'no-cache');
 
-			queryCtl.keepCacheOnErrorFn = () => false;
+			queryCtl.context.keepCacheOnErrorFn = () => false;
 
 			const queryResult = await queryPromise;
 
@@ -496,7 +489,7 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 				error: new Error('manual_error_2'),
 			});
 
-			assert.deepStrictEqual(await store.get(queryCtl.keyHashFn(['key#0101'])), undefined);
+			assert.deepStrictEqual(await store.get(queryCtl.context.keyHashFn(['key#0101'])), undefined);
 		}
 	});
 
@@ -515,14 +508,18 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 		});
 
 		{
-			await store.set(queryCtl.keyHashFn(['key#0101']), 'cached_value', DEFAULT_TTL_DURATION);
+			await store.set(
+				queryCtl.context.keyHashFn(['key#0101']),
+				'cached_value',
+				DEFAULT_TTL_DURATION
+			);
 			await waitUntil(110);
 
 			queryFn.mockRejectedValueOnce(new Error('manual_error_1'));
 
 			const queryResult = await queryCtl.execute(['key#0101'], 'no-cache');
 
-			queryCtl.keepCacheOnErrorFn = () => true;
+			queryCtl.context.keepCacheOnErrorFn = () => true;
 
 			assert.deepStrictEqual(queryResult.state, {
 				status: 'error',
@@ -530,10 +527,14 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 				error: new Error('manual_error_1'),
 			});
 
-			assert.deepStrictEqual(await store.get(queryCtl.keyHashFn(['key#0101'])), undefined);
+			assert.deepStrictEqual(await store.get(queryCtl.context.keyHashFn(['key#0101'])), undefined);
 		}
 		{
-			await store.set(queryCtl.keyHashFn(['key#0101']), 'cached_value', DEFAULT_TTL_DURATION);
+			await store.set(
+				queryCtl.context.keyHashFn(['key#0101']),
+				'cached_value',
+				DEFAULT_TTL_DURATION
+			);
 			await waitUntil(110);
 
 			queryFn.mockRejectedValueOnce(new Error('manual_error_2'));
@@ -546,7 +547,10 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 				error: new Error('manual_error_2'),
 			});
 
-			assert.deepStrictEqual(await store.get(queryCtl.keyHashFn(['key#0101'])), 'cached_value');
+			assert.deepStrictEqual(
+				await store.get(queryCtl.context.keyHashFn(['key#0101'])),
+				'cached_value'
+			);
 		}
 	});
 });
@@ -556,10 +560,7 @@ describe('QueryControl function swap / retryHandleFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
-		const retryPolicy = new BasicRetryPolicy(
-			3,
-			mockBackoffTimer(() => 50)
-		);
+		const retryPolicy = new BasicRetryPolicy(3, new FixedBackoffTimer(50));
 		const retryHandleFn = vi.fn();
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
@@ -585,7 +586,7 @@ describe('QueryControl function swap / retryHandleFn', () => {
 			expect(retryHandleFn).toBeCalledTimes(1);
 			expect(secondRetryHandleFn).toBeCalledTimes(0);
 
-			queryCtl.retryHandleFn = secondRetryHandleFn;
+			queryCtl.context.retryHandleFn = secondRetryHandleFn;
 
 			await waitUntil(50);
 

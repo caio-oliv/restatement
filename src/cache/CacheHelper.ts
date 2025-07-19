@@ -1,4 +1,4 @@
-import type { Millisecond } from '@/Type';
+import type { Millisecond } from '@/core/Type';
 import type { CacheEntry } from '@/cache/CacheStore';
 
 /**

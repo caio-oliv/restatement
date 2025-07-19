@@ -1,15 +1,10 @@
-import type { KeepCacheOnErrorFn, KeyHashFn, Millisecond } from '@/Type';
+import type { KeepCacheOnErrorFn, KeyHashFn, Millisecond } from '@/core/Type';
+import type { RetryHandlerFn, RetryPolicy } from '@/core/RetryPolicy';
+import type { QueryProvider, QueryInput } from '@/plumbing/QueryType';
 import type { CacheStore } from '@/cache/CacheStore';
-import type { RetryHandlerFn } from '@/AsyncModule';
-import { type CacheManagerInput, CacheManager } from '@/cache/CacheManager';
 import type { MutationControlInput } from '@/controller/MutationControl';
-import type {
-	QueryControl,
-	QueryControlInput,
-	QueryControlProvider,
-} from '@/controller/QueryControl';
+import { type CacheManagerInput, CacheManager } from '@/cache/CacheManager';
 import { DEFAULT_RETRY_POLICY, defaultFilterFn } from '@/Default';
-import type { RetryPolicy } from '@/RetryPolicy';
 
 export interface RetryConfig<E = unknown> {
 	readonly retryPolicy: RetryPolicy<E>;
@@ -24,7 +19,7 @@ export interface CacheConfig {
 
 export interface RestatementConfig<E = unknown> {
 	readonly cache: CacheConfig;
-	readonly provider: QueryControlProvider<unknown, E>;
+	readonly provider: QueryProvider<unknown, E>;
 	readonly keyHashFn: KeyHashFn<ReadonlyArray<unknown>>;
 	readonly keepCacheOnErrorFn: KeepCacheOnErrorFn<E>;
 
@@ -43,7 +38,7 @@ export function makeCacheInput<E = unknown>(
 	return {
 		store: config.cache.store,
 		keyHashFn: config.keyHashFn,
-		provider: config.provider as QueryControlProvider<unknown, unknown>,
+		provider: config.provider as QueryProvider<unknown, unknown>,
 		ttl: config.cache.ttl,
 	};
 }
@@ -58,7 +53,7 @@ export function makeCacheManager<E = unknown>(config: RestatementConfig<E>): Cac
 }
 
 export type CustomQueryControlInput<K extends ReadonlyArray<unknown>, T, E = unknown> = Pick<
-	QueryControlInput<K, T, E>,
+	QueryInput<K, T, E>,
 	| 'queryFn'
 	| 'placeholder'
 	| 'fresh'
@@ -73,7 +68,7 @@ export type CustomQueryControlInput<K extends ReadonlyArray<unknown>, T, E = unk
 >;
 
 export type QueryControlMutableInput<K extends ReadonlyArray<unknown>, T, E = unknown> = Pick<
-	QueryControlInput<K, T, E>,
+	QueryInput<K, T, E>,
 	'queryFn' | 'keepCacheOnErrorFn' | 'filterFn' | 'retryHandleFn' | 'stateFn' | 'dataFn' | 'errorFn'
 >;
 
@@ -86,7 +81,7 @@ export type QueryControlMutableInput<K extends ReadonlyArray<unknown>, T, E = un
 export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>(
 	config: RestatementConfig<E>,
 	custom: CustomQueryControlInput<K, T, E>
-): Required<QueryControlInput<K, T, E>> {
+): Required<QueryInput<K, T, E>> {
 	return {
 		queryFn: custom.queryFn,
 		store: config.cache.store as CacheStore<string, T>,
@@ -94,7 +89,7 @@ export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>
 		ttl: custom.ttl ?? config.cache.ttl,
 		keepCacheOnErrorFn: custom.keepCacheOnErrorFn ?? config.keepCacheOnErrorFn,
 		keyHashFn: config.keyHashFn,
-		provider: config.provider as QueryControlProvider<T, E>,
+		provider: config.provider as QueryProvider<T, E>,
 		retryPolicy: custom.retryPolicy ?? DEFAULT_RETRY_POLICY,
 		retryHandleFn: custom.retryHandleFn ?? config.query.retryHandler,
 		dataFn: custom.dataFn ?? null,
@@ -103,24 +98,6 @@ export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>
 		placeholder: custom.placeholder ?? null,
 		filterFn: custom.filterFn ?? defaultFilterFn,
 	};
-}
-
-/**
- * Update QueryControl functions
- * @param controller query control
- * @param config custom query input
- */
-export function updateQueryControl<K extends ReadonlyArray<unknown>, T, E = unknown>(
-	controller: QueryControl<K, T, E>,
-	config: QueryControlMutableInput<K, T, E>
-): void {
-	if (config.queryFn) controller.queryFn = config.queryFn;
-	if (config.filterFn) controller.filterFn = config.filterFn;
-	if (config.keepCacheOnErrorFn) controller.keepCacheOnErrorFn = config.keepCacheOnErrorFn;
-	if (config.retryHandleFn) controller.retryHandleFn = config.retryHandleFn;
-	if (config.stateFn) controller.stateFn = config.stateFn;
-	if (config.errorFn) controller.errorFn = config.errorFn;
-	if (config.dataFn) controller.dataFn = config.dataFn;
 }
 
 export type CustomMutationControlInput<I, T, E> = Pick<
