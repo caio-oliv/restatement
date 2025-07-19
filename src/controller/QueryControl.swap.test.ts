@@ -1,5 +1,6 @@
 import { assert, describe, expect, it, vi } from 'vitest';
 import {
+	BasicRetryPolicy,
 	DEFAULT_TTL_DURATION,
 	defaultFilterFn,
 	QueryControl,
@@ -9,17 +10,21 @@ import {
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { mockQueryHandler, testTransformer } from '@/controller/Control.mock';
+import { mockBackoffTimer } from '@/TimerModdule.mock';
 
 describe('QueryControl function swap / queryFn', () => {
 	it('use same queryFn on retries while swaped mid-air', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const secondQueryFn = vi.fn(testTransformer);
+		const retryPolicy = new BasicRetryPolicy(
+			3,
+			mockBackoffTimer(() => 50)
+		);
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
 			queryFn,
-			retry: 3,
-			retryDelay: () => 50,
+			retryPolicy,
 		});
 
 		const queryPromise = queryCtl.execute(['error'], 'no-cache');
@@ -47,11 +52,14 @@ describe('QueryControl function swap / queryFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const secondQueryFn = vi.fn(testTransformer);
+		const retryPolicy = new BasicRetryPolicy(
+			2,
+			mockBackoffTimer(() => 50)
+		);
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
 			queryFn,
-			retry: 2,
-			retryDelay: () => 50,
+			retryPolicy,
 		});
 
 		const queryPromise = queryCtl.execute(['error'], 'no-cache');
@@ -100,11 +108,14 @@ describe('QueryControl function swap / queryFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const secondQueryFn = vi.fn(testTransformer);
+		const retryPolicy = new BasicRetryPolicy(
+			2,
+			mockBackoffTimer(() => 50)
+		);
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
 			queryFn,
-			retry: 2,
-			retryDelay: () => 50,
+			retryPolicy,
 			fresh: 50,
 			ttl: 100,
 		});
@@ -156,11 +167,14 @@ describe('QueryControl function swap / queryFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const secondQueryFn = vi.fn(testTransformer);
+		const retryPolicy = new BasicRetryPolicy(
+			3,
+			mockBackoffTimer(() => 50)
+		);
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
 			queryFn,
-			retry: 3,
-			retryDelay: () => 50,
+			retryPolicy,
 		});
 
 		queryFn.mockRejectedValueOnce(new Error('manual_error_main_1'));
@@ -204,11 +218,14 @@ describe('QueryControl function swap / queryFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const secondQueryFn = vi.fn(testTransformer);
+		const retryPolicy = new BasicRetryPolicy(
+			3,
+			mockBackoffTimer(() => 50)
+		);
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
 			queryFn,
-			retry: 3,
-			retryDelay: () => 50,
+			retryPolicy,
 		});
 
 		queryFn.mockRejectedValueOnce(new Error('manual_error_main_1'));
@@ -253,10 +270,11 @@ describe('QueryControl function swap / filterFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
 			queryFn,
-			retry: 0,
+			retryPolicy,
 			...handler,
 		});
 
@@ -295,10 +313,11 @@ describe('QueryControl function swap / filterFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
 			queryFn,
-			retry: 0,
+			retryPolicy,
 			...handler,
 		});
 
@@ -362,10 +381,11 @@ describe('QueryControl function swap / filterFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
 			queryFn,
-			retry: 0,
+			retryPolicy,
 			fresh: 50,
 			ttl: 100,
 			...handler,
@@ -431,10 +451,11 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
 			queryFn,
-			retry: 0,
+			retryPolicy,
 			fresh: 50,
 			ttl: 100,
 			...handler,
@@ -483,10 +504,11 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
 			queryFn,
-			retry: 0,
+			retryPolicy,
 			fresh: 50,
 			ttl: 100,
 			...handler,
@@ -534,6 +556,10 @@ describe('QueryControl function swap / retryHandleFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(
+			3,
+			mockBackoffTimer(() => 50)
+		);
 		const retryHandleFn = vi.fn();
 		const queryCtl = new QueryControl<[string], string, Error>({
 			store,
@@ -541,8 +567,7 @@ describe('QueryControl function swap / retryHandleFn', () => {
 			...handler,
 			fresh: 50,
 			ttl: 100,
-			retry: 3,
-			retryDelay: () => 50,
+			retryPolicy,
 			retryHandleFn,
 		});
 

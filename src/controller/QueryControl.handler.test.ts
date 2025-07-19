@@ -1,24 +1,26 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
 	type QueryStateMetadata,
+	BasicRetryPolicy,
 	DEFAULT_TTL_DURATION,
 	defaultKeyHashFn,
 	QueryControl,
 	waitUntil,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
-import { testTransformer, immediateRetryDelay, mockQueryHandler } from '@/controller/Control.mock';
+import { testTransformer, mockQueryHandler } from '@/controller/Control.mock';
+import { mockBackoffTimer } from '@/TimerModdule.mock';
 
 describe('QueryControl handler execution / no-cache query', () => {
 	it('idle to loading to success', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -79,11 +81,11 @@ describe('QueryControl handler execution / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -144,11 +146,11 @@ describe('QueryControl handler execution / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -253,11 +255,11 @@ describe('QueryControl handler execution / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -362,11 +364,11 @@ describe('QueryControl handler execution / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -471,11 +473,11 @@ describe('QueryControl handler execution / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -582,11 +584,11 @@ describe('QueryControl handler execution / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -647,11 +649,11 @@ describe('QueryControl handler execution / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -700,11 +702,11 @@ describe('QueryControl handler execution / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -765,11 +767,11 @@ describe('QueryControl handler execution / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -876,11 +878,11 @@ describe('QueryControl handler execution / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -971,11 +973,11 @@ describe('QueryControl handler execution / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -1080,11 +1082,11 @@ describe('QueryControl handler execution / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -1189,11 +1191,11 @@ describe('QueryControl handler execution / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -1286,11 +1288,11 @@ describe('QueryControl handler execution / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -1397,11 +1399,11 @@ describe('QueryControl handler execution / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -1462,11 +1464,11 @@ describe('QueryControl handler execution / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -1515,11 +1517,11 @@ describe('QueryControl handler execution / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 			fresh: 50,
 		});
@@ -1649,11 +1651,11 @@ describe('QueryControl handler execution / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 			fresh: 50,
 		});
@@ -1783,11 +1785,11 @@ describe('QueryControl handler execution / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -1848,11 +1850,11 @@ describe('QueryControl handler execution / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -1959,11 +1961,11 @@ describe('QueryControl handler execution / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -2054,11 +2056,11 @@ describe('QueryControl handler execution / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 			fresh: 50,
 		});
@@ -2187,11 +2189,11 @@ describe('QueryControl handler execution / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 			fresh: 50,
 		});
@@ -2320,11 +2322,11 @@ describe('QueryControl handler execution / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -2429,11 +2431,11 @@ describe('QueryControl handler execution / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -2538,11 +2540,11 @@ describe('QueryControl handler execution / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -2635,11 +2637,11 @@ describe('QueryControl handler execution / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 			fresh: 50,
 		});
@@ -2768,11 +2770,11 @@ describe('QueryControl handler execution / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 			fresh: 50,
 		});
@@ -2901,11 +2903,11 @@ describe('QueryControl handler execution / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 			fresh: 50,
 		});
@@ -3013,11 +3015,11 @@ describe('QueryControl handler exception handling', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -3126,11 +3128,11 @@ describe('QueryControl handler exception handling', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 
@@ -3283,11 +3285,11 @@ describe('QueryControl handler exception handling', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
+		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
 		const queryApi = new QueryControl({
 			store,
 			queryFn,
-			retry: 0,
-			retryDelay: immediateRetryDelay,
+			retryPolicy,
 			...handler,
 		});
 

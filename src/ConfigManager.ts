@@ -1,14 +1,18 @@
 import type { KeepCacheOnErrorFn, KeyHashFn, Millisecond } from '@/Type';
 import type { CacheStore } from '@/cache/CacheStore';
-import type { RetryDelay, RetryHandlerFn } from '@/AsyncModule';
-import type { MutationControlInput } from '@/controller/MutationControl';
-import type { QueryControlInput, QueryControlProvider } from '@/controller/QueryControl';
+import type { RetryHandlerFn } from '@/AsyncModule';
 import { type CacheManagerInput, CacheManager } from '@/cache/CacheManager';
-import { defaultFilterFn } from '@/Default';
+import type { MutationControlInput } from '@/controller/MutationControl';
+import type {
+	QueryControl,
+	QueryControlInput,
+	QueryControlProvider,
+} from '@/controller/QueryControl';
+import { DEFAULT_RETRY_POLICY, defaultFilterFn } from '@/Default';
+import type { RetryPolicy } from '@/RetryPolicy';
 
 export interface RetryConfig<E = unknown> {
-	readonly retryDelay: RetryDelay<E>;
-	readonly retry: number;
+	readonly retryPolicy: RetryPolicy<E>;
 	readonly retryHandler: RetryHandlerFn<E> | null;
 }
 
@@ -61,12 +65,16 @@ export type CustomQueryControlInput<K extends ReadonlyArray<unknown>, T, E = unk
 	| 'ttl'
 	| 'keepCacheOnErrorFn'
 	| 'filterFn'
-	| 'retry'
-	| 'retryDelay'
+	| 'retryPolicy'
 	| 'retryHandleFn'
 	| 'stateFn'
 	| 'dataFn'
 	| 'errorFn'
+>;
+
+export type QueryControlMutableInput<K extends ReadonlyArray<unknown>, T, E = unknown> = Pick<
+	QueryControlInput<K, T, E>,
+	'queryFn' | 'keepCacheOnErrorFn' | 'filterFn' | 'retryHandleFn' | 'stateFn' | 'dataFn' | 'errorFn'
 >;
 
 /**
@@ -87,8 +95,7 @@ export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>
 		keepCacheOnErrorFn: custom.keepCacheOnErrorFn ?? config.keepCacheOnErrorFn,
 		keyHashFn: config.keyHashFn,
 		provider: config.provider as QueryControlProvider<T, E>,
-		retry: custom.retry ?? config.query.retry,
-		retryDelay: custom.retryDelay ?? config.query.retryDelay,
+		retryPolicy: custom.retryPolicy ?? DEFAULT_RETRY_POLICY,
 		retryHandleFn: custom.retryHandleFn ?? config.query.retryHandler,
 		dataFn: custom.dataFn ?? null,
 		errorFn: custom.errorFn ?? null,
@@ -98,13 +105,30 @@ export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>
 	};
 }
 
+/**
+ * Update QueryControl functions
+ * @param controller query control
+ * @param config custom query input
+ */
+export function updateQueryControl<K extends ReadonlyArray<unknown>, T, E = unknown>(
+	controller: QueryControl<K, T, E>,
+	config: QueryControlMutableInput<K, T, E>
+): void {
+	if (config.queryFn) controller.queryFn = config.queryFn;
+	if (config.filterFn) controller.filterFn = config.filterFn;
+	if (config.keepCacheOnErrorFn) controller.keepCacheOnErrorFn = config.keepCacheOnErrorFn;
+	if (config.retryHandleFn) controller.retryHandleFn = config.retryHandleFn;
+	if (config.stateFn) controller.stateFn = config.stateFn;
+	if (config.errorFn) controller.errorFn = config.errorFn;
+	if (config.dataFn) controller.dataFn = config.dataFn;
+}
+
 export type CustomMutationControlInput<I, T, E> = Pick<
 	MutationControlInput<I, T, E>,
 	| 'mutationFn'
 	| 'placeholder'
 	| 'filterFn'
-	| 'retry'
-	| 'retryDelay'
+	| 'retryPolicy'
 	| 'retryHandleFn'
 	| 'stateFn'
 	| 'dataFn'
@@ -124,8 +148,7 @@ export function makeMutationInput<I, T, E = unknown>(
 	return {
 		mutationFn: custom.mutationFn,
 		cache: makeCacheManager(config),
-		retry: custom.retry ?? config.mutation.retry,
-		retryDelay: custom.retryDelay ?? config.mutation.retryDelay,
+		retryPolicy: custom.retryPolicy ?? DEFAULT_RETRY_POLICY,
 		retryHandleFn: custom.retryHandleFn ?? config.mutation.retryHandler,
 		filterFn: custom.filterFn ?? defaultFilterFn,
 		dataFn: custom.dataFn ?? null,

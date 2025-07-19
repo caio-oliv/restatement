@@ -16,8 +16,8 @@ import {
 	testTransformer,
 } from '@/controller/Control.mock';
 
-function blockProviderState({ metadata }: QueryStateFilterInfo<string, Error>): boolean {
-	return metadata.origin !== 'provider';
+function filterControlState({ metadata }: QueryStateFilterInfo<string, Error>): boolean {
+	return metadata.origin === 'control';
 }
 
 describe('QueryControl state provider / query watcher', () => {
@@ -343,7 +343,7 @@ describe('QueryControl state provider', () => {
 			...handler1,
 			fresh: 50,
 			ttl: 100,
-			filterFn: blockProviderState,
+			filterFn: filterControlState,
 		});
 
 		const queryFn2 = vi.fn(testTransformer);
@@ -355,7 +355,7 @@ describe('QueryControl state provider', () => {
 			...handler2,
 			fresh: 50,
 			ttl: 100,
-			filterFn: blockProviderState,
+			filterFn: filterControlState,
 		});
 
 		const queryFn3 = vi.fn(testTransformer);
@@ -367,7 +367,7 @@ describe('QueryControl state provider', () => {
 			...handler3,
 			fresh: 50,
 			ttl: 100,
-			filterFn: blockProviderState,
+			filterFn: filterControlState,
 		});
 
 		await store.set(defaultKeyHashFn(['key#1']), 'data_stale#1', 100);
@@ -537,7 +537,7 @@ describe('QueryControl state provider / in-flight migration', () => {
 			provider,
 			queryFn: queryFn1,
 			...handler1,
-			filterFn: blockProviderState,
+			filterFn: filterControlState,
 		});
 
 		const queryFn2 = vi.fn(delayedTestTransformer(100));
@@ -547,7 +547,7 @@ describe('QueryControl state provider / in-flight migration', () => {
 			provider,
 			queryFn: queryFn2,
 			...handler2,
-			filterFn: blockProviderState,
+			filterFn: filterControlState,
 		});
 
 		const resultPromise1 = queryApi1.execute(['key#1'], 'no-cache');

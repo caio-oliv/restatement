@@ -1,10 +1,4 @@
-/**
- * @param retryAttempt current retry attempt.
- * @param error error returned from the operation.
- * @returns retry delay in milliseconds. If a negative number is returned, the
- * operation will be rejected with the current error.
- */
-export type RetryDelay<E> = (retryAttempt: number, error: E) => number;
+import type { RetryPolicy } from '@/RetryPolicy';
 
 export type AsyncOperation<T> = () => Promise<T>;
 
@@ -22,15 +16,13 @@ export function waitUntil(time: number): Promise<void> {
 
 /**
  * @param operation async operation
- * @param retryDelay retry delay function
- * @param retryCount maximum number of retries
+ * @param retryPolicy retry policy
  * @param retryHandleFn retry callback handler, called before every retry
  * @returns promise with the result of all the retry attempts.
  */
 export async function retryAsyncOperation<T, E = unknown>(
 	operation: AsyncOperation<T>,
-	retryDelay: RetryDelay<E>,
-	retryCount: number,
+	retryPolicy: RetryPolicy<E>,
 	retryHandleFn: RetryHandlerFn<E> | null = null
 ): Promise<T> {
 	let retryAttempt = 0;
@@ -38,18 +30,19 @@ export async function retryAsyncOperation<T, E = unknown>(
 
 	while (true) {
 		try {
-			return await operation();
+			const value = await operation();
+			retryPolicy.notify('success');
+			return value;
 		} catch (err) {
+			retryPolicy.notify('fail');
 			lastError = err as E;
 			retryAttempt += 1;
-			if (retryCount < retryAttempt) break;
 
-			const delay = retryDelay(retryAttempt, lastError);
+			const delay = retryPolicy.delay(retryAttempt, lastError);
 			if (delay < 0) throw lastError;
+
 			await waitUntil(delay);
 			retryHandleFn?.(retryAttempt, lastError);
 		}
 	}
-
-	throw lastError;
 }

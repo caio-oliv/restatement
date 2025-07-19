@@ -1,5 +1,5 @@
 import type { CacheStore } from '@/cache/CacheStore';
-import { type RetryDelay, type RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
+import { type RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
 import { DummySubscriber, type PubSub, type Subscriber, SubscriberHandle } from '@/PubSub';
 import type {
 	QueryFn,
@@ -19,46 +19,39 @@ import type {
 } from '@/Type';
 import {
 	defaultKeyHashFn,
-	DEFAULT_RETRY_DELAY,
-	DEFAULT_RETRY,
 	defaultKeepCacheOnErrorFn,
 	DEFAULT_FRESH_DURATION,
 	DEFAULT_TTL_DURATION,
 	defaultFilterFn,
+	DEFAULT_RETRY_POLICY,
 } from '@/Default';
 import { blackhole, makeObservablePromise, nullpromise } from '@/Internal';
 import { CacheManager } from '@/cache/CacheManager';
+import type { RetryPolicy } from '@/RetryPolicy';
 
 export interface QueryControlInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	/**
-	 * Idle state placeholder.
+	 * Idle state placeholder
 	 */
 	placeholder?: T | null;
 	/**
-	 * Cache store.
+	 * Cache store
 	 */
 	store: CacheStore<string, T>;
 	/**
-	 * Query function.
+	 * Query function
 	 *
 	 * The function that will be called to query the data `T`.
 	 */
 	queryFn: QueryFn<K, T>;
 	/**
-	 * Key hasher.
+	 * Key hasher
 	 */
 	keyHashFn?: KeyHashFn<K>;
 	/**
-	 * This function receives a retryAttempt integer and the actual Error and returns the delay to apply before the next attempt in milliseconds.
-	 * A function like attempt => Math.min(attempt > 1 ? 2 ** attempt * 1000 : 1000, 30 * 1000) applies exponential backoff.
-	 * A function like attempt => attempt * 1000 applies linear backoff.
+	 * Retry policy
 	 */
-	retryDelay?: RetryDelay<E>;
-	/**
-	 * Maximum retry attempt
-	 * @default 3
-	 */
-	retry?: number;
+	retryPolicy?: RetryPolicy<E>;
 	/**
 	 * Retry handler function
 	 */
@@ -162,9 +155,10 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	 * @summary Error handler function.
 	 */
 	public errorFn: ErrorHandler<E> | null;
-
-	public readonly retry: number;
-	public readonly retryDelay: RetryDelay<E>;
+	/**
+	 * @summary Retry policy.
+	 */
+	public readonly retryPolicy: RetryPolicy<E>;
 
 	/**
 	 * @description Duration in which cache entries will be fresh.
@@ -188,8 +182,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		store,
 		queryFn,
 		keyHashFn = defaultKeyHashFn,
-		retryDelay = DEFAULT_RETRY_DELAY.delay,
-		retry = DEFAULT_RETRY,
+		retryPolicy = DEFAULT_RETRY_POLICY,
 		retryHandleFn = null,
 		keepCacheOnErrorFn = defaultKeepCacheOnErrorFn,
 		fresh = DEFAULT_FRESH_DURATION,
@@ -204,10 +197,9 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		this.#internalCache = store;
 		this.keyHashFn = keyHashFn;
 		this.queryFn = queryFn;
-		this.retryDelay = retryDelay;
-		this.keepCacheOnErrorFn = keepCacheOnErrorFn;
+		this.retryPolicy = retryPolicy;
 		this.retryHandleFn = retryHandleFn;
-		this.retry = retry;
+		this.keepCacheOnErrorFn = keepCacheOnErrorFn;
 		this.fresh = fresh;
 		this.ttl = ttl;
 		this.cache = new CacheManager({
@@ -399,8 +391,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 			const localQueryFn = this.queryFn;
 			const ok = await retryAsyncOperation(
 				() => localQueryFn(key, ctl.signal),
-				this.retryDelay,
-				this.retry,
+				this.retryPolicy,
 				this.retryHandleFn
 			);
 			return (

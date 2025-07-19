@@ -1,5 +1,5 @@
 /**
- * Duration in Millisecond precision
+ * Duration in Millisecond precision (positive or negative integer)
  */
 export type Millisecond = number;
 

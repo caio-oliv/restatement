@@ -1,6 +1,7 @@
 export * from '@/Type';
 export * from '@/AsyncModule';
 export * from '@/TimerModule';
+export * from '@/RetryPolicy';
 export * from '@/PubSub';
 export * from '@/Default';
 export * from '@/cache/CacheStore';

@@ -6,17 +6,17 @@ import type {
 	MutationDataHandler,
 	MutationErrorHandler,
 } from '@/Type';
-import { type RetryDelay, type RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
-import { DEFAULT_RETRY_DELAY, defaultFilterFn } from '@/Default';
+import { type RetryHandlerFn, retryAsyncOperation } from '@/AsyncModule';
+import { DEFAULT_RETRY_POLICY, defaultFilterFn } from '@/Default';
 import { blackhole } from '@/Internal';
 import type { CacheManager } from '@/cache/CacheManager';
+import type { RetryPolicy } from '@/RetryPolicy';
 
 export interface MutationControlInput<I, T, E> {
 	placeholder?: T | null;
 	mutationFn: MutationFn<I, T>;
 	cache: CacheManager;
-	retry?: number;
-	retryDelay?: RetryDelay<E>;
+	retryPolicy?: RetryPolicy<E>;
 	retryHandleFn?: RetryHandlerFn<E> | null;
 	filterFn?: MutationFilterFn<T, E>;
 	stateFn?: MutationStateHandler<T, E> | null;
@@ -27,8 +27,7 @@ export interface MutationControlInput<I, T, E> {
 export type MutationResetTarget = 'state' | 'handler';
 
 export class MutationControl<I, T, E> {
-	public readonly retry: number;
-	public readonly retryDelay: RetryDelay<E>;
+	public readonly retryPolicy: RetryPolicy<E>;
 	public readonly cache: CacheManager;
 	public readonly stateFn: MutationStateHandler<T, E> | null;
 	public readonly dataFn: MutationDataHandler<T> | null;
@@ -38,8 +37,7 @@ export class MutationControl<I, T, E> {
 		placeholder = null,
 		mutationFn,
 		cache,
-		retry = 0,
-		retryDelay = DEFAULT_RETRY_DELAY.delay,
+		retryPolicy = DEFAULT_RETRY_POLICY,
 		retryHandleFn = null,
 		filterFn = defaultFilterFn,
 		stateFn = null,
@@ -48,8 +46,7 @@ export class MutationControl<I, T, E> {
 	}: MutationControlInput<I, T, E>) {
 		this.#placeholder = placeholder;
 		this.#mutationFn = mutationFn;
-		this.retry = retry;
-		this.retryDelay = retryDelay;
+		this.retryPolicy = retryPolicy;
 		this.#retryHandleFn = retryHandleFn;
 		this.cache = cache;
 		this.#filterFn = filterFn;
@@ -86,8 +83,7 @@ export class MutationControl<I, T, E> {
 		try {
 			const data = await retryAsyncOperation(
 				() => this.#mutationFn(input, ctl.signal),
-				this.retryDelay,
-				this.retry,
+				this.retryPolicy,
 				this.#retryHandleFn
 			);
 
