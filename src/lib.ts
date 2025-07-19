@@ -6,6 +6,8 @@ export * from '@/PubSub';
 export * from '@/Default';
 export * from '@/cache/CacheStore';
 export * from '@/cache/CacheManager';
+export * from '@/cache/CacheHelper';
+export * from '@/Plumbing';
 export * from '@/controller/QueryControl';
 export * from '@/controller/MutationControl';
 export * from '@/ConfigManager';

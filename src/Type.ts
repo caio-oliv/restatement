@@ -24,6 +24,11 @@ export type QueryFn<K extends ReadonlyArray<unknown>, T> = (
 
 export type KeyHashFn<K extends ReadonlyArray<unknown>> = (key: K) => string;
 
+export interface KeyPair<K extends ReadonlyArray<unknown>> {
+	readonly key: K;
+	readonly hash: string;
+}
+
 export type KeepCacheOnErrorFn<E> = (err: E) => boolean;
 
 export interface CacheHandler {
@@ -71,6 +76,8 @@ export type QueryState<T, E> =
 	| ErrorQueryState<E>;
 
 export type QueryStateSource = 'query' | 'cache' | 'background-query';
+
+export type QueryStateNoCacheSource = 'query' | 'background-query';
 
 export type QueryStateOrigin = 'control' | 'provider';
 
@@ -145,6 +152,8 @@ export interface QueryExecutorResult<T, E> {
 	state: QueryState<T, E>;
 	next(): Promise<NextQueryState<T, E>>;
 }
+
+export type QueryResetTarget = 'state' | 'handler';
 
 export type MutationStatus = 'idle' | 'loading' | 'success' | 'error';
 

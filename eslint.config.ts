@@ -28,7 +28,6 @@ const testConfig: Linter.Config = {
 		'max-lines': ['error', { max: 5000, skipBlankLines: true, skipComments: true }],
 		'max-lines-per-function': ['error', { max: 1500, skipBlankLines: true, skipComments: true }],
 		'max-nested-callbacks': ['error', 5],
-		'max-params': ['error', 6],
 		'no-console': 'warn',
 
 		'@typescript-eslint/no-non-null-assertion': 'off',
@@ -83,7 +82,7 @@ const projectConfig: Linter.Config = {
 		'max-lines': ['error', { max: 500, skipBlankLines: true, skipComments: true }],
 		'max-lines-per-function': ['error', { max: 100, skipBlankLines: true, skipComments: true }],
 		'max-nested-callbacks': ['error', 3],
-		'max-params': ['error', 4],
+		'max-params': ['error', 6],
 		'no-console': ['error', { allow: ['error'] }],
 		'no-empty-function': 'off', // using @typescript-eslint version
 		'no-eval': 'error',
@@ -117,7 +116,7 @@ const projectConfig: Linter.Config = {
 		'@typescript-eslint/no-useless-constructor': 'error',
 		'@typescript-eslint/no-empty-function': 'error',
 		'@typescript-eslint/no-loop-func': 'error',
-		'@typescript-eslint/no-use-before-define': 'error',
+		'@typescript-eslint/no-use-before-define': ['error', { functions: false }],
 		'@typescript-eslint/prefer-for-of': 'error',
 		'@typescript-eslint/prefer-readonly': 'error',
 

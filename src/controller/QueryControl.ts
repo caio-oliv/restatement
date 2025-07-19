@@ -16,6 +16,9 @@ import type {
 	ErrorHandler,
 	DataHandler,
 	QueryStateHandler,
+	KeyPair,
+	QueryStateNoCacheSource,
+	QueryResetTarget,
 } from '@/Type';
 import {
 	defaultKeyHashFn,
@@ -27,6 +30,7 @@ import {
 } from '@/Default';
 import { blackhole, makeObservablePromise, nullpromise } from '@/Internal';
 import { CacheManager } from '@/cache/CacheManager';
+import { isCacheEntryFresh } from '@/cache/CacheHelper';
 import type { RetryPolicy } from '@/RetryPolicy';
 
 export interface QueryControlInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
@@ -109,15 +113,6 @@ export interface QueryControlInput<K extends ReadonlyArray<unknown>, T, E = unkn
 }
 
 export type QueryControlProvider<T, E> = PubSub<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
-
-type QueryStateNoCacheSource = 'query' | 'background-query';
-
-interface KeyPair<K extends ReadonlyArray<unknown>> {
-	readonly key: K;
-	readonly hash: string;
-}
-
-export type QueryResetTarget = 'state' | 'handler';
 
 export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	/**
@@ -237,7 +232,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 			return this.#tryCurrentPromiseOrRunQuery({ key, hash }, cache, ctl);
 		}
 
-		if ((cache === 'fresh' || cache === 'stale') && entry.ttl - entry.remain_ttl < this.fresh) {
+		if ((cache === 'fresh' || cache === 'stale') && isCacheEntryFresh(entry, this.fresh)) {
 			// Fresh from cache (less time than fresh duration).
 			const state: QueryState<T, E> = { status: 'success', error: null, data: entry.data };
 			this.#updateState(hash, { state, metadata: { origin: 'control', source: 'cache', cache } });

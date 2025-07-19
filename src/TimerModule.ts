@@ -54,3 +54,15 @@ export class LinearBackoffTimer implements BackoffTimer {
 		return Math.min(this.limit, this.base * (attempt + 1));
 	}
 }
+
+export class FixedBackoffTimer implements BackoffTimer {
+	public readonly time: number;
+
+	public constructor(time: number) {
+		this.time = time;
+	}
+
+	public delay(): Millisecond {
+		return this.time;
+	}
+}
