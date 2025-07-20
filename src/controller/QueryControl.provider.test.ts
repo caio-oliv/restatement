@@ -45,7 +45,7 @@ describe('QueryControl state provider / query watcher', () => {
 
 		queryApi2.use(['key#1']);
 
-		await queryApi1.execute(['key#1'], 'no-cache');
+		await queryApi1.execute(['key#1'], { cache: 'no-cache' });
 
 		{
 			expect(handler1.dataFn).toHaveBeenCalledTimes(1);
@@ -163,7 +163,7 @@ describe('QueryControl state provider / query watcher', () => {
 
 			assert.deepStrictEqual(Array.from(provider.topics()), [topic]);
 
-			await queryApi.execute(['key#1'], 'no-cache');
+			await queryApi.execute(['key#1'], { cache: 'no-cache' });
 		}
 
 		assert.deepStrictEqual(Array.from(provider.topics()), []);
@@ -193,7 +193,7 @@ describe('QueryControl state provider / query watcher', () => {
 
 		queryApi2.use(['key#1']);
 
-		await queryApi1.execute(['key#1'], 'no-cache');
+		await queryApi1.execute(['key#1'], { cache: 'no-cache' });
 
 		assert.deepStrictEqual(queryApi2.getState(), {
 			data: 'data#1',
@@ -209,7 +209,7 @@ describe('QueryControl state provider / query watcher', () => {
 			status: 'idle',
 		});
 
-		await queryApi1.execute(['key#1'], 'no-cache');
+		await queryApi1.execute(['key#1'], { cache: 'no-cache' });
 
 		assert.deepStrictEqual(queryApi1.getState(), {
 			data: 'data#1',
@@ -249,7 +249,7 @@ describe('QueryControl state provider / query watcher', () => {
 
 		queryApi2.use(['key#1']);
 
-		await queryApi1.execute(['key#1'], 'no-cache');
+		await queryApi1.execute(['key#1'], { cache: 'no-cache' });
 
 		assert.deepStrictEqual(queryApi2.getState(), {
 			data: 'data#1',
@@ -265,7 +265,7 @@ describe('QueryControl state provider / query watcher', () => {
 			status: 'idle',
 		});
 
-		await queryApi1.execute(['key#1'], 'no-cache');
+		await queryApi1.execute(['key#1'], { cache: 'no-cache' });
 
 		assert.deepStrictEqual(queryApi1.getState(), {
 			data: 'data#1',
@@ -308,8 +308,8 @@ describe('QueryControl state provider', () => {
 			ttl: 100,
 		});
 
-		const resultPromise1 = queryApi1.execute(['key#1'], 'no-cache');
-		const resultPromise2 = queryApi2.execute(['key#1'], 'no-cache');
+		const resultPromise1 = queryApi1.execute(['key#1'], { cache: 'no-cache' });
+		const resultPromise2 = queryApi2.execute(['key#1'], { cache: 'no-cache' });
 
 		expect(queryFn1).toHaveBeenCalledTimes(1);
 		expect(queryFn2).toHaveBeenCalledTimes(0);
@@ -374,9 +374,9 @@ describe('QueryControl state provider', () => {
 
 		await waitUntil(60);
 
-		const resultPromise1 = queryApi1.execute(['key#1'], 'fresh');
-		const resultPromise2 = queryApi2.execute(['key#1'], 'no-cache');
-		const resultPromise3 = queryApi3.execute(['key#1'], 'stale');
+		const resultPromise1 = queryApi1.execute(['key#1'], { cache: 'fresh' });
+		const resultPromise2 = queryApi2.execute(['key#1'], { cache: 'no-cache' });
+		const resultPromise3 = queryApi3.execute(['key#1'], { cache: 'stale' });
 
 		// query1 takes the cache entry | (context switch)
 		// query2 execute query function | (context switch)
@@ -550,8 +550,8 @@ describe('QueryControl state provider / in-flight migration', () => {
 			filterFn: filterControlState,
 		});
 
-		const resultPromise1 = queryApi1.execute(['key#1'], 'no-cache');
-		const resultPromise2 = queryApi2.execute(['key#1'], 'no-cache');
+		const resultPromise1 = queryApi1.execute(['key#1'], { cache: 'no-cache' });
+		const resultPromise2 = queryApi2.execute(['key#1'], { cache: 'no-cache' });
 
 		expect(queryFn1).toHaveBeenCalledTimes(1);
 		expect(queryFn2).toHaveBeenCalledTimes(0);

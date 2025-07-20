@@ -10,14 +10,28 @@ import type {
 	QueryFilterFn,
 	QueryProviderState,
 	QueryStatePromise,
+	ExtractTTLFn,
 } from '@/core/Type';
 import type { PubSub, Subscriber } from '@/PubSub';
 import type { RetryHandlerFn, RetryPolicy } from '@/core/RetryPolicy';
 import type { CacheStore } from '@/cache/CacheStore';
 import type { CacheManager } from '@/cache/CacheManager';
 
+/**
+ * @summary Query subscriber
+ * @description Query state subscriber
+ */
 export type QuerySubscriber<T, E> = Subscriber<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
 
+/**
+ * @summary Query provider
+ * @description Query state provider
+ */
+export type QueryProvider<T, E> = PubSub<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
+
+/**
+ * @summary Query context
+ */
 export interface QueryContext<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	/**
 	 * @summary Idle state placeholder
@@ -41,7 +55,13 @@ export interface QueryContext<K extends ReadonlyArray<unknown>, T, E = unknown> 
 	 * @summary Retry policy
 	 */
 	readonly retryPolicy: RetryPolicy<E>;
+	/**
+	 * @summary Cache fresh duration
+	 */
 	readonly fresh: Millisecond;
+	/**
+	 * @summary Default TTL duration
+	 */
 	readonly ttl: Millisecond;
 	/**
 	 * @summary Key hasher
@@ -61,6 +81,10 @@ export interface QueryContext<K extends ReadonlyArray<unknown>, T, E = unknown> 
 	 * @description Check whether the current cache entry should be kept after a failed query execution.
 	 */
 	keepCacheOnErrorFn: KeepCacheOnErrorFn<E>;
+	/**
+	 * @summary Extract TTL function
+	 */
+	extractTTLFn: ExtractTTLFn<T>;
 	/**
 	 * @summary Query state handler
 	 */
@@ -83,11 +107,15 @@ export interface QueryContext<K extends ReadonlyArray<unknown>, T, E = unknown> 
 	state: QueryState<T, E>;
 }
 
+/**
+ * @description Query context mutable attributes
+ */
 export type QueryContextMut<K extends ReadonlyArray<unknown>, T, E = unknown> = Pick<
 	QueryContext<K, T, E>,
 	| 'queryFn'
 	| 'retryHandleFn'
 	| 'keepCacheOnErrorFn'
+	| 'extractTTLFn'
 	| 'stateFn'
 	| 'dataFn'
 	| 'errorFn'
@@ -95,12 +123,20 @@ export type QueryContextMut<K extends ReadonlyArray<unknown>, T, E = unknown> = 
 	| 'state'
 >;
 
+/**
+ * @description Query context mutable functions
+ */
 export type QueryContextMutFns<K extends ReadonlyArray<unknown>, T, E = unknown> = Pick<
 	QueryContext<K, T, E>,
-	'queryFn' | 'retryHandleFn' | 'keepCacheOnErrorFn' | 'stateFn' | 'dataFn' | 'errorFn' | 'filterFn'
+	| 'queryFn'
+	| 'retryHandleFn'
+	| 'keepCacheOnErrorFn'
+	| 'extractTTLFn'
+	| 'stateFn'
+	| 'dataFn'
+	| 'errorFn'
+	| 'filterFn'
 >;
-
-export type QueryProvider<T, E> = PubSub<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
 
 /**
  * @summary Query input
@@ -108,29 +144,29 @@ export type QueryProvider<T, E> = PubSub<QueryProviderState<T, E>, QueryStatePro
  */
 export interface QueryInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	/**
-	 * Idle state placeholder
+	 * @summary Idle state placeholder
 	 */
 	placeholder?: T | null;
 	/**
-	 * Cache store
+	 * @summary Cache store
 	 */
 	store: CacheStore<string, T>;
 	/**
-	 * Query function
-	 *
-	 * The function that will be called to query the data `T`.
+	 * @summary Query function
+	 * @description Async function that will be called to query the data `T`.
 	 */
 	queryFn: QueryFn<K, T>;
 	/**
-	 * Key hasher
+	 * @summary Key hasher
 	 */
 	keyHashFn?: KeyHashFn<K>;
 	/**
-	 * Retry policy
+	 * @summary Retry policy
 	 */
 	retryPolicy?: RetryPolicy<E>;
 	/**
-	 * Retry handler function
+	 * @summary Retry handler
+	 * @description Callback executed **before** every retry
 	 */
 	retryHandleFn?: RetryHandlerFn<E> | null;
 	/**
@@ -139,31 +175,35 @@ export interface QueryInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	 */
 	keepCacheOnErrorFn?: KeepCacheOnErrorFn<E>;
 	/**
+	 * @summary Extract TTL function
+	 */
+	extractTTLFn?: ExtractTTLFn<T>;
+	/**
+	 * @summary Default TTL duration
+	 * @description Time To Live (duration) of cache entries.
+	 *
+	 * ### Invariant
+	 *
+	 * Must be greater than or equal {@link fresh} cache duration.
+	 */
+	ttl?: Millisecond;
+	/**
+	 * @summary Cache fresh duration
 	 * @description Duration in which cache entries will be fresh.
 	 *
-	 * ## Pro tip
+	 * ### Invariant
+	 *
+	 * Must be less than or equal the cache {@link ttl}.
+	 *
+	 * ### Pro tip
 	 *
 	 * If all of the cache results **must be stale**, set the fresh
 	 * option to zero.
 	 *
 	 * If all of the cache results **must be fresh**, set the fresh
 	 * option equal to the cache {@link ttl}.
-	 *
-	 * ## Invariant
-	 *
-	 * Must be less than or equal the cache {@link ttl}.
-	 * @default 30 * 1000; // 30 seconds
 	 */
 	fresh?: Millisecond;
-	/**
-	 * @description Time To Live (duration) of cache entries.
-	 *
-	 * ## Invariant
-	 *
-	 * Must be greater than or equal {@link fresh} cache duration.
-	 * @default 3 * 60 * 1000 // 3 minutes
-	 */
-	ttl?: Millisecond;
 	/**
 	 * @summary Query state handler
 	 */
@@ -177,11 +217,11 @@ export interface QueryInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	 */
 	errorFn?: ErrorHandler<E> | null;
 	/**
-	 * Query state filter function
+	 * @summary Query state filter
 	 */
 	filterFn?: QueryFilterFn<T, E>;
 	/**
-	 * State provider.
+	 * @summary State provider.
 	 */
 	provider?: QueryProvider<T, E> | null;
 }

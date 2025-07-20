@@ -1,7 +1,7 @@
 import type { Millisecond } from '@/core/Type';
 import { type BackoffTimer, JitterExponentialBackoffTimer } from '@/core/BackoffTimer';
-import { jsonStringifyObjectSorter } from '@/Internal';
 import { BasicRetryPolicy, type RetryPolicy } from '@/core/RetryPolicy';
+import { jsonStringifyObjectSorter } from '@/Internal';
 
 /**
  * @summary Default retry limit
@@ -61,4 +61,15 @@ export function defaultFilterFn(): boolean {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function defaultKeepCacheOnErrorFn<T = unknown>(_: T): boolean {
 	return false;
+}
+
+/**
+ * @summary Default extract TTL function
+ * @description Returns the fallback TTL.
+ * @param _ data
+ * @param fallbackTTL fallback TTL
+ * @returns TTL
+ */
+export function defaultExtractTTLFn<T>(_: T, fallbackTTL: Millisecond): Millisecond {
+	return fallbackTTL;
 }

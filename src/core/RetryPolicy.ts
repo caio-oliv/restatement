@@ -100,13 +100,13 @@ export function waitUntil(time: number): Promise<void> {
 /**
  * @summary Execute async operation
  * @param operation async operation
- * @param retryPolicy retry policy
+ * @param policy retry policy
  * @param retryHandleFn retry callback handler, called before every retry
  * @returns promise with the result of all the retry attempts.
  */
 export async function execAsyncOperation<T, E = unknown>(
 	operation: AsyncOperation<T>,
-	retryPolicy: RetryPolicy<E>,
+	policy: RetryPolicy<E>,
 	retryHandleFn: RetryHandlerFn<E> | null = null
 ): Promise<T> {
 	let retryAttempt = 0;
@@ -115,14 +115,14 @@ export async function execAsyncOperation<T, E = unknown>(
 	while (true) {
 		try {
 			const value = await operation();
-			retryPolicy.notify('success');
+			policy.notify('success');
 			return value;
 		} catch (err) {
-			retryPolicy.notify('fail');
+			policy.notify('fail');
 			lastError = err as E;
 			retryAttempt += 1;
 
-			const delay = retryPolicy.delay(retryAttempt, lastError);
+			const delay = policy.delay(retryAttempt, lastError);
 			if (delay < 0) throw lastError;
 
 			await waitUntil(delay);

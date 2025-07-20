@@ -4,7 +4,7 @@ import type { QueryProvider, QueryInput } from '@/plumbing/QueryType';
 import type { CacheStore } from '@/cache/CacheStore';
 import type { MutationControlInput } from '@/controller/MutationControl';
 import { type CacheManagerInput, CacheManager } from '@/cache/CacheManager';
-import { DEFAULT_RETRY_POLICY, defaultFilterFn } from '@/Default';
+import { DEFAULT_RETRY_POLICY, defaultExtractTTLFn, defaultFilterFn } from '@/Default';
 
 export interface RetryConfig<E = unknown> {
 	readonly retryPolicy: RetryPolicy<E>;
@@ -59,6 +59,7 @@ export type CustomQueryControlInput<K extends ReadonlyArray<unknown>, T, E = unk
 	| 'fresh'
 	| 'ttl'
 	| 'keepCacheOnErrorFn'
+	| 'extractTTLFn'
 	| 'filterFn'
 	| 'retryPolicy'
 	| 'retryHandleFn'
@@ -69,7 +70,14 @@ export type CustomQueryControlInput<K extends ReadonlyArray<unknown>, T, E = unk
 
 export type QueryControlMutableInput<K extends ReadonlyArray<unknown>, T, E = unknown> = Pick<
 	QueryInput<K, T, E>,
-	'queryFn' | 'keepCacheOnErrorFn' | 'filterFn' | 'retryHandleFn' | 'stateFn' | 'dataFn' | 'errorFn'
+	| 'queryFn'
+	| 'keepCacheOnErrorFn'
+	| 'extractTTLFn'
+	| 'filterFn'
+	| 'retryHandleFn'
+	| 'stateFn'
+	| 'dataFn'
+	| 'errorFn'
 >;
 
 /**
@@ -88,6 +96,7 @@ export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>
 		fresh: custom.fresh ?? config.cache.fresh,
 		ttl: custom.ttl ?? config.cache.ttl,
 		keepCacheOnErrorFn: custom.keepCacheOnErrorFn ?? config.keepCacheOnErrorFn,
+		extractTTLFn: custom.extractTTLFn ?? defaultExtractTTLFn,
 		keyHashFn: config.keyHashFn,
 		provider: config.provider as QueryProvider<T, E>,
 		retryPolicy: custom.retryPolicy ?? DEFAULT_RETRY_POLICY,

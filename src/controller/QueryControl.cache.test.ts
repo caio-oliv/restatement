@@ -21,7 +21,7 @@ describe('QueryControl cache usage / no-cache query', () => {
 			retryPolicy,
 		});
 
-		await queryApi.execute(['key#1'], 'no-cache');
+		await queryApi.execute(['key#1'], { cache: 'no-cache' });
 
 		const value = await store.get(defaultKeyHashFn(['key#1']));
 
@@ -40,7 +40,7 @@ describe('QueryControl cache usage / no-cache query', () => {
 			ttl: 1_000,
 		});
 
-		await queryApi.execute(['key#1'], 'no-cache');
+		await queryApi.execute(['key#1'], { cache: 'no-cache' });
 
 		{
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
@@ -63,7 +63,7 @@ describe('QueryControl cache usage / no-cache query', () => {
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
 
-		await queryApi.execute(['key#1'], 'no-cache');
+		await queryApi.execute(['key#1'], { cache: 'no-cache' });
 
 		{
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
@@ -90,14 +90,14 @@ describe('QueryControl cache usage / no-cache query', () => {
 
 		queryFn.mockResolvedValueOnce('valid_result');
 
-		await queryApi.execute(['invalid_1'], 'no-cache');
+		await queryApi.execute(['invalid_1'], { cache: 'no-cache' });
 
 		{
 			const value = await store.get(defaultKeyHashFn(['invalid_1']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
-		await queryApi.execute(['invalid_1'], 'no-cache');
+		await queryApi.execute(['invalid_1'], { cache: 'no-cache' });
 
 		{
 			const value = await store.get(defaultKeyHashFn(['invalid_1']));
@@ -120,14 +120,14 @@ describe('QueryControl cache usage / no-cache query', () => {
 
 		queryFn.mockResolvedValueOnce('valid_result');
 
-		await queryApi.execute(['invalid_1'], 'no-cache');
+		await queryApi.execute(['invalid_1'], { cache: 'no-cache' });
 
 		{
 			const value = await store.get(defaultKeyHashFn(['invalid_1']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
-		await queryApi.execute(['invalid_1'], 'no-cache');
+		await queryApi.execute(['invalid_1'], { cache: 'no-cache' });
 
 		{
 			const value = await store.get(defaultKeyHashFn(['invalid_1']));
@@ -147,7 +147,7 @@ describe('QueryControl cache usage / fresh query', () => {
 			retryPolicy,
 		});
 
-		await queryApi.execute(['key#1'], 'fresh');
+		await queryApi.execute(['key#1'], { cache: 'fresh' });
 
 		const value = await store.get(defaultKeyHashFn(['key#1']));
 
@@ -166,7 +166,7 @@ describe('QueryControl cache usage / fresh query', () => {
 			ttl: 1_000,
 		});
 
-		await queryApi.execute(['key#1'], 'fresh');
+		await queryApi.execute(['key#1'], { cache: 'fresh' });
 
 		{
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
@@ -189,7 +189,7 @@ describe('QueryControl cache usage / fresh query', () => {
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
 
-		await queryApi.execute(['key#1'], 'fresh');
+		await queryApi.execute(['key#1'], { cache: 'fresh' });
 
 		{
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
@@ -216,7 +216,7 @@ describe('QueryControl cache usage / fresh query', () => {
 
 		queryFn.mockResolvedValueOnce('valid_result');
 
-		await queryApi.execute(['invalid'], 'fresh');
+		await queryApi.execute(['invalid'], { cache: 'fresh' });
 
 		{
 			const value = await store.get(defaultKeyHashFn(['invalid']));
@@ -225,7 +225,7 @@ describe('QueryControl cache usage / fresh query', () => {
 
 		await waitUntil(50);
 
-		await queryApi.execute(['invalid'], 'fresh');
+		await queryApi.execute(['invalid'], { cache: 'fresh' });
 
 		{
 			const value = await store.get(defaultKeyHashFn(['invalid']));
@@ -251,7 +251,7 @@ describe('QueryControl cache usage / fresh query', () => {
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
-		await queryApi.execute(['invalid'], 'fresh');
+		await queryApi.execute(['invalid'], { cache: 'fresh' });
 
 		{
 			const value = await store.get(defaultKeyHashFn(['invalid']));
@@ -278,7 +278,7 @@ describe('QueryControl cache usage / fresh query', () => {
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
-		await queryApi.execute(['invalid'], 'fresh');
+		await queryApi.execute(['invalid'], { cache: 'fresh' });
 
 		{
 			const value = await store.get(defaultKeyHashFn(['invalid']));
@@ -298,7 +298,7 @@ describe('QueryControl cache usage / stale query', () => {
 			retryPolicy,
 		});
 
-		await queryApi.execute(['key#1'], 'stale');
+		await queryApi.execute(['key#1'], { cache: 'stale' });
 
 		const value = await store.get(defaultKeyHashFn(['key#1']));
 
@@ -317,7 +317,7 @@ describe('QueryControl cache usage / stale query', () => {
 			ttl: 1_000,
 		});
 
-		await queryApi.execute(['key#1'], 'stale');
+		await queryApi.execute(['key#1'], { cache: 'stale' });
 
 		{
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
@@ -340,7 +340,7 @@ describe('QueryControl cache usage / stale query', () => {
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
 
-		const result = await queryApi.execute(['key#1'], 'stale');
+		const result = await queryApi.execute(['key#1'], { cache: 'stale' });
 		await result.next();
 
 		{
@@ -368,14 +368,14 @@ describe('QueryControl cache usage / stale query', () => {
 
 		queryFn.mockResolvedValueOnce('valid_result');
 
-		await queryApi.execute(['invalid'], 'stale');
+		await queryApi.execute(['invalid'], { cache: 'stale' });
 
 		{
 			const value = await store.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
-		const result = await queryApi.execute(['invalid'], 'stale');
+		const result = await queryApi.execute(['invalid'], { cache: 'stale' });
 		await result.next();
 
 		{
@@ -402,7 +402,7 @@ describe('QueryControl cache usage / stale query', () => {
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
-		const result = await queryApi.execute(['invalid'], 'stale');
+		const result = await queryApi.execute(['invalid'], { cache: 'stale' });
 		await result.next();
 
 		{
@@ -430,7 +430,7 @@ describe('QueryControl cache usage / stale query', () => {
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
-		const result = await queryApi.execute(['invalid'], 'stale');
+		const result = await queryApi.execute(['invalid'], { cache: 'stale' });
 		await result.next();
 
 		{
@@ -452,7 +452,7 @@ describe('QueryControl cache exception handling', () => {
 			retryPolicy,
 		});
 
-		await queryApi.execute(['key#1'], 'stale');
+		await queryApi.execute(['key#1'], { cache: 'stale' });
 
 		{
 			const value = await store.get(defaultKeyHashFn(['key#1']));
@@ -463,7 +463,7 @@ describe('QueryControl cache exception handling', () => {
 
 		storeSpy.mockRejectedValueOnce(new Error('service_unavailable'));
 
-		const result = await queryApi.execute(['key#1'], 'stale');
+		const result = await queryApi.execute(['key#1'], { cache: 'stale' });
 
 		assert.deepStrictEqual(result.state, {
 			data: 'data#1',
@@ -492,7 +492,7 @@ describe('QueryControl cache exception handling', () => {
 
 		storeSpy.mockRejectedValueOnce(new Error('service_unavailable'));
 
-		await queryApi.execute(['key#1'], 'stale');
+		await queryApi.execute(['key#1'], { cache: 'stale' });
 
 		{
 			const value = await store.get(defaultKeyHashFn(['key#1']));
@@ -501,7 +501,7 @@ describe('QueryControl cache exception handling', () => {
 
 		expect(queryFn).toHaveBeenCalledTimes(1);
 
-		const result = await queryApi.execute(['key#1'], 'stale');
+		const result = await queryApi.execute(['key#1'], { cache: 'stale' });
 
 		assert.deepStrictEqual(result.state, {
 			data: 'data#1',
@@ -532,7 +532,7 @@ describe('QueryControl cache exception handling', () => {
 		storeSpy.mockRejectedValueOnce(new Error('service_unavailable'));
 		queryFn.mockResolvedValueOnce('valid_result');
 
-		await queryApi.execute(['invalid_1'], 'stale');
+		await queryApi.execute(['invalid_1'], { cache: 'stale' });
 
 		{
 			const value = await store.get(defaultKeyHashFn(['invalid_1']));
@@ -541,7 +541,7 @@ describe('QueryControl cache exception handling', () => {
 
 		expect(queryFn).toHaveBeenCalledTimes(1);
 
-		const result = await queryApi.execute(['invalid_1'], 'fresh');
+		const result = await queryApi.execute(['invalid_1'], { cache: 'fresh' });
 
 		assert.deepStrictEqual(result.state, {
 			data: null,

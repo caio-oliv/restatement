@@ -9,7 +9,7 @@ import type {
 import { execAsyncOperation, type RetryHandlerFn, type RetryPolicy } from '@/core/RetryPolicy';
 import type { CacheManager } from '@/cache/CacheManager';
 import { DEFAULT_RETRY_POLICY, defaultFilterFn } from '@/Default';
-import { blackhole } from '@/Internal';
+import { blackhole, makeAbortSignal } from '@/Internal';
 
 export interface MutationControlInput<I, T, E> {
 	placeholder?: T | null;
@@ -57,13 +57,13 @@ export class MutationControl<I, T, E> {
 
 	public async execute(
 		input: I,
-		ctl: AbortController = new AbortController()
+		signal: AbortSignal = makeAbortSignal()
 	): Promise<MutationState<T, E>> {
 		const state: MutationState<T, E> = { status: 'loading', data: null, error: null };
 		this.#updateState(state);
 
 		// eslint-disable-next-line @typescript-eslint/return-await
-		return this.#runMutation(input, ctl);
+		return this.#runMutation(input, signal);
 	}
 
 	public getState(): MutationState<T, E> {
@@ -78,10 +78,10 @@ export class MutationControl<I, T, E> {
 		}
 	}
 
-	async #runMutation(input: I, ctl: AbortController): Promise<MutationState<T, E>> {
+	async #runMutation(input: I, signal: AbortSignal): Promise<MutationState<T, E>> {
 		try {
 			const data = await execAsyncOperation(
-				() => this.#mutationFn(input, ctl.signal),
+				() => this.#mutationFn(input, signal),
 				this.retryPolicy,
 				this.#retryHandleFn
 			);

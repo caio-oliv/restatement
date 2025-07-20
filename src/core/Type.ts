@@ -31,6 +31,8 @@ export interface KeyPair<K extends ReadonlyArray<unknown>> {
 
 export type KeepCacheOnErrorFn<E> = (err: E) => boolean;
 
+export type ExtractTTLFn<T> = (data: T, fallbackTTL: number) => number;
+
 export interface CacheHandler {
 	set<K extends ReadonlyArray<unknown>, T>(key: K, data: T, ttl?: Millisecond): Promise<void>;
 	get<K extends ReadonlyArray<unknown>, T>(key: K): Promise<T | undefined>;

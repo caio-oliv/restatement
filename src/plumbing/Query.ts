@@ -8,6 +8,7 @@ import type {
 	QueryStateMetadata,
 	QueryExecutorResult,
 	QueryResetTarget,
+	Millisecond,
 } from '@/core/Type';
 import type {
 	QueryContext,
@@ -15,7 +16,7 @@ import type {
 	QueryInput,
 	QueryProvider,
 } from '@/plumbing/QueryType';
-import { blackhole, makeObservablePromise, nullpromise } from '@/Internal';
+import { blackhole, makeAbortSignal, makeObservablePromise, nullpromise } from '@/Internal';
 import { isCacheEntryFresh } from '@/cache/CacheHelper';
 import { DummySubscriber, SubscriberHandle } from '@/PubSub';
 import { CacheManager } from '@/cache/CacheManager';
@@ -23,15 +24,31 @@ import {
 	defaultKeyHashFn,
 	DEFAULT_RETRY_POLICY,
 	defaultKeepCacheOnErrorFn,
-	DEFAULT_FRESH_DURATION,
-	DEFAULT_TTL_DURATION,
 	defaultFilterFn,
+	defaultExtractTTLFn,
+	DEFAULT_TTL_DURATION,
+	DEFAULT_FRESH_DURATION,
 } from '@/Default';
 import { execAsyncOperation } from '@/core/RetryPolicy';
 
-// eslint-disable-next-line jsdoc/require-param
 /**
  * @summary Make a new query context
+ * @param input query input
+ * @param input.placeholder idle state placeholder
+ * @param input.store cache store
+ * @param input.queryFn query function
+ * @param input.keyHashFn key hasher
+ * @param input.retryPolicy retry policy
+ * @param input.retryHandleFn retry handler
+ * @param input.keepCacheOnErrorFn keep cache on error
+ * @param input.extractTTLFn extract TTL function
+ * @param input.ttl default TTL duration
+ * @param input.fresh cache fresh duration
+ * @param input.stateFn query state handler
+ * @param input.dataFn query data handler
+ * @param input.errorFn query error handler
+ * @param input.filterFn query state filter
+ * @param input.provider state provider
  * @returns query context
  */
 export function makeQueryContext<K extends ReadonlyArray<unknown>, T, E = unknown>({
@@ -42,12 +59,13 @@ export function makeQueryContext<K extends ReadonlyArray<unknown>, T, E = unknow
 	retryPolicy = DEFAULT_RETRY_POLICY,
 	retryHandleFn = null,
 	keepCacheOnErrorFn = defaultKeepCacheOnErrorFn,
-	fresh = DEFAULT_FRESH_DURATION,
+	extractTTLFn = defaultExtractTTLFn,
 	ttl = DEFAULT_TTL_DURATION,
-	filterFn = defaultFilterFn,
+	fresh = DEFAULT_FRESH_DURATION,
 	stateFn = null,
 	dataFn = null,
 	errorFn = null,
+	filterFn = defaultFilterFn,
 	provider = null,
 }: QueryInput<K, T, E>): QueryContext<K, T, E> {
 	const context: QueryContext<K, T, E> = {
@@ -56,10 +74,11 @@ export function makeQueryContext<K extends ReadonlyArray<unknown>, T, E = unknow
 		keyHashFn,
 		queryFn,
 		retryPolicy,
+		ttl,
+		fresh,
 		retryHandleFn,
 		keepCacheOnErrorFn,
-		fresh,
-		ttl,
+		extractTTLFn,
 		cache: new CacheManager({
 			store,
 			keyHashFn: keyHashFn as KeyHashFn<ReadonlyArray<unknown>>,
@@ -81,32 +100,50 @@ export function makeQueryContext<K extends ReadonlyArray<unknown>, T, E = unknow
 	return context;
 }
 
+export interface ExecuteQueryOptions {
+	/**
+	 * @summary Cache directive
+	 * @default 'stale'
+	 */
+	cache?: QueryCache;
+	/**
+	 * @summary Fallback TTL
+	 */
+	ttl?: Millisecond;
+	/**
+	 * @summary Abort signal
+	 */
+	signal?: AbortSignal;
+}
+
 /**
- *
+ * @summary Execute a query
+ * @description Execute a query based on the provided cache directive.
  * @param ctx query context
  * @param key key value
- * @param cache cache directive
- * @param ctl abort controller
+ * @param options execute query options
+ * @param options.cache cache directive
+ * @param options.ttl TTL
+ * @param options.signal abort signal
  * @returns query execution result
  */
 export async function executeQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	key: K,
-	cache: QueryCache = 'stale',
-	ctl: AbortController = new AbortController()
+	{ cache = 'stale', ttl = ctx.ttl, signal = makeAbortSignal() }: ExecuteQueryOptions = {}
 ): Promise<QueryExecutorResult<T, E>> {
 	const hash = ctx.keyHashFn(key);
 	ctx.subscriber.useTopic(hash);
 
 	if (cache === 'no-cache') {
 		// eslint-disable-next-line @typescript-eslint/return-await
-		return tryCurrentPromiseOrRunQuery(ctx, { key, hash }, cache, ctl);
+		return runActiveQuery(ctx, { key, hash }, { cache, ttl, signal });
 	}
 
 	const entry = await ctx.internalCache.getEntry(hash).catch(blackhole);
 	if (entry === undefined) {
 		// eslint-disable-next-line @typescript-eslint/return-await
-		return tryCurrentPromiseOrRunQuery(ctx, { key, hash }, cache, ctl);
+		return runActiveQuery(ctx, { key, hash }, { cache, ttl, signal });
 	}
 
 	if ((cache === 'fresh' || cache === 'stale') && isCacheEntryFresh(entry, ctx.fresh)) {
@@ -122,23 +159,33 @@ export async function executeQuery<K extends ReadonlyArray<unknown>, T, E>(
 		updateQuery(ctx, hash, { state, metadata: { origin: 'control', source: 'cache', cache } });
 
 		// eslint-disable-next-line @typescript-eslint/return-await
-		return tryCurrentPromiseOrRunBackgroundQuery(ctx, state, { key, hash }, cache, ctl);
+		return runBackgroundQuery(ctx, state, { key, hash }, { ttl, signal });
 	}
 
 	// eslint-disable-next-line @typescript-eslint/return-await
-	return tryCurrentPromiseOrRunQuery(ctx, { key, hash }, cache, ctl);
+	return runActiveQuery(ctx, { key, hash }, { cache, ttl, signal });
+}
+
+export interface ResetQueryOptions {
+	/**
+	 * @summary Reset target
+	 * @default 'state'
+	 */
+	target?: QueryResetTarget;
 }
 
 /**
- *
+ * @summary Use provided query key
+ * @description Reset query state and subscribe to the provided key.
  * @param ctx query context
  * @param key key value
- * @param target query reset target
+ * @param options reset query options
+ * @param options.target query reset target
  */
 export function useQueryKey<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	key: K,
-	target: QueryResetTarget = 'state'
+	{ target = 'state' }: ResetQueryOptions = {}
 ): void {
 	const hash = ctx.keyHashFn(key);
 	ctx.subscriber.useTopic(hash);
@@ -150,13 +197,14 @@ export function useQueryKey<K extends ReadonlyArray<unknown>, T, E>(
 }
 
 /**
- *
+ * @summary Reset query state and context
  * @param ctx query context
- * @param target query reset target
+ * @param options reset query options
+ * @param options.target query reset target
  */
 export function resetQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
-	target: QueryResetTarget = 'state'
+	{ target = 'state' }: ResetQueryOptions = {}
 ): void {
 	ctx.subscriber.unsubscribe();
 	ctx.state = { data: ctx.placeholder, error: null, status: 'idle' };
@@ -167,7 +215,7 @@ export function resetQuery<K extends ReadonlyArray<unknown>, T, E>(
 }
 
 /**
- *
+ * @summary Send initialization event
  * @param ctx query context
  */
 function stateInitialization<K extends ReadonlyArray<unknown>, T, E>(
@@ -179,7 +227,7 @@ function stateInitialization<K extends ReadonlyArray<unknown>, T, E>(
 }
 
 /**
- *
+ * @summary Dispose the query
  * @param ctx query context
  */
 export function disposeQuery<K extends ReadonlyArray<unknown>, T, E>(
@@ -188,13 +236,39 @@ export function disposeQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx.subscriber.unsubscribe();
 }
 
-// TODO: rename
-// eslint-disable-next-line jsdoc/require-jsdoc
-export async function tryCurrentPromiseOrRunQuery<K extends ReadonlyArray<unknown>, T, E>(
+export interface RunActiveQueryOptions {
+	/**
+	 * @summary Cache directive
+	 * @default 'stale'
+	 */
+	cache?: QueryCache;
+	/**
+	 * @summary Fallback TTL
+	 */
+	ttl?: Millisecond;
+	/**
+	 * @summary Abort signal
+	 */
+	signal?: AbortSignal;
+}
+
+/**
+ * @summary Run active query
+ * @description Try to reuse active query or run a new query in the foreground.
+ * @param ctx query context
+ * @param key key pair
+ * @param key.key key value
+ * @param key.hash key hash
+ * @param options run active query options
+ * @param options.cache cache directive
+ * @param options.ttl TTL
+ * @param options.signal abort signal
+ * @returns query execution result
+ */
+export async function runActiveQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	{ key, hash }: KeyPair<K>,
-	cache: QueryCache,
-	ctl: AbortController
+	{ cache = 'stale', ttl = ctx.ttl, signal = makeAbortSignal() }: RunActiveQueryOptions = {}
 ): Promise<QueryExecutorResult<T, E>> {
 	const state: QueryState<T, E> = { status: 'loading', data: ctx.state.data, error: null };
 	const metadata: QueryStateMetadata = { origin: 'control', source: 'query', cache };
@@ -210,26 +284,48 @@ export async function tryCurrentPromiseOrRunQuery<K extends ReadonlyArray<unknow
 		return { state: await currPromise, next: nullpromise };
 	}
 
-	const promise = runQuery(ctx, { key, hash }, cache, 'query', ctl);
+	const promise = runQuery(ctx, { key, hash }, { cache, source: 'query', ttl, signal });
 	ctx.subscriber.setCurrentState(makeObservablePromise(promise));
 	return { state: await promise, next: nullpromise };
 }
 
-// TODO: rename
-// eslint-disable-next-line jsdoc/require-jsdoc
-export async function tryCurrentPromiseOrRunBackgroundQuery<K extends ReadonlyArray<unknown>, T, E>(
+export interface RunBackgroundQueryOptions {
+	/**
+	 * @summary Fallback TTL
+	 */
+	ttl?: Millisecond;
+	/**
+	 * @summary Abort signal
+	 */
+	signal?: AbortSignal;
+}
+
+/**
+ * @summary Run background query
+ * @description Return the {@link QueryExecutorResult} with the provided state and try
+ * to reuse the active query or create a new one for the next background query.
+ * @param ctx query context
+ * @param state query state
+ * @param key key pair
+ * @param key.key key value
+ * @param key.hash key hash
+ * @param options run background query options
+ * @param options.ttl TTL
+ * @param options.signal abort signal
+ * @returns query execution result
+ */
+export async function runBackgroundQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	state: QueryState<T, E>,
 	{ key, hash }: KeyPair<K>,
-	cache: QueryCache,
-	ctl: AbortController
+	{ ttl = ctx.ttl, signal = makeAbortSignal() }: RunBackgroundQueryOptions = {}
 ): Promise<QueryExecutorResult<T, E>> {
 	const currPromise = ctx.subscriber.getCurrentState();
 	if (currPromise?.status === 'pending') {
 		currPromise.then((state: QueryState<T, E>) => {
 			updateQuery(ctx, hash, {
 				state,
-				metadata: { origin: 'control', source: 'background-query', cache },
+				metadata: { origin: 'control', source: 'background-query', cache: 'stale' },
 			});
 		});
 
@@ -240,9 +336,34 @@ export async function tryCurrentPromiseOrRunBackgroundQuery<K extends ReadonlyAr
 	 * `runQuery` should run in the background, so it's promise
 	 * **must not** be awaited.
 	 */
-	const queryPromise = runQuery(ctx, { key, hash }, cache, 'background-query', ctl);
+	const queryPromise = runQuery(
+		ctx,
+		{ key, hash },
+		{ cache: 'stale', source: 'background-query', ttl, signal }
+	);
 	ctx.subscriber.setCurrentState(makeObservablePromise(queryPromise));
 	return { state, next: () => queryPromise };
+}
+
+export interface RunQueryOptions {
+	/**
+	 * @summary Cache directive
+	 * @default 'stale'
+	 */
+	cache?: QueryCache;
+	/**
+	 * @summary State source
+	 * @default 'query'
+	 */
+	source?: QueryStateNoCacheSource;
+	/**
+	 * @summary Fallback TTL
+	 */
+	ttl?: Millisecond;
+	/**
+	 * @summary Abort signal
+	 */
+	signal?: AbortSignal;
 }
 
 /**
@@ -258,57 +379,84 @@ export async function tryCurrentPromiseOrRunBackgroundQuery<K extends ReadonlyAr
  * @param key key pair
  * @param key.hash key hash
  * @param key.key key value
- * @param cache cache directive
- * @param source query source
- * @param ctl abort controller
+ * @param options run query options
+ * @param options.cache cache directive
+ * @param options.source query source
+ * @param options.ttl fallback TTL
+ * @param options.signal abort signal
  * @returns query state
  * @example
  * ```
  * // move `queryPromise` to somewhere else
- * const queryPromise = runQuery(ctx, { key, hash }, 'stale', 'query', new AbortController());
+ * const queryPromise = runQuery(ctx, { key, hash });
  * takeNextQuery(queryPromise);
  *
  * // or
  *
  * // not be `await`'ed
- * runQuery(ctx, { key, hash }, 'stale', 'background-query', new AbortController());
+ * runQuery(ctx, { key, hash }, { source: 'background-query' });
  * ```
  */
 export async function runQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	{ key, hash }: KeyPair<K>,
-	cache: QueryCache,
-	source: QueryStateNoCacheSource,
-	ctl: AbortController
+	{
+		cache = 'stale',
+		source = 'query',
+		ttl = ctx.ttl,
+		signal = makeAbortSignal(),
+	}: RunQueryOptions = {}
 ): Promise<QueryState<T, E>> {
 	try {
 		const localQueryFn = ctx.queryFn;
 		const result = await execAsyncOperation(
-			() => localQueryFn(key, ctl.signal),
+			() => localQueryFn(key, signal),
 			ctx.retryPolicy,
 			ctx.retryHandleFn
 		);
-		return (await queryResolve(ctx, result, hash, cache, source).catch(blackhole)) ?? ctx.state;
+		return (
+			(await queryResolve(ctx, result, hash, cache, source, ttl).catch(blackhole)) ?? ctx.state
+		);
 	} catch (err) {
 		return (await queryReject(ctx, err, hash, cache, source).catch(blackhole)) ?? ctx.state;
 	}
 }
 
-// eslint-disable-next-line jsdoc/require-jsdoc
+/**
+ * @summary Resolve query execution
+ * @description Resolve the query with the provided data, updates and returns the query state.
+ * @param ctx query context
+ * @param data data
+ * @param hash key hash
+ * @param cache cache directive
+ * @param source query source
+ * @param ttl fallback TTL
+ * @returns query state
+ */
 export async function queryResolve<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	data: T,
 	hash: string,
 	cache: QueryCache,
-	source: QueryStateNoCacheSource
+	source: QueryStateNoCacheSource,
+	ttl: Millisecond = ctx.ttl
 ): Promise<QueryState<T, E>> {
 	const state: QueryState<T, E> = { status: 'success', error: null, data };
-	await ctx.internalCache.set(hash, data, ctx.ttl).catch(blackhole);
+	await ctx.internalCache.set(hash, data, ctx.extractTTLFn(data, ttl)).catch(blackhole);
 	updateQuery(ctx, hash, { state, metadata: { origin: 'control', source, cache } });
 	return state;
 }
 
-// eslint-disable-next-line jsdoc/require-jsdoc
+/**
+ * @summary Reject query execution
+ * @description Reject the query with the provided error, updates and returns the query state.
+ * @param ctx query context
+ * @param err error
+ * @param hash key hash
+ * @param cache cache directive
+ * @param source query source
+ * @returns query state
+ */
 export async function queryReject<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	err: unknown,
@@ -324,7 +472,15 @@ export async function queryReject<K extends ReadonlyArray<unknown>, T, E>(
 	return state;
 }
 
-// eslint-disable-next-line jsdoc/require-jsdoc
+/**
+ * @summary Update the query state
+ * @description Update the query state, call function handlers and publish the new state.
+ * @param ctx query context
+ * @param hash key hash
+ * @param event state event
+ * @param event.state query state
+ * @param event.metadata query state metadata
+ */
 export function updateQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	hash: string,
@@ -361,7 +517,7 @@ export function updateQuery<K extends ReadonlyArray<unknown>, T, E>(
 }
 
 /**
- * Update `QueryContext` functions
+ * @summary Update {@link QueryContext `QueryContext`} functions
  * @param ctx query context
  * @param fns replacing functions
  */
@@ -369,11 +525,11 @@ export function updateQueryContext<K extends ReadonlyArray<unknown>, T, E = unkn
 	ctx: QueryContext<K, T, E>,
 	fns: Partial<QueryContextMutFns<K, T, E>>
 ): void {
-	if (fns.queryFn) ctx.queryFn = fns.queryFn;
-	if (fns.retryHandleFn) ctx.retryHandleFn = fns.retryHandleFn;
-	if (fns.keepCacheOnErrorFn) ctx.keepCacheOnErrorFn = fns.keepCacheOnErrorFn;
-	if (fns.stateFn) ctx.stateFn = fns.stateFn;
-	if (fns.dataFn) ctx.dataFn = fns.dataFn;
-	if (fns.errorFn) ctx.errorFn = fns.errorFn;
-	if (fns.filterFn) ctx.filterFn = fns.filterFn;
+	if (fns.queryFn !== undefined) ctx.queryFn = fns.queryFn;
+	if (fns.retryHandleFn !== undefined) ctx.retryHandleFn = fns.retryHandleFn;
+	if (fns.keepCacheOnErrorFn !== undefined) ctx.keepCacheOnErrorFn = fns.keepCacheOnErrorFn;
+	if (fns.stateFn !== undefined) ctx.stateFn = fns.stateFn;
+	if (fns.dataFn !== undefined) ctx.dataFn = fns.dataFn;
+	if (fns.errorFn !== undefined) ctx.errorFn = fns.errorFn;
+	if (fns.filterFn !== undefined) ctx.filterFn = fns.filterFn;
 }

@@ -25,9 +25,9 @@ describe('QueryControl function swap / queryFn', () => {
 			retryPolicy,
 		});
 
-		const queryPromise = queryCtl.execute(['error'], 'no-cache');
+		const queryPromise = queryCtl.execute(['error'], { cache: 'no-cache' });
 
-		queryCtl.context.queryFn = secondQueryFn;
+		queryCtl.ctx.queryFn = secondQueryFn;
 
 		const result = await queryPromise;
 
@@ -57,9 +57,9 @@ describe('QueryControl function swap / queryFn', () => {
 			retryPolicy,
 		});
 
-		const queryPromise = queryCtl.execute(['error'], 'no-cache');
+		const queryPromise = queryCtl.execute(['error'], { cache: 'no-cache' });
 
-		queryCtl.context.queryFn = secondQueryFn;
+		queryCtl.ctx.queryFn = secondQueryFn;
 
 		const result = await queryPromise;
 
@@ -77,7 +77,7 @@ describe('QueryControl function swap / queryFn', () => {
 		expect(queryFn).toHaveBeenCalledTimes(3);
 		expect(secondQueryFn).toHaveBeenCalledTimes(0);
 
-		const secondQueryResult = await queryCtl.execute(['key#101'], 'no-cache');
+		const secondQueryResult = await queryCtl.execute(['key#101'], { cache: 'no-cache' });
 
 		assert.deepStrictEqual(secondQueryResult.state, {
 			data: 'data#101',
@@ -93,7 +93,7 @@ describe('QueryControl function swap / queryFn', () => {
 		expect(queryFn).toHaveBeenCalledTimes(3);
 		expect(secondQueryFn).toHaveBeenCalledTimes(1);
 
-		await queryCtl.execute(['key#101'], 'no-cache');
+		await queryCtl.execute(['key#101'], { cache: 'no-cache' });
 
 		expect(queryFn).toHaveBeenCalledTimes(3);
 		expect(secondQueryFn).toHaveBeenCalledTimes(2);
@@ -112,7 +112,7 @@ describe('QueryControl function swap / queryFn', () => {
 			ttl: 100,
 		});
 
-		await store.set(queryCtl.context.keyHashFn(['key#updated_result']), 'stale_data', 100);
+		await store.set(queryCtl.ctx.keyHashFn(['key#updated_result']), 'stale_data', 100);
 		await waitUntil(70);
 
 		secondQueryFn.mockImplementationOnce(async (...params) => {
@@ -120,8 +120,8 @@ describe('QueryControl function swap / queryFn', () => {
 			return await testTransformer(...params);
 		});
 
-		const queryPromise = queryCtl.execute(['key#updated_result'], 'stale');
-		queryCtl.context.queryFn = secondQueryFn;
+		const queryPromise = queryCtl.execute(['key#updated_result'], { cache: 'stale' });
+		queryCtl.ctx.queryFn = secondQueryFn;
 
 		expect(queryFn).toHaveBeenCalledTimes(0);
 		expect(secondQueryFn).toHaveBeenCalledTimes(0);
@@ -177,10 +177,10 @@ describe('QueryControl function swap / queryFn', () => {
 		secondQueryFn.mockRejectedValueOnce(new Error('manual_error_second_1'));
 		secondQueryFn.mockRejectedValueOnce(new Error('manual_error_second_2'));
 
-		const mainQueryPromise = queryCtl.execute(['key#main_value'], 'no-cache');
+		const mainQueryPromise = queryCtl.execute(['key#main_value'], { cache: 'no-cache' });
 
-		queryCtl.context.queryFn = secondQueryFn;
-		const secondQueryPromise = queryCtl.execute(['key#second_value'], 'no-cache');
+		queryCtl.ctx.queryFn = secondQueryFn;
+		const secondQueryPromise = queryCtl.execute(['key#second_value'], { cache: 'no-cache' });
 
 		const [mainResult, secondResult] = await Promise.all([mainQueryPromise, secondQueryPromise]);
 
@@ -228,10 +228,10 @@ describe('QueryControl function swap / queryFn', () => {
 		secondQueryFn.mockRejectedValueOnce(new Error('manual_error_second_3'));
 		secondQueryFn.mockResolvedValueOnce('second');
 
-		const mainQueryPromise = queryCtl.execute(['key#race'], 'no-cache');
+		const mainQueryPromise = queryCtl.execute(['key#race'], { cache: 'no-cache' });
 
-		queryCtl.context.queryFn = secondQueryFn;
-		const secondQueryPromise = queryCtl.execute(['key#race'], 'no-cache');
+		queryCtl.ctx.queryFn = secondQueryFn;
+		const secondQueryPromise = queryCtl.execute(['key#race'], { cache: 'no-cache' });
 
 		const [mainResult, secondResult] = await Promise.all([mainQueryPromise, secondQueryPromise]);
 
@@ -269,9 +269,9 @@ describe('QueryControl function swap / filterFn', () => {
 		});
 
 		{
-			queryCtl.context.filterFn = ({ next }) => next.status !== 'loading';
+			queryCtl.ctx.filterFn = ({ next }) => next.status !== 'loading';
 
-			const result = await queryCtl.execute(['key#true'], 'no-cache');
+			const result = await queryCtl.execute(['key#true'], { cache: 'no-cache' });
 
 			assert.deepStrictEqual(result.state, { status: 'success', data: 'data#true', error: null });
 
@@ -285,9 +285,9 @@ describe('QueryControl function swap / filterFn', () => {
 		queryCtl.reset();
 
 		{
-			queryCtl.context.filterFn = defaultFilterFn;
+			queryCtl.ctx.filterFn = defaultFilterFn;
 
-			const result = await queryCtl.execute(['key#false'], 'no-cache');
+			const result = await queryCtl.execute(['key#false'], { cache: 'no-cache' });
 
 			assert.deepStrictEqual(result.state, { status: 'success', data: 'data#false', error: null });
 
@@ -315,7 +315,7 @@ describe('QueryControl function swap / filterFn', () => {
 		queryFn.mockRejectedValueOnce(new Error('manual_error_2'));
 
 		{
-			const result = await queryCtl.execute(['key#true'], 'no-cache');
+			const result = await queryCtl.execute(['key#true'], { cache: 'no-cache' });
 
 			expect(handler.stateFn).toHaveBeenNthCalledWith(
 				2,
@@ -339,9 +339,9 @@ describe('QueryControl function swap / filterFn', () => {
 			});
 		}
 		{
-			queryCtl.context.filterFn = ({ next }) => next.status !== 'error';
+			queryCtl.ctx.filterFn = ({ next }) => next.status !== 'error';
 
-			const result = await queryCtl.execute(['key#true'], 'no-cache');
+			const result = await queryCtl.execute(['key#true'], { cache: 'no-cache' });
 
 			// error state supressed.
 			expect(handler.stateFn).toHaveBeenNthCalledWith(
@@ -381,12 +381,12 @@ describe('QueryControl function swap / filterFn', () => {
 			...handler,
 		});
 
-		await store.set(queryCtl.context.keyHashFn(['key#true']), 'stale_data', DEFAULT_TTL_DURATION);
+		await store.set(queryCtl.ctx.keyHashFn(['key#true']), 'stale_data', DEFAULT_TTL_DURATION);
 		await waitUntil(70);
 
-		const queryPromise = queryCtl.execute(['key#true'], 'stale');
+		const queryPromise = queryCtl.execute(['key#true'], { cache: 'stale' });
 
-		queryCtl.context.filterFn = ({ metadata }) => metadata.source !== 'background-query';
+		queryCtl.ctx.filterFn = ({ metadata }) => metadata.source !== 'background-query';
 
 		const queryResult = await queryPromise;
 
@@ -451,15 +451,15 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 			...handler,
 		});
 
-		await store.set(queryCtl.context.keyHashFn(['key#0101']), 'cached_value', DEFAULT_TTL_DURATION);
+		await store.set(queryCtl.ctx.keyHashFn(['key#0101']), 'cached_value', DEFAULT_TTL_DURATION);
 		await waitUntil(110);
 
 		{
 			queryFn.mockRejectedValueOnce(new Error('manual_error_1'));
 
-			const queryPromise = queryCtl.execute(['key#0101'], 'no-cache');
+			const queryPromise = queryCtl.execute(['key#0101'], { cache: 'no-cache' });
 
-			queryCtl.context.keepCacheOnErrorFn = () => true;
+			queryCtl.ctx.keepCacheOnErrorFn = () => true;
 
 			const queryResult = await queryPromise;
 
@@ -469,17 +469,14 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 				error: new Error('manual_error_1'),
 			});
 
-			assert.deepStrictEqual(
-				await store.get(queryCtl.context.keyHashFn(['key#0101'])),
-				'cached_value'
-			);
+			assert.deepStrictEqual(await store.get(queryCtl.ctx.keyHashFn(['key#0101'])), 'cached_value');
 		}
 		{
 			queryFn.mockRejectedValueOnce(new Error('manual_error_2'));
 
-			const queryPromise = queryCtl.execute(['key#0101'], 'no-cache');
+			const queryPromise = queryCtl.execute(['key#0101'], { cache: 'no-cache' });
 
-			queryCtl.context.keepCacheOnErrorFn = () => false;
+			queryCtl.ctx.keepCacheOnErrorFn = () => false;
 
 			const queryResult = await queryPromise;
 
@@ -489,7 +486,7 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 				error: new Error('manual_error_2'),
 			});
 
-			assert.deepStrictEqual(await store.get(queryCtl.context.keyHashFn(['key#0101'])), undefined);
+			assert.deepStrictEqual(await store.get(queryCtl.ctx.keyHashFn(['key#0101'])), undefined);
 		}
 	});
 
@@ -508,18 +505,14 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 		});
 
 		{
-			await store.set(
-				queryCtl.context.keyHashFn(['key#0101']),
-				'cached_value',
-				DEFAULT_TTL_DURATION
-			);
+			await store.set(queryCtl.ctx.keyHashFn(['key#0101']), 'cached_value', DEFAULT_TTL_DURATION);
 			await waitUntil(110);
 
 			queryFn.mockRejectedValueOnce(new Error('manual_error_1'));
 
-			const queryResult = await queryCtl.execute(['key#0101'], 'no-cache');
+			const queryResult = await queryCtl.execute(['key#0101'], { cache: 'no-cache' });
 
-			queryCtl.context.keepCacheOnErrorFn = () => true;
+			queryCtl.ctx.keepCacheOnErrorFn = () => true;
 
 			assert.deepStrictEqual(queryResult.state, {
 				status: 'error',
@@ -527,19 +520,15 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 				error: new Error('manual_error_1'),
 			});
 
-			assert.deepStrictEqual(await store.get(queryCtl.context.keyHashFn(['key#0101'])), undefined);
+			assert.deepStrictEqual(await store.get(queryCtl.ctx.keyHashFn(['key#0101'])), undefined);
 		}
 		{
-			await store.set(
-				queryCtl.context.keyHashFn(['key#0101']),
-				'cached_value',
-				DEFAULT_TTL_DURATION
-			);
+			await store.set(queryCtl.ctx.keyHashFn(['key#0101']), 'cached_value', DEFAULT_TTL_DURATION);
 			await waitUntil(110);
 
 			queryFn.mockRejectedValueOnce(new Error('manual_error_2'));
 
-			const queryResult = await queryCtl.execute(['key#0101'], 'no-cache');
+			const queryResult = await queryCtl.execute(['key#0101'], { cache: 'no-cache' });
 
 			assert.deepStrictEqual(queryResult.state, {
 				status: 'error',
@@ -547,10 +536,7 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 				error: new Error('manual_error_2'),
 			});
 
-			assert.deepStrictEqual(
-				await store.get(queryCtl.context.keyHashFn(['key#0101'])),
-				'cached_value'
-			);
+			assert.deepStrictEqual(await store.get(queryCtl.ctx.keyHashFn(['key#0101'])), 'cached_value');
 		}
 	});
 });
@@ -579,14 +565,14 @@ describe('QueryControl function swap / retryHandleFn', () => {
 			queryFn.mockRejectedValueOnce(new Error('manual_error_2'));
 			queryFn.mockRejectedValueOnce(new Error('manual_error_3'));
 
-			const queryPromise = queryCtl.execute(['key#ok?'], 'no-cache');
+			const queryPromise = queryCtl.execute(['key#ok?'], { cache: 'no-cache' });
 
 			await waitUntil(100);
 
 			expect(retryHandleFn).toBeCalledTimes(1);
 			expect(secondRetryHandleFn).toBeCalledTimes(0);
 
-			queryCtl.context.retryHandleFn = secondRetryHandleFn;
+			queryCtl.ctx.retryHandleFn = secondRetryHandleFn;
 
 			await waitUntil(50);
 
@@ -609,7 +595,7 @@ describe('QueryControl function swap / retryHandleFn', () => {
 			queryFn.mockRejectedValueOnce(new Error('manual_error_1'));
 			queryFn.mockRejectedValueOnce(new Error('manual_error_2'));
 
-			const queryPromise = queryCtl.execute(['key#yes'], 'no-cache');
+			const queryPromise = queryCtl.execute(['key#yes'], { cache: 'no-cache' });
 
 			await waitUntil(100);
 

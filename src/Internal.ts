@@ -115,3 +115,11 @@ export function syncPromiseResolver<Fn extends () => void | Promise<void>>(func:
 		/* no-op */
 	}
 }
+
+/**
+ * @summary create a `AbortSignal`
+ * @returns abort signal
+ */
+export function makeAbortSignal(): AbortSignal {
+	return new AbortController().signal;
+}
