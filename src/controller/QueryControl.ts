@@ -21,9 +21,15 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	 */
 	public readonly cache: CacheManager;
 
-	public constructor(input: QueryInput<K, T, E>) {
-		this.ctx = makeQueryContext(input);
+	public constructor(ctx: QueryContext<K, T, E>) {
+		this.ctx = ctx;
 		this.cache = this.ctx.cache;
+	}
+
+	public static create<K extends ReadonlyArray<unknown>, T, E = unknown>(
+		input: QueryInput<K, T, E>
+	): QueryControl<K, T, E> {
+		return new QueryControl(makeQueryContext(input));
 	}
 
 	/**

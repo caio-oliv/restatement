@@ -27,7 +27,7 @@ describe('QueryControl state provider / query watcher', () => {
 
 		const queryFn1 = vi.fn(testTransformer);
 		const handler1 = mockQueryHandler();
-		const queryApi1 = new QueryControl<[string], string, Error>({
+		const queryApi1 = QueryControl.create<[string], string, Error>({
 			store,
 			provider,
 			queryFn: queryFn1,
@@ -36,7 +36,7 @@ describe('QueryControl state provider / query watcher', () => {
 
 		const queryFn2 = vi.fn(testTransformer);
 		const handler2 = mockQueryHandler();
-		const queryApi2 = new QueryControl<[string], string, Error>({
+		const queryApi2 = QueryControl.create<[string], string, Error>({
 			store,
 			provider,
 			queryFn: queryFn2,
@@ -152,7 +152,7 @@ describe('QueryControl state provider / query watcher', () => {
 		{
 			const queryFn = vi.fn(testTransformer);
 			const handler = mockQueryHandler();
-			using queryApi = new QueryControl<[string], string, Error>({
+			using queryApi = QueryControl.create<[string], string, Error>({
 				store,
 				provider,
 				queryFn: queryFn,
@@ -175,7 +175,7 @@ describe('QueryControl state provider / query watcher', () => {
 
 		const queryFn1 = vi.fn(testTransformer);
 		const handler1 = mockQueryHandler();
-		const queryApi1 = new QueryControl<[string], string, Error>({
+		const queryApi1 = QueryControl.create<[string], string, Error>({
 			store,
 			provider,
 			queryFn: queryFn1,
@@ -184,7 +184,7 @@ describe('QueryControl state provider / query watcher', () => {
 
 		const queryFn2 = vi.fn(testTransformer);
 		const handler2 = mockQueryHandler();
-		const queryApi2 = new QueryControl<[string], string, Error>({
+		const queryApi2 = QueryControl.create<[string], string, Error>({
 			store,
 			provider,
 			queryFn: queryFn2,
@@ -230,7 +230,7 @@ describe('QueryControl state provider / query watcher', () => {
 
 		const queryFn1 = vi.fn(testTransformer);
 		const handler1 = mockQueryHandler();
-		const queryApi1 = new QueryControl<[string], string, Error>({
+		const queryApi1 = QueryControl.create<[string], string, Error>({
 			store,
 			provider,
 			queryFn: queryFn1,
@@ -239,7 +239,7 @@ describe('QueryControl state provider / query watcher', () => {
 
 		const queryFn2 = vi.fn(testTransformer);
 		const handler2 = mockQueryHandler();
-		const queryApi2 = new QueryControl<[string], string, Error>({
+		const queryApi2 = QueryControl.create<[string], string, Error>({
 			placeholder: 'placeholder',
 			store,
 			provider,
@@ -288,7 +288,7 @@ describe('QueryControl state provider', () => {
 
 		const queryFn1 = vi.fn(testTransformer);
 		const handler1 = mockQueryHandler();
-		const queryApi1 = new QueryControl<[string], string, Error>({
+		const queryApi1 = QueryControl.create<[string], string, Error>({
 			store,
 			provider,
 			queryFn: queryFn1,
@@ -299,7 +299,7 @@ describe('QueryControl state provider', () => {
 
 		const queryFn2 = vi.fn(testTransformer);
 		const handler2 = mockQueryHandler();
-		const queryApi2 = new QueryControl<[string], string, Error>({
+		const queryApi2 = QueryControl.create<[string], string, Error>({
 			store,
 			provider,
 			queryFn: queryFn2,
@@ -336,7 +336,7 @@ describe('QueryControl state provider', () => {
 
 		const queryFn1 = vi.fn(testTransformer);
 		const handler1 = mockQueryHandler();
-		const queryApi1 = new QueryControl<[string], string, Error>({
+		const queryApi1 = QueryControl.create<[string], string, Error>({
 			store,
 			provider,
 			queryFn: queryFn1,
@@ -348,7 +348,7 @@ describe('QueryControl state provider', () => {
 
 		const queryFn2 = vi.fn(testTransformer);
 		const handler2 = mockQueryHandler();
-		const queryApi2 = new QueryControl<[string], string, Error>({
+		const queryApi2 = QueryControl.create<[string], string, Error>({
 			store,
 			provider,
 			queryFn: queryFn2,
@@ -360,7 +360,7 @@ describe('QueryControl state provider', () => {
 
 		const queryFn3 = vi.fn(testTransformer);
 		const handler3 = mockQueryHandler();
-		const queryApi3 = new QueryControl<[string], string, Error>({
+		const queryApi3 = QueryControl.create<[string], string, Error>({
 			store,
 			provider,
 			queryFn: queryFn3,
@@ -532,7 +532,7 @@ describe('QueryControl state provider / in-flight migration', () => {
 
 		const queryFn1 = vi.fn(delayedTestTransformer(100));
 		const handler1 = mockQueryHandler();
-		const queryApi1 = new QueryControl<[string], string, Error>({
+		const queryApi1 = QueryControl.create<[string], string, Error>({
 			store,
 			provider,
 			queryFn: queryFn1,
@@ -542,7 +542,7 @@ describe('QueryControl state provider / in-flight migration', () => {
 
 		const queryFn2 = vi.fn(delayedTestTransformer(100));
 		const handler2 = mockQueryHandler();
-		const queryApi2 = new QueryControl<[string], string, Error>({
+		const queryApi2 = QueryControl.create<[string], string, Error>({
 			store,
 			provider,
 			queryFn: queryFn2,

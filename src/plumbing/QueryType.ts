@@ -225,3 +225,23 @@ export interface QueryInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	 */
 	provider?: QueryProvider<T, E> | null;
 }
+
+/**
+ * @summary Local query input
+ * @description Local input options for a query context
+ */
+export type LocalQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown> = Pick<
+	QueryInput<K, T, E>,
+	| 'placeholder'
+	| 'queryFn'
+	| 'retryPolicy'
+	| 'retryHandleFn'
+	| 'keepCacheOnErrorFn'
+	| 'extractTTLFn'
+	| 'ttl'
+	| 'fresh'
+	| 'stateFn'
+	| 'dataFn'
+	| 'errorFn'
+	| 'filterFn'
+>;

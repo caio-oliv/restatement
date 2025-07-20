@@ -409,14 +409,12 @@ export async function runQuery<K extends ReadonlyArray<unknown>, T, E>(
 ): Promise<QueryState<T, E>> {
 	try {
 		const localQueryFn = ctx.queryFn;
-		const result = await execAsyncOperation(
+		const val = await execAsyncOperation(
 			() => localQueryFn(key, signal),
 			ctx.retryPolicy,
 			ctx.retryHandleFn
 		);
-		return (
-			(await queryResolve(ctx, result, hash, cache, source, ttl).catch(blackhole)) ?? ctx.state
-		);
+		return (await queryResolve(ctx, val, hash, cache, source, ttl).catch(blackhole)) ?? ctx.state;
 	} catch (err) {
 		return (await queryReject(ctx, err, hash, cache, source).catch(blackhole)) ?? ctx.state;
 	}
@@ -521,13 +519,14 @@ export function updateQuery<K extends ReadonlyArray<unknown>, T, E>(
  * @param ctx query context
  * @param fns replacing functions
  */
-export function updateQueryContext<K extends ReadonlyArray<unknown>, T, E = unknown>(
+export function updateQueryContextFn<K extends ReadonlyArray<unknown>, T, E = unknown>(
 	ctx: QueryContext<K, T, E>,
 	fns: Partial<QueryContextMutFns<K, T, E>>
 ): void {
 	if (fns.queryFn !== undefined) ctx.queryFn = fns.queryFn;
 	if (fns.retryHandleFn !== undefined) ctx.retryHandleFn = fns.retryHandleFn;
 	if (fns.keepCacheOnErrorFn !== undefined) ctx.keepCacheOnErrorFn = fns.keepCacheOnErrorFn;
+	if (fns.extractTTLFn !== undefined) ctx.extractTTLFn = fns.extractTTLFn;
 	if (fns.stateFn !== undefined) ctx.stateFn = fns.stateFn;
 	if (fns.dataFn !== undefined) ctx.dataFn = fns.dataFn;
 	if (fns.errorFn !== undefined) ctx.errorFn = fns.errorFn;

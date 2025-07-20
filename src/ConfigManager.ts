@@ -1,6 +1,6 @@
 import type { KeepCacheOnErrorFn, KeyHashFn, Millisecond } from '@/core/Type';
 import type { RetryHandlerFn, RetryPolicy } from '@/core/RetryPolicy';
-import type { QueryProvider, QueryInput } from '@/plumbing/QueryType';
+import type { QueryProvider, QueryInput, LocalQueryInput } from '@/plumbing/QueryType';
 import type { CacheStore } from '@/cache/CacheStore';
 import type { MutationControlInput } from '@/controller/MutationControl';
 import { type CacheManagerInput, CacheManager } from '@/cache/CacheManager';
@@ -32,7 +32,7 @@ export interface RestatementConfig<E = unknown> {
  * @param config config object
  * @returns cache manager input
  */
-export function makeCacheInput<E = unknown>(
+export function makeCacheManagerInput<E = unknown>(
 	config: RestatementConfig<E>
 ): Required<CacheManagerInput> {
 	return {
@@ -49,67 +49,39 @@ export function makeCacheInput<E = unknown>(
  * @returns CacheManager instance
  */
 export function makeCacheManager<E = unknown>(config: RestatementConfig<E>): CacheManager {
-	return new CacheManager(makeCacheInput(config));
+	return new CacheManager(makeCacheManagerInput(config));
 }
-
-export type CustomQueryControlInput<K extends ReadonlyArray<unknown>, T, E = unknown> = Pick<
-	QueryInput<K, T, E>,
-	| 'queryFn'
-	| 'placeholder'
-	| 'fresh'
-	| 'ttl'
-	| 'keepCacheOnErrorFn'
-	| 'extractTTLFn'
-	| 'filterFn'
-	| 'retryPolicy'
-	| 'retryHandleFn'
-	| 'stateFn'
-	| 'dataFn'
-	| 'errorFn'
->;
-
-export type QueryControlMutableInput<K extends ReadonlyArray<unknown>, T, E = unknown> = Pick<
-	QueryInput<K, T, E>,
-	| 'queryFn'
-	| 'keepCacheOnErrorFn'
-	| 'extractTTLFn'
-	| 'filterFn'
-	| 'retryHandleFn'
-	| 'stateFn'
-	| 'dataFn'
-	| 'errorFn'
->;
 
 /**
  * Make QueryControl input based on the global config
  * @param config config object
- * @param custom custom query input
+ * @param local local query input
  * @returns QueryControl input
  */
 export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>(
 	config: RestatementConfig<E>,
-	custom: CustomQueryControlInput<K, T, E>
+	local: LocalQueryInput<K, T, E>
 ): Required<QueryInput<K, T, E>> {
 	return {
-		queryFn: custom.queryFn,
+		placeholder: local.placeholder ?? null,
 		store: config.cache.store as CacheStore<string, T>,
-		fresh: custom.fresh ?? config.cache.fresh,
-		ttl: custom.ttl ?? config.cache.ttl,
-		keepCacheOnErrorFn: custom.keepCacheOnErrorFn ?? config.keepCacheOnErrorFn,
-		extractTTLFn: custom.extractTTLFn ?? defaultExtractTTLFn,
+		queryFn: local.queryFn,
 		keyHashFn: config.keyHashFn,
+		retryPolicy: local.retryPolicy ?? DEFAULT_RETRY_POLICY,
+		retryHandleFn: local.retryHandleFn ?? config.query.retryHandler,
+		keepCacheOnErrorFn: local.keepCacheOnErrorFn ?? config.keepCacheOnErrorFn,
+		extractTTLFn: local.extractTTLFn ?? defaultExtractTTLFn,
+		ttl: local.ttl ?? config.cache.ttl,
+		fresh: local.fresh ?? config.cache.fresh,
+		stateFn: local.stateFn ?? null,
+		dataFn: local.dataFn ?? null,
+		errorFn: local.errorFn ?? null,
+		filterFn: local.filterFn ?? defaultFilterFn,
 		provider: config.provider as QueryProvider<T, E>,
-		retryPolicy: custom.retryPolicy ?? DEFAULT_RETRY_POLICY,
-		retryHandleFn: custom.retryHandleFn ?? config.query.retryHandler,
-		dataFn: custom.dataFn ?? null,
-		errorFn: custom.errorFn ?? null,
-		stateFn: custom.stateFn ?? null,
-		placeholder: custom.placeholder ?? null,
-		filterFn: custom.filterFn ?? defaultFilterFn,
 	};
 }
 
-export type CustomMutationControlInput<I, T, E> = Pick<
+export type LocalMutationInput<I, T, E> = Pick<
 	MutationControlInput<I, T, E>,
 	| 'mutationFn'
 	| 'placeholder'
@@ -124,22 +96,22 @@ export type CustomMutationControlInput<I, T, E> = Pick<
 /**
  * Make MutationControl input based on the global config
  * @param config config object
- * @param custom custom mutation input
+ * @param local local mutation input
  * @returns MutationControl input
  */
 export function makeMutationInput<I, T, E = unknown>(
 	config: RestatementConfig<E>,
-	custom: CustomMutationControlInput<I, T, E>
+	local: LocalMutationInput<I, T, E>
 ): Required<MutationControlInput<I, T, E>> {
 	return {
-		mutationFn: custom.mutationFn,
+		mutationFn: local.mutationFn,
 		cache: makeCacheManager(config),
-		retryPolicy: custom.retryPolicy ?? DEFAULT_RETRY_POLICY,
-		retryHandleFn: custom.retryHandleFn ?? config.mutation.retryHandler,
-		filterFn: custom.filterFn ?? defaultFilterFn,
-		dataFn: custom.dataFn ?? null,
-		errorFn: custom.errorFn ?? null,
-		stateFn: custom.stateFn ?? null,
-		placeholder: custom.placeholder ?? null,
+		retryPolicy: local.retryPolicy ?? DEFAULT_RETRY_POLICY,
+		retryHandleFn: local.retryHandleFn ?? config.mutation.retryHandler,
+		filterFn: local.filterFn ?? defaultFilterFn,
+		dataFn: local.dataFn ?? null,
+		errorFn: local.errorFn ?? null,
+		stateFn: local.stateFn ?? null,
+		placeholder: local.placeholder ?? null,
 	};
 }

@@ -1,7 +1,7 @@
 import { assert, describe, expect, it, vi } from 'vitest';
 import {
-	BasicRetryPolicy,
 	defaultKeyHashFn,
+	NoRetryPolicy,
 	QueryControl,
 	waitUntil,
 	type InitialStateMetadata,
@@ -12,14 +12,13 @@ import {
 	testTransformer,
 	mockQueryHandler,
 } from '@/controller/Control.mock';
-import { mockBackoffTimer } from '@/core/BackoffTimer.mock';
 
 describe('QueryControl state transition / reset query', () => {
 	it('reset query state to idle', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -52,8 +51,8 @@ describe('QueryControl state transition / reset query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			placeholder: '123',
 			store,
 			queryFn,
@@ -92,8 +91,8 @@ describe('QueryControl state transition / reset query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			placeholder: '123',
 			store,
 			queryFn,
@@ -149,8 +148,8 @@ describe('QueryControl state transition / reset query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -188,8 +187,8 @@ describe('QueryControl state transition / reset query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -244,8 +243,8 @@ describe('QueryControl state transition / no-cache query', () => {
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -280,8 +279,8 @@ describe('QueryControl state transition / no-cache query', () => {
 	it('start the query state as "idle" and change to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -316,8 +315,8 @@ describe('QueryControl state transition / no-cache query', () => {
 	it('start the query state as "idle" and change to "loading" after start of execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -362,8 +361,8 @@ describe('QueryControl state transition / no-cache query', () => {
 	it('start the query state as "success" and change to "loading" and to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -426,8 +425,8 @@ describe('QueryControl state transition / no-cache query', () => {
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -490,8 +489,8 @@ describe('QueryControl state transition / no-cache query', () => {
 	it('start the query state as "error" and change to "loading" and to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -554,8 +553,8 @@ describe('QueryControl state transition / no-cache query', () => {
 	it('start the query state as "error" and change to "loading" and to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -622,8 +621,8 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -658,8 +657,8 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "idle" and change to "success" after result from cache', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -696,8 +695,8 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "idle" and change to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -732,8 +731,8 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "idle" and change to "loading" after start of execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -782,8 +781,8 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "success" and change to "loading" and to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -853,8 +852,8 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "success" and change to "success" after result from cache', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -911,8 +910,8 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -979,8 +978,8 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "error" and change to "loading" and to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1047,8 +1046,8 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "error" and change to "success" after result from cache', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1109,8 +1108,8 @@ describe('QueryControl state transition / fresh query', () => {
 	it('start the query state as "error" and change to "loading" and to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1179,8 +1178,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1215,8 +1214,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "success" after result from cache', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1253,8 +1252,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "stale" and to "success" after background query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1315,8 +1314,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "stale" and to "error" after background query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1377,8 +1376,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1413,8 +1412,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "loading" after start of execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1463,8 +1462,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "success" and change to "loading" and to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1533,8 +1532,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "success" and change to "success" after result from cache', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1591,8 +1590,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "stale" and to "success" after background query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1671,8 +1670,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "idle" and change to "stale" and to "error" after background query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1751,8 +1750,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1821,8 +1820,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "error" and change to "loading" and to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1889,8 +1888,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "error" and change to "loading" and to "success" after result from cache', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1951,8 +1950,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "error" and change to "stale" and to "success" after background query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -2033,8 +2032,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "error" and change to "stale" and to "error" after background query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -2113,8 +2112,8 @@ describe('QueryControl state transition / stale query', () => {
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
-		const queryApi = new QueryControl<[string], string, Error>({
+		const retryPolicy = new NoRetryPolicy();
+		const queryApi = QueryControl.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,

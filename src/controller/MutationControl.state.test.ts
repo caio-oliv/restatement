@@ -1,20 +1,14 @@
 import { assert, describe, it, vi } from 'vitest';
-import {
-	CacheManager,
-	type MutationStateFilterInfo,
-	MutationControl,
-	BasicRetryPolicy,
-} from '@/lib';
+import { CacheManager, type MutationStateFilterInfo, MutationControl, NoRetryPolicy } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { testTransformer } from '@/controller/Control.mock';
-import { mockBackoffTimer } from '@/core/BackoffTimer.mock';
 
 describe('MutationControl state transition', () => {
 	it('"idle" to "loading" to "success"', async () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
+		const retryPolicy = new NoRetryPolicy();
 		const mutationCtl = new MutationControl({ cache, mutationFn, retryPolicy });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: null, error: null });
@@ -36,7 +30,7 @@ describe('MutationControl state transition', () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
+		const retryPolicy = new NoRetryPolicy();
 		const mutationCtl = new MutationControl({ cache, mutationFn, retryPolicy });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: null, error: null });
@@ -58,7 +52,7 @@ describe('MutationControl state transition', () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
+		const retryPolicy = new NoRetryPolicy();
 		const mutationCtl = new MutationControl({ cache, mutationFn, retryPolicy });
 
 		const state = await mutationCtl.execute(['key#test']);
@@ -91,7 +85,7 @@ describe('MutationControl state transition', () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
+		const retryPolicy = new NoRetryPolicy();
 		const mutationCtl = new MutationControl({ cache, mutationFn, retryPolicy });
 
 		const state = await mutationCtl.execute(['key#test']);
@@ -124,7 +118,7 @@ describe('MutationControl state transition', () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
+		const retryPolicy = new NoRetryPolicy();
 		const mutationCtl = new MutationControl({ cache, mutationFn, retryPolicy });
 
 		const state = await mutationCtl.execute(['invalid']);
@@ -157,7 +151,7 @@ describe('MutationControl state transition', () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
+		const retryPolicy = new NoRetryPolicy();
 		const mutationCtl = new MutationControl({ cache, mutationFn, retryPolicy });
 
 		const state = await mutationCtl.execute(['invalid']);
@@ -192,7 +186,7 @@ describe('MutationControl state transition / reset query', () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
+		const retryPolicy = new NoRetryPolicy();
 		const mutationCtl = new MutationControl({ cache, mutationFn, retryPolicy });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: null, error: null });
@@ -214,7 +208,7 @@ describe('MutationControl state transition / reset query', () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
+		const retryPolicy = new NoRetryPolicy();
 		const mutationCtl = new MutationControl({ placeholder: 'one', cache, mutationFn, retryPolicy });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: 'one', error: null });
@@ -236,7 +230,7 @@ describe('MutationControl state transition / reset query', () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
+		const retryPolicy = new NoRetryPolicy();
 		const mutationCtl = new MutationControl({ placeholder: 'one', cache, mutationFn, retryPolicy });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: 'one', error: null });
@@ -268,7 +262,7 @@ describe('MutationControl state transition / filter', () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
+		const retryPolicy = new NoRetryPolicy();
 		function filterFn<T, E>({ next }: MutationStateFilterInfo<T, E>): boolean {
 			return next.status !== 'loading';
 		}
@@ -307,7 +301,7 @@ describe('MutationControl state transition / filter', () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
-		const retryPolicy = new BasicRetryPolicy(0, mockBackoffTimer());
+		const retryPolicy = new NoRetryPolicy();
 		function filterFn<T, E>({ next }: MutationStateFilterInfo<T, E>): boolean {
 			return next.status !== 'error';
 		}

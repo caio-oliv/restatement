@@ -94,3 +94,29 @@ describe('retryAsyncOperation', () => {
 		}
 	});
 });
+
+describe('NoRetryPolicy', () => {
+	it('should not retry', () => {
+		const policy = new NoRetryPolicy();
+
+		assert.strictEqual(policy.shouldRetry(), false);
+	});
+
+	it('retry limit as zero', () => {
+		const policy = new NoRetryPolicy();
+
+		assert.strictEqual(policy.limit, 0);
+	});
+
+	it('must return negative delay', () => {
+		const policy = new NoRetryPolicy();
+
+		assert.strictEqual(policy.delay(), -1);
+	});
+
+	it('noop notify', () => {
+		const policy = new NoRetryPolicy();
+
+		assert.strictEqual(policy.notify(), undefined);
+	});
+});
