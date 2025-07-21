@@ -106,8 +106,9 @@ export async function runMutation<I, T, E>(
 	signal: AbortSignal
 ): Promise<MutationState<T, E>> {
 	try {
+		const localMutationFn = ctx.mutationFn;
 		const data = await execAsyncOperation(
-			() => ctx.mutationFn(input, signal),
+			() => localMutationFn(input, signal),
 			ctx.retryPolicy,
 			ctx.retryHandleFn
 		);

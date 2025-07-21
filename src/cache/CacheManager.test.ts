@@ -1,5 +1,5 @@
 import { assert, describe, expect, it, vi } from 'vitest';
-import { CacheManager, type QueryProviderState, PubSub, type CacheManagerProvider } from '@/lib';
+import { CacheManager, type QueryProviderState, PubSub, type QueryProvider } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 
 interface UserMock {
@@ -32,7 +32,7 @@ describe('CacheManager', () => {
 
 	it('set value and publish through the provider', async () => {
 		const store = makeCache();
-		const provider: CacheManagerProvider<string, Error> = new PubSub();
+		const provider: QueryProvider<string, Error> = new PubSub();
 		const listener = vi.fn();
 		const cache = new CacheManager({ store, provider });
 

@@ -1,17 +1,19 @@
 /**
- * Duration in Millisecond precision (positive or negative integer)
+ * @description Duration in millisecond precision (positive or negative integer)
  */
 export type Millisecond = number;
 
 /**
- * Fetch status
+ * @summary Fetch status
+ * @description
  *
  * TODO: explain each
  */
 export type FetchStatus = 'idle' | 'loading' | 'stale' | 'success' | 'error';
 
 /**
- * Query cache control
+ * @summary Query cache directive
+ * @description
  *
  * TODO: explain each
  */

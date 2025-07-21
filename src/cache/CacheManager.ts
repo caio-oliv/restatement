@@ -1,39 +1,35 @@
-import type {
-	CacheHandler,
-	KeyHashFn,
-	Millisecond,
-	QueryProviderState,
-	QueryStatePromise,
-} from '@/core/Type';
+import type { CacheHandler, KeyHashFn, Millisecond } from '@/core/Type';
+import type { QueryProvider } from '@/plumbing/QueryType';
 import type { CacheStore } from '@/cache/CacheStore';
-import type { PubSub } from '@/PubSub';
 import { defaultKeyHashFn, DEFAULT_TTL_DURATION } from '@/Default';
 
-export interface CacheManagerInput {
+export interface CacheManagerInput<T = unknown, E = unknown> {
+	/**
+	 * @summary Key hasher
+	 */
 	keyHashFn?: KeyHashFn<ReadonlyArray<unknown>>;
 	/**
-	 * @description Time To Live (duration) of cache entries.
-	 * @default 3 * 60 * 1000 // 3 minutes
+	 * @summary Default TTL duration
 	 */
 	ttl?: Millisecond;
 	/**
-	 * Cache store.
+	 * @summary Cache store
 	 */
 	store: CacheStore<string, unknown>;
 	/**
-	 * State provider.
+	 * @summary State provider.
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	provider?: CacheManagerProvider<any, any> | null;
+	provider?: QueryProvider<T, E> | null;
 }
 
-export type CacheManagerProvider<T, E> = PubSub<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
-
 export class CacheManager implements CacheHandler {
+	/**
+	 * @summary Key hasher
+	 */
 	public readonly keyHashFn: KeyHashFn<ReadonlyArray<unknown>>;
 	/**
-	 * @summary Default TTL (duration)
-	 * @description Default Time To Live (duration) of cache entries set through this manager.
+	 * @summary Default TTL duration
+	 * @description Time To Live of cache entries.
 	 */
 	public readonly ttl: Millisecond;
 
@@ -42,7 +38,8 @@ export class CacheManager implements CacheHandler {
 		ttl = DEFAULT_TTL_DURATION,
 		store,
 		provider = null,
-	}: CacheManagerInput) {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	}: CacheManagerInput<any, any>) {
 		this.keyHashFn = keyHashFn;
 		this.ttl = ttl;
 		this.#internalCache = store;
@@ -78,5 +75,5 @@ export class CacheManager implements CacheHandler {
 	}
 
 	readonly #internalCache: CacheStore<string, unknown>;
-	readonly #provider: CacheManagerProvider<unknown, unknown> | null;
+	readonly #provider: QueryProvider<unknown, unknown> | null;
 }

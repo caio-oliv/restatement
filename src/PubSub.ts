@@ -182,18 +182,18 @@ export class DummySubscriber<T, S> implements Subscriber<T, S> {
 		return null;
 	}
 
-	// eslint-disable-next-line class-methods-use-this, @typescript-eslint/class-methods-use-this, @typescript-eslint/no-unused-vars
-	public setCurrentState(_state: S): boolean {
+	// eslint-disable-next-line class-methods-use-this, @typescript-eslint/class-methods-use-this
+	public setCurrentState(): boolean {
 		return false;
 	}
 
-	// eslint-disable-next-line class-methods-use-this, @typescript-eslint/class-methods-use-this, @typescript-eslint/no-unused-vars
-	public publish(_data: T): boolean {
+	// eslint-disable-next-line class-methods-use-this, @typescript-eslint/class-methods-use-this
+	public publish(): boolean {
 		return false;
 	}
 
-	// eslint-disable-next-line class-methods-use-this, @typescript-eslint/class-methods-use-this, @typescript-eslint/no-unused-vars
-	public publishTopic(_topic: string, _data: T): void {
+	// eslint-disable-next-line class-methods-use-this, @typescript-eslint/class-methods-use-this
+	public publishTopic(): void {
 		return;
 	}
 

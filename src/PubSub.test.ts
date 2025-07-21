@@ -429,10 +429,10 @@ describe('DummySubscriber', () => {
 
 		assert.deepStrictEqual(sub.currentTopic(), 'topic#2');
 
-		assert.deepStrictEqual(sub.setCurrentState('try'), false);
+		assert.deepStrictEqual(sub.setCurrentState(), false);
 		assert.deepStrictEqual(sub.getCurrentState(), null);
 
-		assert.deepStrictEqual(sub.publish(10), false);
+		assert.deepStrictEqual(sub.publish(), false);
 
 		sub.useTopic('topic#1');
 

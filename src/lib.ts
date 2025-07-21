@@ -11,5 +11,5 @@ export * from '@/plumbing/QueryType';
 export * from '@/plumbing/Query';
 export * from '@/controller/QueryControl';
 export * from '@/controller/MutationControl';
-export * from '@/ConfigManager';
+export * from '@/Config';
 export * from '@/integration/lru-cache';
