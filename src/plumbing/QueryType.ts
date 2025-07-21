@@ -56,13 +56,13 @@ export interface QueryContext<K extends ReadonlyArray<unknown>, T, E = unknown> 
 	 */
 	readonly retryPolicy: RetryPolicy<E>;
 	/**
-	 * @summary Cache fresh duration
-	 */
-	readonly fresh: Millisecond;
-	/**
 	 * @summary Default TTL duration
 	 */
 	readonly ttl: Millisecond;
+	/**
+	 * @summary Cache fresh duration
+	 */
+	readonly fresh: Millisecond;
 	/**
 	 * @summary Key hasher
 	 */

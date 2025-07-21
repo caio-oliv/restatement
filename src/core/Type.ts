@@ -155,7 +155,15 @@ export interface QueryExecutorResult<T, E> {
 	next(): Promise<NextQueryState<T, E>>;
 }
 
-export type QueryResetTarget = 'state' | 'handler';
+export type ResetTarget = 'state' | 'handler';
+
+export interface ResetOptions {
+	/**
+	 * @summary Reset target
+	 * @default 'state'
+	 */
+	target?: ResetTarget;
+}
 
 export type MutationStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -179,7 +187,7 @@ export interface SuccessMutationState<T> {
 
 export interface ErrorMutationState<E> {
 	readonly data: null;
-	readonly error: E | null;
+	readonly error: E;
 	readonly status: 'error';
 }
 

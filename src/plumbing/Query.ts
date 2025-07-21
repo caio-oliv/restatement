@@ -7,8 +7,8 @@ import type {
 	QueryStateNoCacheSource,
 	QueryStateMetadata,
 	QueryExecutorResult,
-	QueryResetTarget,
 	Millisecond,
+	ResetOptions,
 } from '@/core/Type';
 import type {
 	QueryContext,
@@ -166,26 +166,18 @@ export async function executeQuery<K extends ReadonlyArray<unknown>, T, E>(
 	return runActiveQuery(ctx, { key, hash }, { cache, ttl, signal });
 }
 
-export interface ResetQueryOptions {
-	/**
-	 * @summary Reset target
-	 * @default 'state'
-	 */
-	target?: QueryResetTarget;
-}
-
 /**
  * @summary Use provided query key
  * @description Reset query state and subscribe to the provided key.
  * @param ctx query context
  * @param key key value
- * @param options reset query options
- * @param options.target query reset target
+ * @param options reset options
+ * @param options.target reset target
  */
 export function useQueryKey<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	key: K,
-	{ target = 'state' }: ResetQueryOptions = {}
+	{ target = 'state' }: ResetOptions = {}
 ): void {
 	const hash = ctx.keyHashFn(key);
 	ctx.subscriber.useTopic(hash);
@@ -199,12 +191,12 @@ export function useQueryKey<K extends ReadonlyArray<unknown>, T, E>(
 /**
  * @summary Reset query state and context
  * @param ctx query context
- * @param options reset query options
- * @param options.target query reset target
+ * @param options reset options
+ * @param options.target reset target
  */
 export function resetQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
-	{ target = 'state' }: ResetQueryOptions = {}
+	{ target = 'state' }: ResetOptions = {}
 ): void {
 	ctx.subscriber.unsubscribe();
 	ctx.state = { data: ctx.placeholder, error: null, status: 'idle' };

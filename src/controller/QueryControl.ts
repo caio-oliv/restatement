@@ -1,4 +1,4 @@
-import type { QueryState, QueryExecutorResult } from '@/core/Type';
+import type { QueryState, QueryExecutorResult, ResetOptions } from '@/core/Type';
 import type { QueryContext, QueryInput } from '@/plumbing/QueryType';
 import {
 	disposeQuery,
@@ -7,7 +7,6 @@ import {
 	resetQuery,
 	useQueryKey,
 	type ExecuteQueryOptions,
-	type ResetQueryOptions,
 } from '@/plumbing/Query';
 import type { CacheManager } from '@/cache/CacheManager';
 
@@ -39,8 +38,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	 * @param options execute query options
 	 * @returns query execution result
 	 */
-	public async execute(key: K, options?: ExecuteQueryOptions): Promise<QueryExecutorResult<T, E>> {
-		// eslint-disable-next-line @typescript-eslint/return-await
+	public execute(key: K, options?: ExecuteQueryOptions): Promise<QueryExecutorResult<T, E>> {
 		return executeQuery(this.ctx, key, options);
 	}
 
@@ -50,7 +48,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	 * @param key key value
 	 * @param options reset query options
 	 */
-	public use(key: K, options?: ResetQueryOptions): void {
+	public use(key: K, options?: ResetOptions): void {
 		useQueryKey(this.ctx, key, options);
 	}
 
@@ -58,7 +56,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	 * @summary Reset query state and context
 	 * @param options reset query options
 	 */
-	public reset(options?: ResetQueryOptions): void {
+	public reset(options?: ResetOptions): void {
 		resetQuery(this.ctx, options);
 	}
 

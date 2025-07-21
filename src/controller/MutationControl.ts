@@ -1,128 +1,55 @@
-import type {
-	MutationFn,
-	MutationState,
-	MutationFilterFn,
-	MutationStateHandler,
-	MutationDataHandler,
-	MutationErrorHandler,
-} from '@/core/Type';
-import { execAsyncOperation, type RetryHandlerFn, type RetryPolicy } from '@/core/RetryPolicy';
+import type { MutationState, ResetOptions } from '@/core/Type';
+import type { MutationContext, MutationInput } from '@/plumbing/MutationType';
 import type { CacheManager } from '@/cache/CacheManager';
-import { DEFAULT_RETRY_POLICY, defaultFilterFn } from '@/Default';
-import { blackhole, makeAbortSignal } from '@/Internal';
+import {
+	executeMutation,
+	makeMutationContext,
+	resetMutation,
+	type ExecuteMutationOptions,
+} from '@/plumbing/Mutation';
 
-export interface MutationControlInput<I, T, E> {
-	placeholder?: T | null;
-	mutationFn: MutationFn<I, T>;
-	cache: CacheManager;
-	retryPolicy?: RetryPolicy<E>;
-	retryHandleFn?: RetryHandlerFn<E> | null;
-	filterFn?: MutationFilterFn<T, E>;
-	stateFn?: MutationStateHandler<T, E> | null;
-	dataFn?: MutationDataHandler<T> | null;
-	errorFn?: MutationErrorHandler<E> | null;
-}
-
-export type MutationResetTarget = 'state' | 'handler';
-
-export class MutationControl<I, T, E> {
-	public readonly retryPolicy: RetryPolicy<E>;
+export class MutationControl<I, T, E = unknown> {
+	/**
+	 * @summary Mutation context
+	 */
+	public readonly ctx: MutationContext<I, T, E>;
+	/**
+	 * @summary Cache manager
+	 */
 	public readonly cache: CacheManager;
-	public readonly stateFn: MutationStateHandler<T, E> | null;
-	public readonly dataFn: MutationDataHandler<T> | null;
-	public readonly errorFn: MutationErrorHandler<E> | null;
 
-	public constructor({
-		placeholder = null,
-		mutationFn,
-		cache,
-		retryPolicy = DEFAULT_RETRY_POLICY,
-		retryHandleFn = null,
-		filterFn = defaultFilterFn,
-		stateFn = null,
-		dataFn = null,
-		errorFn = null,
-	}: MutationControlInput<I, T, E>) {
-		this.#placeholder = placeholder;
-		this.#mutationFn = mutationFn;
-		this.retryPolicy = retryPolicy;
-		this.#retryHandleFn = retryHandleFn;
-		this.cache = cache;
-		this.#filterFn = filterFn;
-		this.stateFn = stateFn;
-		this.dataFn = dataFn;
-		this.errorFn = errorFn;
-		this.#state = { data: this.#placeholder, error: null, status: 'idle' };
+	public constructor(ctx: MutationContext<I, T, E>) {
+		this.ctx = ctx;
+		this.cache = this.ctx.cache;
 	}
 
-	public async execute(
-		input: I,
-		signal: AbortSignal = makeAbortSignal()
-	): Promise<MutationState<T, E>> {
-		const state: MutationState<T, E> = { status: 'loading', data: null, error: null };
-		this.#updateState(state);
-
-		// eslint-disable-next-line @typescript-eslint/return-await
-		return this.#runMutation(input, signal);
+	public static create<I, T, E = unknown>(input: MutationInput<I, T, E>): MutationControl<I, T, E> {
+		return new MutationControl(makeMutationContext(input));
 	}
 
+	/**
+	 * @summary Execute mutation
+	 * @param input mutation input
+	 * @param options execute mutation options
+	 * @returns mutation state
+	 */
+	public execute(input: I, options?: ExecuteMutationOptions): Promise<MutationState<T, E>> {
+		return executeMutation(this.ctx, input, options);
+	}
+
+	/**
+	 * @summary Reset mutation state
+	 * @param options reset mutation options
+	 */
+	public reset(options?: ResetOptions): void {
+		resetMutation(this.ctx, options);
+	}
+
+	/**
+	 * @summary Get mutation state
+	 * @returns mutation state
+	 */
 	public getState(): MutationState<T, E> {
-		return this.#state;
+		return this.ctx.state;
 	}
-
-	public reset(target: MutationResetTarget = 'state'): void {
-		this.#state = { status: 'idle', data: this.#placeholder, error: null };
-
-		if (target === 'handler') {
-			this.stateFn?.(this.#state, this.cache)?.catch(blackhole);
-		}
-	}
-
-	async #runMutation(input: I, signal: AbortSignal): Promise<MutationState<T, E>> {
-		try {
-			const data = await execAsyncOperation(
-				() => this.#mutationFn(input, signal),
-				this.retryPolicy,
-				this.#retryHandleFn
-			);
-
-			return this.#mutationResolve(data);
-		} catch (err: unknown) {
-			return this.#mutationReject(err as E);
-		}
-	}
-
-	#mutationResolve(data: T): MutationState<T, E> {
-		const state: MutationState<T, E> = { status: 'success', data, error: null };
-		this.#updateState(state);
-		return state;
-	}
-
-	#mutationReject(error: E): MutationState<T, E> {
-		const state: MutationState<T, E> = { status: 'error', data: null, error };
-		this.#updateState(state);
-		return state;
-	}
-
-	#updateState(state: MutationState<T, E>): void {
-		if (!this.#filterFn({ current: this.#state, next: state })) {
-			return;
-		}
-
-		this.#state = state;
-
-		if (this.#state.data !== null) {
-			this.dataFn?.(this.#state.data, this.cache)?.catch(blackhole);
-		}
-		if (this.#state.error !== null) {
-			this.errorFn?.(this.#state.error, this.cache)?.catch(blackhole);
-		}
-		this.stateFn?.(this.#state, this.cache)?.catch(blackhole);
-	}
-
-	#state: MutationState<T, E>;
-	readonly #placeholder: T | null;
-	readonly #filterFn: MutationFilterFn<T, E>;
-	readonly #mutationFn: MutationFn<I, T>;
-	readonly #retryHandleFn: RetryHandlerFn<E> | null;
 }

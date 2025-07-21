@@ -1,8 +1,8 @@
 import type { KeepCacheOnErrorFn, KeyHashFn, Millisecond } from '@/core/Type';
 import type { RetryHandlerFn, RetryPolicy } from '@/core/RetryPolicy';
 import type { QueryProvider, QueryInput, LocalQueryInput } from '@/plumbing/QueryType';
+import type { LocalMutationInput, MutationInput } from '@/plumbing/MutationType';
 import type { CacheStore } from '@/cache/CacheStore';
-import type { MutationControlInput } from '@/controller/MutationControl';
 import { type CacheManagerInput, CacheManager } from '@/cache/CacheManager';
 import { DEFAULT_RETRY_POLICY, defaultExtractTTLFn, defaultFilterFn } from '@/Default';
 
@@ -53,10 +53,10 @@ export function makeCacheManager<E = unknown>(config: RestatementConfig<E>): Cac
 }
 
 /**
- * Make QueryControl input based on the global config
+ * Make query input based on the global config
  * @param config config object
  * @param local local query input
- * @returns QueryControl input
+ * @returns query input
  */
 export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>(
 	config: RestatementConfig<E>,
@@ -81,37 +81,25 @@ export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>
 	};
 }
 
-export type LocalMutationInput<I, T, E> = Pick<
-	MutationControlInput<I, T, E>,
-	| 'mutationFn'
-	| 'placeholder'
-	| 'filterFn'
-	| 'retryPolicy'
-	| 'retryHandleFn'
-	| 'stateFn'
-	| 'dataFn'
-	| 'errorFn'
->;
-
 /**
- * Make MutationControl input based on the global config
+ * Make mutation input based on the global config
  * @param config config object
  * @param local local mutation input
- * @returns MutationControl input
+ * @returns mutation input
  */
 export function makeMutationInput<I, T, E = unknown>(
 	config: RestatementConfig<E>,
 	local: LocalMutationInput<I, T, E>
-): Required<MutationControlInput<I, T, E>> {
+): Required<MutationInput<I, T, E>> {
 	return {
-		mutationFn: local.mutationFn,
+		placeholder: local.placeholder ?? null,
 		cache: makeCacheManager(config),
+		mutationFn: local.mutationFn,
 		retryPolicy: local.retryPolicy ?? DEFAULT_RETRY_POLICY,
 		retryHandleFn: local.retryHandleFn ?? config.mutation.retryHandler,
-		filterFn: local.filterFn ?? defaultFilterFn,
+		stateFn: local.stateFn ?? null,
 		dataFn: local.dataFn ?? null,
 		errorFn: local.errorFn ?? null,
-		stateFn: local.stateFn ?? null,
-		placeholder: local.placeholder ?? null,
+		filterFn: local.filterFn ?? defaultFilterFn,
 	};
 }
