@@ -15,6 +15,7 @@
 	"include": [
 		"src/**/*",
 		"test/**/*",
+		"typedoc.config.js",
 		"rollup.config.js",
 		"eslint.config.ts",
 		"vite.config.ts",

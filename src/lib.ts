@@ -9,6 +9,8 @@ export * from '@/cache/CacheHelper';
 export * from '@/Helper';
 export * from '@/plumbing/QueryType';
 export * from '@/plumbing/Query';
+export * from '@/plumbing/MutationType';
+export * from '@/plumbing/Mutation';
 export * from '@/controller/QueryControl';
 export * from '@/controller/MutationControl';
 export * from '@/Config';
