@@ -1,44 +1,78 @@
 import type { Millisecond } from '@/core/Type';
 import type { BackoffTimer } from '@/core/BackoffTimer';
 
+/**
+ * Operation result
+ * @description All possible results of a {@link AsyncOperation retriable operation}.
+ */
 export type OperationResult = 'success' | 'fail';
 
+/**
+ * Async operation
+ * @description Any async operation that can be retried.
+ * @typeParam T Async operation success value
+ */
 export type AsyncOperation<T> = () => Promise<T>;
 
+/**
+ * Retry handler function
+ * @description Handler function **called before every retry**.
+ * @param retryAttempt Current retry attempt
+ * @param error Resulting error from the previous retry
+ * @typeParam E Async operation error value
+ */
 export type RetryHandlerFn<E> = (retryAttempt: number, error: E) => void;
 
+/**
+ * Retry policy interface
+ * @typeParam E Async operation error value
+ */
 export interface RetryPolicy<E = unknown> {
 	/**
-	 * @summary Retry count limit
+	 * Retry count limit
 	 */
 	readonly limit: number;
 
 	/**
 	 * @description Returns `true` if the operation should be retried, `false`
 	 * otherwise.
-	 * @param attempt current retry attempt
-	 * @param error resulting error from the previous retry
+	 * @param attempt Current retry attempt
+	 * @param error Resulting error from the previous retry
 	 */
 	shouldRetry(attempt: number, error: E): boolean;
 
 	/**
-	 * @description Returns the delay in milliseconds for the next attempt if
+	 * @description Returns the delay in {@link Millisecond milliseconds} for the next attempt if
 	 * the operation **should** be retried. It returns a negative integer in case
 	 * the operation **should not** be retried.
-	 * @param attempt current retry attempt
-	 * @param error resulting error from the previous retry
-	 * @returns positive delay in milliseconds or a negative integer.
+	 * @param attempt Current retry attempt
+	 * @param error Resulting error from the previous retry
+	 * @returns Positive delay in milliseconds or a negative integer.
 	 */
 	delay(attempt: number, error: E): Millisecond;
 
 	/**
-	 * @summary Notify success and failure rates.
+	 * Notify success and failure rates.
 	 * @description Notify the retry policy if the operation succeeded or failed.
-	 * @param result attempt result
+	 * @param result Attempt result
 	 */
 	notify(result: OperationResult): void;
 }
 
+/**
+ * Basic retry policy
+ * @description Retry policy that limits the maximum number of retries
+ * by the constant `limit` field.
+ * @example
+ * ```
+ * const policy = new BasicRetryPolicy(3, timer);
+ *
+ * console.log(policy.shouldRetry(1)); // Expected output: true
+ * console.log(policy.shouldRetry(2)); // Expected output: true
+ * console.log(policy.shouldRetry(3)); // Expected output: true
+ * console.log(policy.shouldRetry(4)); // Expected output: false
+ * ```
+ */
 export class BasicRetryPolicy implements RetryPolicy {
 	public readonly limit: number;
 	public readonly timer: BackoffTimer;
@@ -63,6 +97,16 @@ export class BasicRetryPolicy implements RetryPolicy {
 	}
 }
 
+/**
+ * No retry policy
+ * @description Retry policy that denies all retries.
+ * @example
+ * ```
+ * const policy = new NoRetryPolicy();
+ *
+ * console.log(policy.shouldRetry()); // Expected output: false
+ * ```
+ */
 export class NoRetryPolicy implements RetryPolicy {
 	public readonly limit: number;
 
@@ -87,22 +131,24 @@ export class NoRetryPolicy implements RetryPolicy {
 }
 
 /**
- * @summary Wait until timeout
- * @param time wait time in milliseconds
- * @returns promise that will resolve after specified time.
+ * Wait until timeout
+ * @param time Wait time in {@link Millisecond milliseconds}
+ * @returns Promise that will resolve after specified time.
  */
-export function waitUntil(time: number): Promise<void> {
+export function waitUntil(time: Millisecond): Promise<void> {
 	return new Promise(resolve => {
 		setTimeout(resolve, time);
 	});
 }
 
 /**
- * @summary Execute async operation
- * @param operation async operation
- * @param policy retry policy
- * @param retryHandleFn retry callback handler, called before every retry
- * @returns promise with the result of all the retry attempts.
+ * Execute async operation
+ * @param operation Async operation
+ * @param policy Retry policy
+ * @param retryHandleFn Retry callback handler, called before every retry
+ * @returns Promise with the result of all the retry attempts.
+ * @typeParam T Async operation success value
+ * @typeParam E Async operation error value
  */
 export async function execAsyncOperation<T, E = unknown>(
 	operation: AsyncOperation<T>,
