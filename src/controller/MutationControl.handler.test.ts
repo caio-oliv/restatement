@@ -1,5 +1,5 @@
 import { assert, describe, expect, it, vi } from 'vitest';
-import { CacheManager, MutationControl, NoRetryPolicy } from '@/lib';
+import { CacheManager, Mutation, NoRetryPolicy } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { mockMutationHandler, testTransformer } from '@/controller/Control.mock';
 
@@ -10,7 +10,7 @@ describe('MutationControl handler execution', () => {
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy, ...handler });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy, ...handler });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: null, error: null });
 
@@ -44,7 +44,7 @@ describe('MutationControl handler execution', () => {
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy, ...handler });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy, ...handler });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: null, error: null });
 
@@ -78,7 +78,7 @@ describe('MutationControl handler execution', () => {
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy, ...handler });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy, ...handler });
 
 		await mutationCtl.execute(['key#valid']);
 
@@ -112,7 +112,7 @@ describe('MutationControl handler execution', () => {
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy, ...handler });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy, ...handler });
 
 		await mutationCtl.execute(['key#valid']);
 
@@ -146,7 +146,7 @@ describe('MutationControl handler execution', () => {
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy, ...handler });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy, ...handler });
 
 		await mutationCtl.execute(['invalid']);
 
@@ -180,7 +180,7 @@ describe('MutationControl handler execution', () => {
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy, ...handler });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy, ...handler });
 
 		await mutationCtl.execute(['invalid']);
 
@@ -214,7 +214,7 @@ describe('MutationControl handler execution', () => {
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy, ...handler });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy, ...handler });
 
 		await mutationCtl.execute(['key#valid']);
 
@@ -237,7 +237,7 @@ describe('MutationControl handler execution', () => {
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy, ...handler });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy, ...handler });
 
 		await mutationCtl.execute(['key#valid']);
 
@@ -266,7 +266,7 @@ describe('MutationControl handler execution', () => {
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy, ...handler });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy, ...handler });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: null, error: null });
 
@@ -315,7 +315,7 @@ describe('MutationControl handler exception handling', () => {
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy, ...handler });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy, ...handler });
 
 		handler.dataFn.mockRejectedValue(new Error('broken_data_handler'));
 		handler.errorFn.mockRejectedValue(new Error('broken_error_handler'));
@@ -353,7 +353,7 @@ describe('MutationControl handler exception handling', () => {
 		const mutationFn = vi.fn(testTransformer);
 		const handler = mockMutationHandler();
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy, ...handler });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy, ...handler });
 
 		handler.dataFn.mockRejectedValue(new Error('broken_data_handler'));
 		handler.errorFn.mockRejectedValue(new Error('broken_error_handler'));

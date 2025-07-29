@@ -2,7 +2,7 @@ import { assert, describe, expect, it, vi } from 'vitest';
 import {
 	defaultKeyHashFn,
 	NoRetryPolicy,
-	QueryControl,
+	Query,
 	waitUntil,
 	type InitialStateMetadata,
 } from '@/lib';
@@ -18,11 +18,7 @@ describe('QueryControl state transition / reset query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -52,7 +48,7 @@ describe('QueryControl state transition / reset query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
+		const queryApi = Query.create<[string], string, Error>({
 			placeholder: '123',
 			store,
 			queryFn,
@@ -92,7 +88,7 @@ describe('QueryControl state transition / reset query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
+		const queryApi = Query.create<[string], string, Error>({
 			placeholder: '123',
 			store,
 			queryFn,
@@ -149,7 +145,7 @@ describe('QueryControl state transition / reset query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
+		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -188,7 +184,7 @@ describe('QueryControl state transition / reset query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
+		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -244,11 +240,7 @@ describe('QueryControl state transition / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -280,11 +272,7 @@ describe('QueryControl state transition / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -316,11 +304,7 @@ describe('QueryControl state transition / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -362,11 +346,7 @@ describe('QueryControl state transition / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -426,11 +406,7 @@ describe('QueryControl state transition / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -490,11 +466,7 @@ describe('QueryControl state transition / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -554,11 +526,7 @@ describe('QueryControl state transition / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -622,11 +590,7 @@ describe('QueryControl state transition / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -658,11 +622,7 @@ describe('QueryControl state transition / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -696,11 +656,7 @@ describe('QueryControl state transition / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -732,11 +688,7 @@ describe('QueryControl state transition / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -782,7 +734,7 @@ describe('QueryControl state transition / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
+		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -853,11 +805,7 @@ describe('QueryControl state transition / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -911,11 +859,7 @@ describe('QueryControl state transition / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -979,11 +923,7 @@ describe('QueryControl state transition / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1047,11 +987,7 @@ describe('QueryControl state transition / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1109,11 +1045,7 @@ describe('QueryControl state transition / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1179,11 +1111,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1215,11 +1143,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1253,7 +1177,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
+		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1315,7 +1239,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
+		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1377,11 +1301,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1413,11 +1333,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1463,11 +1379,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1533,11 +1445,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1591,7 +1499,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
+		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1671,7 +1579,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
+		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -1751,11 +1659,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1821,11 +1725,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1889,11 +1789,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1951,7 +1847,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
+		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -2033,7 +1929,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
+		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
 			retryPolicy,
@@ -2113,11 +2009,7 @@ describe('QueryControl state transition / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create<[string], string, Error>({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,

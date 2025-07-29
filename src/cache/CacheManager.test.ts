@@ -1,5 +1,5 @@
 import { assert, describe, expect, it, vi } from 'vitest';
-import { CacheManager, type QueryProviderState, PubSub, type QueryProvider } from '@/lib';
+import { CacheManager, type QueryProviderData, PubSub, type QueryProvider } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 
 interface UserMock {
@@ -50,7 +50,7 @@ describe('CacheManager', () => {
 		expect(listener).toHaveBeenNthCalledWith(1, hash, {
 			state: { status: 'success', data, error: null },
 			metadata: { cache: 'none', origin: 'provider', source: 'mutation' },
-		} satisfies QueryProviderState<typeof data, Error>);
+		} satisfies QueryProviderData<typeof data, Error>);
 	});
 
 	it('set value with custom ttl', async () => {

@@ -1,11 +1,5 @@
 import { assert, describe, expect, it, vi } from 'vitest';
-import {
-	DEFAULT_TTL_DURATION,
-	defaultKeyHashFn,
-	NoRetryPolicy,
-	QueryControl,
-	waitUntil,
-} from '@/lib';
+import { DEFAULT_TTL_DURATION, defaultKeyHashFn, NoRetryPolicy, Query, waitUntil } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { testTransformer } from '@/controller/Control.mock';
 
@@ -14,11 +8,7 @@ describe('QueryControl cache usage / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy });
 
 		await queryApi.execute(['key#1'], { cache: 'no-cache' });
 
@@ -31,13 +21,7 @@ describe('QueryControl cache usage / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			fresh: 100,
-			ttl: 1_000,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 100, ttl: 1_000 });
 
 		await queryApi.execute(['key#1'], { cache: 'no-cache' });
 
@@ -79,13 +63,7 @@ describe('QueryControl cache usage / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			fresh: 100,
-			ttl: 1_000,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 100, ttl: 1_000 });
 
 		queryFn.mockResolvedValueOnce('valid_result');
 
@@ -108,7 +86,7 @@ describe('QueryControl cache usage / no-cache query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
+		const queryApi = Query.create({
 			store,
 			queryFn,
 			retryPolicy,
@@ -140,11 +118,7 @@ describe('QueryControl cache usage / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy });
 
 		await queryApi.execute(['key#1'], { cache: 'fresh' });
 
@@ -157,13 +131,7 @@ describe('QueryControl cache usage / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			fresh: 20,
-			ttl: 1_000,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 20, ttl: 1_000 });
 
 		await queryApi.execute(['key#1'], { cache: 'fresh' });
 
@@ -205,13 +173,7 @@ describe('QueryControl cache usage / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			fresh: 20,
-			ttl: 1_000,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 20, ttl: 1_000 });
 
 		queryFn.mockResolvedValueOnce('valid_result');
 
@@ -236,12 +198,7 @@ describe('QueryControl cache usage / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			fresh: 0,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 0 });
 
 		await store.set(defaultKeyHashFn(['invalid']), 'valid_result', DEFAULT_TTL_DURATION);
 
@@ -262,7 +219,7 @@ describe('QueryControl cache usage / fresh query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
+		const queryApi = Query.create({
 			store,
 			queryFn,
 			retryPolicy,
@@ -291,11 +248,7 @@ describe('QueryControl cache usage / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy });
 
 		await queryApi.execute(['key#1'], { cache: 'stale' });
 
@@ -308,13 +261,7 @@ describe('QueryControl cache usage / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			fresh: 0,
-			ttl: 1_000,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 0, ttl: 1_000 });
 
 		await queryApi.execute(['key#1'], { cache: 'stale' });
 
@@ -357,13 +304,7 @@ describe('QueryControl cache usage / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			fresh: 0,
-			ttl: 1_000,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 0, ttl: 1_000 });
 
 		queryFn.mockResolvedValueOnce('valid_result');
 
@@ -387,12 +328,7 @@ describe('QueryControl cache usage / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			fresh: 0,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 0 });
 
 		await store.set(defaultKeyHashFn(['invalid']), 'valid_result', DEFAULT_TTL_DURATION);
 
@@ -414,7 +350,7 @@ describe('QueryControl cache usage / stale query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
+		const queryApi = Query.create({
 			store,
 			queryFn,
 			retryPolicy,
@@ -445,11 +381,7 @@ describe('QueryControl cache exception handling', () => {
 		const storeSpy = vi.spyOn(store, 'getEntry');
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy });
 
 		await queryApi.execute(['key#1'], { cache: 'stale' });
 
@@ -483,11 +415,7 @@ describe('QueryControl cache exception handling', () => {
 		const storeSpy = vi.spyOn(store, 'set');
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy });
 
 		storeSpy.mockRejectedValueOnce(new Error('service_unavailable'));
 
@@ -521,12 +449,7 @@ describe('QueryControl cache exception handling', () => {
 		const storeSpy = vi.spyOn(store, 'delete');
 		const queryFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			fresh: 0,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 0 });
 
 		storeSpy.mockRejectedValueOnce(new Error('service_unavailable'));
 		queryFn.mockResolvedValueOnce('valid_result');

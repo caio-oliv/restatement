@@ -8,7 +8,7 @@ import {
 	type ExecuteMutationOptions,
 } from '@/plumbing/Mutation';
 
-export class MutationControl<I, T, E = unknown> {
+export class Mutation<I, T, E = unknown> {
 	/**
 	 * @summary Mutation context
 	 */
@@ -23,8 +23,8 @@ export class MutationControl<I, T, E = unknown> {
 		this.cache = this.ctx.cache;
 	}
 
-	public static create<I, T, E = unknown>(input: MutationInput<I, T, E>): MutationControl<I, T, E> {
-		return new MutationControl(makeMutationContext(input));
+	public static create<I, T, E = unknown>(input: MutationInput<I, T, E>): Mutation<I, T, E> {
+		return new Mutation(makeMutationContext(input));
 	}
 
 	/**

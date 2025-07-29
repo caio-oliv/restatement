@@ -1,12 +1,12 @@
 import type {
 	QueryState,
-	QueryProviderState,
+	QueryProviderData,
 	KeyPair,
 	KeyHashFn,
-	QueryCache,
+	CacheDirective,
 	QueryStateNoCacheSource,
 	QueryStateMetadata,
-	QueryExecutorResult,
+	QueryExecutionResult,
 	Millisecond,
 	ResetOptions,
 } from '@/core/Type';
@@ -91,7 +91,7 @@ export function makeQueryContext<K extends ReadonlyArray<unknown>, T, E = unknow
 		errorFn,
 		filterFn,
 		subscriber: provider
-			? new SubscriberHandle(function listener(hash: string, data: QueryProviderState<T, E>) {
+			? new SubscriberHandle(function listener(hash: string, data: QueryProviderData<T, E>) {
 					updateQuery(context, hash, data);
 				}, provider)
 			: new DummySubscriber(),
@@ -105,7 +105,7 @@ export interface ExecuteQueryOptions {
 	 * @summary Cache directive
 	 * @default 'stale'
 	 */
-	cache?: QueryCache;
+	cache?: CacheDirective;
 	/**
 	 * @summary Fallback TTL
 	 */
@@ -131,7 +131,7 @@ export async function executeQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	key: K,
 	{ cache = 'stale', ttl = ctx.ttl, signal = makeAbortSignal() }: ExecuteQueryOptions = {}
-): Promise<QueryExecutorResult<T, E>> {
+): Promise<QueryExecutionResult<T, E>> {
 	const hash = ctx.keyHashFn(key);
 	ctx.subscriber.useTopic(hash);
 
@@ -233,7 +233,7 @@ export interface RunActiveQueryOptions {
 	 * @summary Cache directive
 	 * @default 'stale'
 	 */
-	cache?: QueryCache;
+	cache?: CacheDirective;
 	/**
 	 * @summary Fallback TTL
 	 */
@@ -261,7 +261,7 @@ export async function runActiveQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	{ key, hash }: KeyPair<K>,
 	{ cache = 'stale', ttl = ctx.ttl, signal = makeAbortSignal() }: RunActiveQueryOptions = {}
-): Promise<QueryExecutorResult<T, E>> {
+): Promise<QueryExecutionResult<T, E>> {
 	const state: QueryState<T, E> = { status: 'loading', data: ctx.state.data, error: null };
 	const metadata: QueryStateMetadata = { origin: 'control', source: 'query', cache };
 
@@ -294,7 +294,7 @@ export interface RunBackgroundQueryOptions {
 
 /**
  * @summary Run background query
- * @description Return the {@link QueryExecutorResult} with the provided state and try
+ * @description Return the {@link QueryExecutionResult} with the provided state and try
  * to reuse the active query or create a new one for the next background query.
  * @param ctx query context
  * @param state query state
@@ -311,7 +311,7 @@ export async function runBackgroundQuery<K extends ReadonlyArray<unknown>, T, E>
 	state: QueryState<T, E>,
 	{ key, hash }: KeyPair<K>,
 	{ ttl = ctx.ttl, signal = makeAbortSignal() }: RunBackgroundQueryOptions = {}
-): Promise<QueryExecutorResult<T, E>> {
+): Promise<QueryExecutionResult<T, E>> {
 	const currPromise = ctx.subscriber.getCurrentState();
 	if (currPromise?.status === 'pending') {
 		currPromise.then((state: QueryState<T, E>) => {
@@ -342,7 +342,7 @@ export interface RunQueryOptions {
 	 * @summary Cache directive
 	 * @default 'stale'
 	 */
-	cache?: QueryCache;
+	cache?: CacheDirective;
 	/**
 	 * @summary State source
 	 * @default 'query'
@@ -359,8 +359,9 @@ export interface RunQueryOptions {
 }
 
 /**
- * @summary Run the query function
- * @description Runs the query function with the provided retry policy
+ * Runs the query function
+ * @description
+ * Runs the query function with the provided retry policy
  * and returns the new query state within a promise.
  *
  * ## Invariant
@@ -427,7 +428,7 @@ export async function queryResolve<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	data: T,
 	hash: string,
-	cache: QueryCache,
+	cache: CacheDirective,
 	source: QueryStateNoCacheSource,
 	ttl: Millisecond = ctx.ttl
 ): Promise<QueryState<T, E>> {
@@ -451,7 +452,7 @@ export async function queryReject<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	err: unknown,
 	hash: string,
-	cache: QueryCache,
+	cache: CacheDirective,
 	source: QueryStateNoCacheSource
 ): Promise<QueryState<T, E>> {
 	const state: QueryState<T, E> = { status: 'error', error: err as E, data: null };
@@ -474,7 +475,7 @@ export async function queryReject<K extends ReadonlyArray<unknown>, T, E>(
 export function updateQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	hash: string,
-	{ state, metadata }: QueryProviderState<T, E>
+	{ state, metadata }: QueryProviderData<T, E>
 ): void {
 	if (ctx.subscriber.currentTopic() !== hash) {
 		return;

@@ -4,7 +4,7 @@ import {
 	DEFAULT_TTL_DURATION,
 	defaultKeyHashFn,
 	NoRetryPolicy,
-	QueryControl,
+	Query,
 	waitUntil,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
@@ -16,12 +16,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -81,12 +76,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -146,12 +136,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		await queryApi.execute(['key#1'], { cache: 'no-cache' });
 
@@ -255,12 +240,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		await queryApi.execute(['key#1'], { cache: 'no-cache' });
 
@@ -364,12 +344,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		await queryApi.execute(['invalid_1'], { cache: 'no-cache' });
 
@@ -473,12 +448,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		await queryApi.execute(['invalid_1'], { cache: 'no-cache' });
 
@@ -584,12 +554,7 @@ describe('QueryControl handler execution / fresh query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -649,12 +614,7 @@ describe('QueryControl handler execution / fresh query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -702,12 +662,7 @@ describe('QueryControl handler execution / fresh query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -767,12 +722,7 @@ describe('QueryControl handler execution / fresh query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		await queryApi.execute(['key#1'], { cache: 'fresh' });
 
@@ -878,12 +828,7 @@ describe('QueryControl handler execution / fresh query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		await queryApi.execute(['key#1'], { cache: 'fresh' });
 
@@ -973,12 +918,7 @@ describe('QueryControl handler execution / fresh query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		await queryApi.execute(['key#1'], { cache: 'fresh' });
 
@@ -1082,12 +1022,7 @@ describe('QueryControl handler execution / fresh query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		await queryApi.execute(['invalid_1'], { cache: 'fresh' });
 
@@ -1191,12 +1126,7 @@ describe('QueryControl handler execution / fresh query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		await queryApi.execute(['invalid_1'], { cache: 'fresh' });
 
@@ -1288,12 +1218,7 @@ describe('QueryControl handler execution / fresh query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		await queryApi.execute(['invalid_1'], { cache: 'fresh' });
 
@@ -1399,12 +1324,7 @@ describe('QueryControl handler execution / stale query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1464,12 +1384,7 @@ describe('QueryControl handler execution / stale query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1517,13 +1432,7 @@ describe('QueryControl handler execution / stale query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-			fresh: 50,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler, fresh: 50 });
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1658,13 +1567,7 @@ describe('QueryControl handler execution / stale query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-			fresh: 50,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler, fresh: 50 });
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1798,12 +1701,7 @@ describe('QueryControl handler execution / stale query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(0);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
@@ -1863,12 +1761,7 @@ describe('QueryControl handler execution / stale query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		await queryApi.execute(['key#1'], { cache: 'stale' });
 
@@ -1974,12 +1867,7 @@ describe('QueryControl handler execution / stale query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		await queryApi.execute(['key#1'], { cache: 'stale' });
 
@@ -2069,13 +1957,7 @@ describe('QueryControl handler execution / stale query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-			fresh: 50,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler, fresh: 50 });
 
 		await queryApi.execute(['key#1'], { cache: 'stale' });
 
@@ -2206,13 +2088,7 @@ describe('QueryControl handler execution / stale query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-			fresh: 50,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler, fresh: 50 });
 
 		await queryApi.execute(['key#1'], { cache: 'stale' });
 
@@ -2343,12 +2219,7 @@ describe('QueryControl handler execution / stale query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		await queryApi.execute(['key#1'], { cache: 'stale' });
 
@@ -2452,12 +2323,7 @@ describe('QueryControl handler execution / stale query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		await queryApi.execute(['invalid_1'], { cache: 'stale' });
 
@@ -2561,12 +2427,7 @@ describe('QueryControl handler execution / stale query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		await queryApi.execute(['invalid_1'], { cache: 'stale' });
 
@@ -2658,13 +2519,7 @@ describe('QueryControl handler execution / stale query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-			fresh: 50,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler, fresh: 50 });
 
 		await queryApi.execute(['invalid_1'], { cache: 'stale' });
 
@@ -2795,13 +2650,7 @@ describe('QueryControl handler execution / stale query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-			fresh: 50,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler, fresh: 50 });
 
 		await queryApi.execute(['invalid_1'], { cache: 'stale' });
 
@@ -2932,13 +2781,7 @@ describe('QueryControl handler execution / stale query', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-			fresh: 50,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler, fresh: 50 });
 
 		await queryApi.execute(['invalid_1'], { cache: 'stale' });
 
@@ -3044,12 +2887,7 @@ describe('QueryControl handler exception handling', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		handler.dataFn.mockRejectedValue(new Error('broken_data_handler'));
 		handler.errorFn.mockRejectedValue(new Error('broken_error_handler'));
@@ -3157,12 +2995,7 @@ describe('QueryControl handler exception handling', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		handler.dataFn.mockRejectedValue(new Error('broken_data_handler'));
 		handler.errorFn.mockRejectedValue(new Error('broken_error_handler'));
@@ -3314,12 +3147,7 @@ describe('QueryControl handler exception handling', () => {
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
 		const retryPolicy = new NoRetryPolicy();
-		const queryApi = QueryControl.create({
-			store,
-			queryFn,
-			retryPolicy,
-			...handler,
-		});
+		const queryApi = Query.create({ store, queryFn, retryPolicy, ...handler });
 
 		handler.dataFn.mockRejectedValue(new Error('broken_data_handler'));
 		handler.errorFn.mockRejectedValue(new Error('broken_error_handler'));

@@ -138,6 +138,7 @@ const projectConfig: Linter.Config = {
 		'@typescript-eslint/consistent-return': 'off', // using tsconfig rule
 
 		'jsdoc/require-jsdoc': 'warn',
+		'jsdoc/check-tag-names': ['error', { definedTags: ['typeParam'] }],
 
 		'prettier/prettier': 'error',
 	},

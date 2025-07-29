@@ -1,12 +1,12 @@
 import { vi, type Mock } from 'vitest';
 import type {
-	DataHandler,
-	ErrorHandler,
-	MutationControlHandler,
+	QueryDataHandler,
+	QueryErrorHandler,
+	MutationHandler,
 	MutationDataHandler,
 	MutationErrorHandler,
 	MutationStateHandler,
-	QueryControlHandler,
+	QueryHandler,
 	QueryStateHandler,
 } from '@/core/Type';
 import { waitUntil } from '@/core/RetryPolicy';
@@ -18,17 +18,17 @@ async function emptypromise(): Promise<void> {
 	/* no-op */
 }
 
-export interface MockQueryControlHandler<T, E> extends QueryControlHandler<T, E> {
+export interface MockQueryHandler<T, E> extends QueryHandler<T, E> {
 	stateFn: Mock<QueryStateHandler<T, E>>;
-	dataFn: Mock<DataHandler<T>>;
-	errorFn: Mock<ErrorHandler<E>>;
+	dataFn: Mock<QueryDataHandler<T>>;
+	errorFn: Mock<QueryErrorHandler<E>>;
 }
 
 /**
- * @description Mock the {@link QueryControlHandler} functions
- * @returns mock of `QueryControlHandler`
+ * @description Mock the {@link QueryHandler} functions
+ * @returns mock of `QueryHandler`
  */
-export function mockQueryHandler<T, E = unknown>(): MockQueryControlHandler<T, E> {
+export function mockQueryHandler<T, E = unknown>(): MockQueryHandler<T, E> {
 	return {
 		dataFn: vi.fn(emptypromise),
 		errorFn: vi.fn(emptypromise),
@@ -36,17 +36,17 @@ export function mockQueryHandler<T, E = unknown>(): MockQueryControlHandler<T, E
 	};
 }
 
-export interface MockMutationControlHandler<T, E> extends MutationControlHandler<T, E> {
+export interface MockMutationHandler<T, E> extends MutationHandler<T, E> {
 	stateFn: Mock<MutationStateHandler<T, E>>;
 	dataFn: Mock<MutationDataHandler<T>>;
 	errorFn: Mock<MutationErrorHandler<E>>;
 }
 
 /**
- * @description Mock the {@link MutationControlHandler} functions
- * @returns mock of `MutationControlHandler`
+ * @description Mock the {@link MutationHandler} functions
+ * @returns mock of `MutationHandler`
  */
-export function mockMutationHandler<T, E = unknown>(): MockMutationControlHandler<T, E> {
+export function mockMutationHandler<T, E = unknown>(): MockMutationHandler<T, E> {
 	return {
 		dataFn: vi.fn(emptypromise),
 		errorFn: vi.fn(emptypromise),

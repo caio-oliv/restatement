@@ -5,10 +5,10 @@ import type {
 	Millisecond,
 	QueryState,
 	QueryStateHandler,
-	DataHandler,
-	ErrorHandler,
+	QueryDataHandler,
+	QueryErrorHandler,
 	QueryFilterFn,
-	QueryProviderState,
+	QueryProviderData,
 	QueryStatePromise,
 	ExtractTTLFn,
 } from '@/core/Type';
@@ -21,13 +21,13 @@ import type { CacheManager } from '@/cache/CacheManager';
  * @summary Query subscriber
  * @description Query state subscriber
  */
-export type QuerySubscriber<T, E> = Subscriber<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
+export type QuerySubscriber<T, E> = Subscriber<QueryProviderData<T, E>, QueryStatePromise<T, E>>;
 
 /**
  * @summary Query provider
  * @description Query state provider
  */
-export type QueryProvider<T, E> = PubSub<QueryProviderState<T, E>, QueryStatePromise<T, E>>;
+export type QueryProvider<T, E> = PubSub<QueryProviderData<T, E>, QueryStatePromise<T, E>>;
 
 /**
  * @summary Query context
@@ -92,11 +92,11 @@ export interface QueryContext<K extends ReadonlyArray<unknown>, T, E = unknown> 
 	/**
 	 * @summary Query data handler
 	 */
-	dataFn: DataHandler<T> | null;
+	dataFn: QueryDataHandler<T> | null;
 	/**
 	 * @summary Query error handler
 	 */
-	errorFn: ErrorHandler<E> | null;
+	errorFn: QueryErrorHandler<E> | null;
 	/**
 	 * @summary Query state filter
 	 */
@@ -211,11 +211,11 @@ export interface QueryInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	/**
 	 * @summary Query data handler
 	 */
-	dataFn?: DataHandler<T> | null;
+	dataFn?: QueryDataHandler<T> | null;
 	/**
 	 * @summary Query error handler
 	 */
-	errorFn?: ErrorHandler<E> | null;
+	errorFn?: QueryErrorHandler<E> | null;
 	/**
 	 * @summary Query state filter
 	 */

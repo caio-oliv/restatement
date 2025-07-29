@@ -1,4 +1,4 @@
-import type { QueryState, QueryExecutorResult, ResetOptions } from '@/core/Type';
+import type { QueryState, QueryExecutionResult, ResetOptions } from '@/core/Type';
 import type { QueryContext, QueryInput } from '@/plumbing/QueryType';
 import {
 	disposeQuery,
@@ -10,7 +10,7 @@ import {
 } from '@/plumbing/Query';
 import type { CacheManager } from '@/cache/CacheManager';
 
-export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
+export class Query<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	/**
 	 * @summary Query context
 	 */
@@ -27,8 +27,8 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 
 	public static create<K extends ReadonlyArray<unknown>, T, E = unknown>(
 		input: QueryInput<K, T, E>
-	): QueryControl<K, T, E> {
-		return new QueryControl(makeQueryContext(input));
+	): Query<K, T, E> {
+		return new Query(makeQueryContext(input));
 	}
 
 	/**
@@ -38,7 +38,7 @@ export class QueryControl<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	 * @param options execute query options
 	 * @returns query execution result
 	 */
-	public execute(key: K, options?: ExecuteQueryOptions): Promise<QueryExecutorResult<T, E>> {
+	public execute(key: K, options?: ExecuteQueryOptions): Promise<QueryExecutionResult<T, E>> {
 		return executeQuery(this.ctx, key, options);
 	}
 

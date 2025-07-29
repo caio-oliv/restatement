@@ -1,5 +1,3 @@
-/* eslint-disable jsdoc/check-tag-names */
-
 import { join } from 'node:path';
 import { readFileSync } from 'node:fs';
 import { cwd } from 'node:process';

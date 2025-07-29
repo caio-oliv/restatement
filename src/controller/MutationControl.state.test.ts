@@ -1,5 +1,5 @@
 import { assert, describe, it, vi } from 'vitest';
-import { CacheManager, type MutationStateFilterInfo, MutationControl, NoRetryPolicy } from '@/lib';
+import { CacheManager, type MutationStateTransition, Mutation, NoRetryPolicy } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { testTransformer } from '@/controller/Control.mock';
 
@@ -9,7 +9,7 @@ describe('MutationControl state transition', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: null, error: null });
 
@@ -31,7 +31,7 @@ describe('MutationControl state transition', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: null, error: null });
 
@@ -53,7 +53,7 @@ describe('MutationControl state transition', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy });
 
 		const state = await mutationCtl.execute(['key#test']);
 
@@ -86,7 +86,7 @@ describe('MutationControl state transition', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy });
 
 		const state = await mutationCtl.execute(['key#test']);
 
@@ -119,7 +119,7 @@ describe('MutationControl state transition', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy });
 
 		const state = await mutationCtl.execute(['invalid']);
 
@@ -152,7 +152,7 @@ describe('MutationControl state transition', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy });
 
 		const state = await mutationCtl.execute(['invalid']);
 
@@ -187,7 +187,7 @@ describe('MutationControl state transition / reset query', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: null, error: null });
 
@@ -209,12 +209,7 @@ describe('MutationControl state transition / reset query', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({
-			placeholder: 'one',
-			cache,
-			mutationFn,
-			retryPolicy,
-		});
+		const mutationCtl = Mutation.create({ placeholder: 'one', cache, mutationFn, retryPolicy });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: 'one', error: null });
 
@@ -236,12 +231,7 @@ describe('MutationControl state transition / reset query', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		const mutationCtl = MutationControl.create({
-			placeholder: 'one',
-			cache,
-			mutationFn,
-			retryPolicy,
-		});
+		const mutationCtl = Mutation.create({ placeholder: 'one', cache, mutationFn, retryPolicy });
 
 		assert.deepStrictEqual(mutationCtl.getState(), { status: 'idle', data: 'one', error: null });
 
@@ -273,10 +263,10 @@ describe('MutationControl state transition / filter', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		function filterFn<T, E>({ next }: MutationStateFilterInfo<T, E>): boolean {
+		function filterFn<T, E>({ next }: MutationStateTransition<T, E>): boolean {
 			return next.status !== 'loading';
 		}
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy, filterFn });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy, filterFn });
 
 		const mutationPromise1 = mutationCtl.execute(['key#test']);
 
@@ -312,10 +302,10 @@ describe('MutationControl state transition / filter', () => {
 		const cache = new CacheManager({ store });
 		const mutationFn = vi.fn(testTransformer);
 		const retryPolicy = new NoRetryPolicy();
-		function filterFn<T, E>({ next }: MutationStateFilterInfo<T, E>): boolean {
+		function filterFn<T, E>({ next }: MutationStateTransition<T, E>): boolean {
 			return next.status !== 'error';
 		}
-		const mutationCtl = MutationControl.create({ cache, mutationFn, retryPolicy, filterFn });
+		const mutationCtl = Mutation.create({ cache, mutationFn, retryPolicy, filterFn });
 
 		const mutationPromise1 = mutationCtl.execute(['key#test']);
 
