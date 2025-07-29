@@ -3,32 +3,40 @@ import type { QueryProvider } from '@/plumbing/QueryType';
 import type { CacheStore } from '@/cache/CacheStore';
 import { defaultKeyHashFn, DEFAULT_TTL_DURATION } from '@/Default';
 
+/**
+ * Cache manager input
+ */
 export interface CacheManagerInput<T = unknown, E = unknown> {
 	/**
-	 * @summary Key hasher
+	 * Key hash function
 	 */
 	keyHashFn?: KeyHashFn<ReadonlyArray<unknown>>;
 	/**
-	 * @summary Default TTL duration
+	 * Default TTL duration
 	 */
 	ttl?: Millisecond;
 	/**
-	 * @summary Cache store
+	 * Cache store
 	 */
 	store: CacheStore<string, unknown>;
 	/**
-	 * @summary State provider.
+	 * State provider.
 	 */
 	provider?: QueryProvider<T, E> | null;
 }
 
+/**
+ * Cache manager
+ * @description Default implementation for a {@link CacheHandler cache handler}.
+ * @see {@link CacheHandler Cache handler}
+ */
 export class CacheManager implements CacheHandler {
 	/**
-	 * @summary Key hasher
+	 * Key hash function
 	 */
 	public readonly keyHashFn: KeyHashFn<ReadonlyArray<unknown>>;
 	/**
-	 * @summary Default TTL duration
+	 * Default TTL duration
 	 * @description Time To Live of cache entries.
 	 */
 	public readonly ttl: Millisecond;
