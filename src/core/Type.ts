@@ -77,7 +77,7 @@ export interface KeyPair<K extends ReadonlyArray<unknown>> {
  * Keep cache on error function
  * @description Verify if the provided error from a failed {@link QueryFn query}
  * execution should invalidate the current cache entry.
- * @typeParam E Error from a failed {@link QueryFn query} execution.
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export type KeepCacheOnErrorFn<E> = (err: E) => boolean;
 
@@ -159,16 +159,16 @@ export interface CacheHandler {
  * Idle query state
  * @description Initial state of any query.
  *
- * The `data` will always be the {@link QueryContext#placeholder query placeholder} value.
+ * The `data` property will always be the {@link QueryContext#placeholder query placeholder} value.
  * @typeParam T Return value of a successful query
  */
 export interface IdleQueryState<T> {
 	/**
-	 * The {@link QueryContext#placeholder query placeholder} value.
+	 * {@link QueryContext#placeholder Query placeholder} value.
 	 */
 	readonly data: T | null;
 	/**
-	 * The idle error field. Always `null`.
+	 * Idle error field. Always `null`.
 	 */
 	readonly error: null;
 	readonly status: 'idle';
@@ -186,11 +186,11 @@ export interface IdleQueryState<T> {
  */
 export interface LoadingQueryState<T> {
 	/**
-	 * The previous data or `null`.
+	 * Previous data or `null`.
 	 */
 	readonly data: T | null;
 	/**
-	 * The loading error field. Always `null`.
+	 * Loading error field. Always `null`.
 	 */
 	readonly error: null;
 	readonly status: 'loading';
@@ -206,11 +206,11 @@ export interface LoadingQueryState<T> {
  */
 export interface StaleQueryState<T> {
 	/**
-	 * The stale data field.
+	 * Stale data field.
 	 */
 	readonly data: T;
 	/**
-	 * The stale error field. Always `null`.
+	 * Stale error field. Always `null`.
 	 */
 	readonly error: null;
 	readonly status: 'stale';
@@ -220,17 +220,17 @@ export interface StaleQueryState<T> {
  * Success query state
  * @description Success state of a query.
  *
- * The query state data can be set from the return of a successful query
+ * The `data` field can be set from the return of a successful query
  * or a fresh cache entry.
  * @typeParam T Return value of a successful query
  */
 export interface SuccessQueryState<T> {
 	/**
-	 * The success data field.
+	 * Success data field.
 	 */
 	readonly data: T;
 	/**
-	 * The success error field. Always `null`.
+	 * Success error field. Always `null`.
 	 */
 	readonly error: null;
 	readonly status: 'success';
@@ -240,16 +240,16 @@ export interface SuccessQueryState<T> {
  * Error query state
  * @description Error state of a query.
  *
- * The error query state is always set after the query fails all retries.
- * @typeParam E Error from a failed {@link QueryFn query} execution.
+ * The `error` field is always set after the query fails all retries.
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export interface ErrorQueryState<E> {
 	/**
-	 * The error data field. Always `null`.
+	 * Error data field. Always `null`.
 	 */
 	readonly data: null;
 	/**
-	 * The error field.
+	 * Error field.
 	 */
 	readonly error: E;
 	readonly status: 'error';
@@ -264,7 +264,7 @@ export interface ErrorQueryState<E> {
  * - {@link SuccessQueryState success}
  * - {@link ErrorQueryState error}
  * @typeParam T Return value of a successful query
- * @typeParam E Error from a failed {@link QueryFn query} execution.
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export type QueryState<T, E> =
 	| IdleQueryState<T>
@@ -362,7 +362,7 @@ export type StateMetadata = QueryStateMetadata | MutationStateMetadata | Initial
  * its {@link StateMetadata metadata} that is propagated by
  * the {@link QueryProvider query provider}.
  * @typeParam T Return value of a successful query
- * @typeParam E Error from a failed {@link QueryFn query} execution.
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export interface QueryProviderData<T, E> {
 	readonly state: QueryState<T, E>;
@@ -393,7 +393,7 @@ export interface ObservablePromise<T> extends Promise<T> {
  * @description A {@link ObservablePromise observable promise} that returns
  * a {@link QueryState query state}.
  * @typeParam T Return value of a successful query
- * @typeParam E Error from a failed {@link QueryFn query} execution.
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export type QueryStatePromise<T, E> = ObservablePromise<QueryState<T, E>>;
 
@@ -401,7 +401,7 @@ export type QueryStatePromise<T, E> = ObservablePromise<QueryState<T, E>>;
  * Query state transition
  * @description A object that represents the transition of a {@link QueryState query state}.
  * @typeParam T Return value of a successful query
- * @typeParam E Error from a failed {@link QueryFn query} execution.
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export interface QueryStateTransition<T, E> {
 	/**
@@ -424,7 +424,7 @@ export interface QueryStateTransition<T, E> {
  *
  * Executed for each transition. Should return `true` to allow the state transition.
  * @typeParam T Return value of a successful query
- * @typeParam E Error from a failed {@link QueryFn query} execution.
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export type QueryFilterFn<T, E> = (transition: QueryStateTransition<T, E>) => boolean;
 
@@ -435,7 +435,7 @@ export type QueryFilterFn<T, E> = (transition: QueryStateTransition<T, E>) => bo
  * @param metadata State metadata
  * @param cache Cache handler
  * @typeParam T Return value of a successful query
- * @typeParam E Error from a failed {@link QueryFn query} execution.
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export type QueryStateHandler<T, E> = (
 	state: QueryState<T, E>,
@@ -465,7 +465,7 @@ export type QueryDataHandler<T> = (
  * @param error Query state `error` field
  * @param metadata State metadata
  * @param cache Cache handler
- * @typeParam E Error from a failed {@link QueryFn query} execution.
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export type QueryErrorHandler<E> = (
 	error: E,
@@ -477,7 +477,7 @@ export type QueryErrorHandler<E> = (
  * Query handler
  * @description Object with all optional query handlers.
  * @typeParam T Return value of a successful query
- * @typeParam E Error from a failed {@link QueryFn query} execution.
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export interface QueryHandler<T, E> {
 	stateFn: QueryStateHandler<T, E> | null;
@@ -491,7 +491,7 @@ export interface QueryHandler<T, E> {
  *
  * When `null`, no background query was needed.
  * @typeParam T Return value of a successful query
- * @typeParam E Error from a failed {@link QueryFn query} execution.
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export type NextQueryState<T, E> = QueryState<T, E> | null;
 
@@ -508,7 +508,7 @@ export type NextQueryState<T, E> = QueryState<T, E> | null;
  * The `next` function is also {@link https://en.wikipedia.org/wiki/Idempotence idempotent}, so it can be called multiple
  * times, as the same state will be returned for multiple calls.
  * @typeParam T Return value of a successful query
- * @typeParam E Error from a failed {@link QueryFn query} execution.
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export interface QueryExecutionResult<T, E> {
 	/**
@@ -550,56 +550,170 @@ export interface ResetOptions {
 	target?: ResetTarget;
 }
 
-export type MutationStatus = 'idle' | 'loading' | 'success' | 'error';
+/**
+ * Mutation function type
+ * @typeParam I Mutation input
+ * @typeParam T Return value of a successful mutation
+ */
+export type MutationFn<I, T> = (input: I, signal: AbortSignal) => Promise<T>;
 
+/**
+ * Idle mutation state
+ * @description Initial state of any mutation.
+ *
+ * The `data` property will always be the {@link MutationContext#placeholder mutation placeholder} value.
+ * @typeParam T Return value of a successful mutation
+ */
 export interface IdleMutationState<T> {
+	/**
+	 * The {@link MutationContext#placeholder mutation placeholder} value.
+	 */
 	readonly data: T | null;
+	/**
+	 * The idle error field. Always `null`.
+	 */
 	readonly error: null;
 	readonly status: 'idle';
 }
 
+/**
+ * Loading mutation state
+ * @description Loading state of a mutation.
+ *
+ * While the mutation is on the `loading` state, there will be no `data` nor `error` field set.
+ */
 export interface LoadingMutationState {
+	/**
+	 * Loading data field. Always `null`.
+	 */
 	readonly data: null;
+	/**
+	 * Loading error field. Always `null`.
+	 */
 	readonly error: null;
 	readonly status: 'loading';
 }
 
+/**
+ * Success mutation state
+ * @description Success state of a mutation.
+ *
+ * The `data` field is always set with the return of a successful mutation.
+ * @typeParam T Return value of a successful mutation
+ */
 export interface SuccessMutationState<T> {
+	/**
+	 * Success data field.
+	 */
 	readonly data: T;
+	/**
+	 * Success error field. Always `null`.
+	 */
 	readonly error: null;
 	readonly status: 'success';
 }
 
+/**
+ * Error mutation state
+ * @description Error state of a mutation.
+ *
+ * The `error` field is always set after the mutation fails all retries.
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
+ */
 export interface ErrorMutationState<E> {
+	/**
+	 * Error data field. Always `null`.
+	 */
 	readonly data: null;
+	/**
+	 * Error field.
+	 */
 	readonly error: E;
 	readonly status: 'error';
 }
 
+/**
+ * Union of all possible mutation states.
+ *
+ * - {@link IdleMutationState idle}
+ * - {@link LoadingMutationState loading}
+ * - {@link SuccessMutationState success}
+ * - {@link ErrorMutationState error}
+ * @typeParam T Return value of a successful mutation
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
+ */
 export type MutationState<T, E> =
 	| IdleMutationState<T>
 	| LoadingMutationState
 	| SuccessMutationState<T>
 	| ErrorMutationState<E>;
 
-export type MutationFn<I, T> = (input: I, signal: AbortSignal) => Promise<T>;
-
+/**
+ * Mutation state transition
+ * @description A object that represents the transition of a {@link MutationState mutation state}.
+ * @typeParam T Return value of a successful mutation
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
+ */
 export interface MutationStateTransition<T, E> {
+	/**
+	 * Current mutation state
+	 */
 	readonly current: MutationState<T, E>;
+	/**
+	 * Next mutation state
+	 */
 	readonly next: MutationState<T, E>;
 }
 
-export type MutationFilterFn<T, E> = (info: MutationStateTransition<T, E>) => boolean;
+/**
+ * Mutation filter function
+ * @description A {@link MutationStateTransition mutation state transition} predicate function.
+ *
+ * Executed for each transition. Should return `true` to allow the state transition.
+ * @typeParam T Return value of a successful mutation
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
+ */
+export type MutationFilterFn<T, E> = (transition: MutationStateTransition<T, E>) => boolean;
 
+/**
+ * Mutation state handler
+ * @description Handler function that is executed for **every** new {@link MutationState mutation state}.
+ * @param state Current mutation state
+ * @param cache Cache handler
+ * @typeParam T Return value of a successful mutation
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
+ */
 export type MutationStateHandler<T, E> = (
 	state: MutationState<T, E>,
 	cache: CacheHandler
 ) => Promise<void>;
 
+/**
+ * Mutation data handler
+ * @description Handler function that is executed for **every**
+ * new {@link MutationState mutation state} that has a `data` field.
+ * @param data Mutation state `data` field
+ * @param cache Cache handler
+ * @typeParam T Return value of a successful mutation
+ */
 export type MutationDataHandler<T> = (data: T, cache: CacheHandler) => Promise<void>;
 
+/**
+ * Mutation error handler
+ * @description Handler function that is executed for **every**
+ * new {@link MutationState mutation state} that has an `error` field.
+ * @param data Mutation state `error` field
+ * @param cache Cache handler
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
+ */
 export type MutationErrorHandler<E> = (error: E, cache: CacheHandler) => Promise<void>;
 
+/**
+ * Mutation handler
+ * @description Object with all optional mutation handlers.
+ * @typeParam T Return value of a successful mutation
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
+ */
 export interface MutationHandler<T, E> {
 	stateFn: MutationStateHandler<T, E> | null;
 	dataFn: MutationDataHandler<T> | null;
