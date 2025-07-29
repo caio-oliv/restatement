@@ -296,7 +296,6 @@ export type QueryStateSource = 'query' | 'cache' | 'background-query';
  */
 export type QueryStateNoCacheSource = 'query' | 'background-query';
 
-// TODO: rename `'control'` to `'self'`
 /**
  * Origin of a {@link QueryState query state}
  * @description Where the current query state originated.
@@ -309,7 +308,7 @@ export type QueryStateNoCacheSource = 'query' | 'background-query';
  *
  * From the {@link QueryProvider query state provider}.
  */
-export type QueryStateOrigin = 'control' | 'provider';
+export type QueryStateOrigin = 'self' | 'provider';
 
 /**
  * Query state metadata
@@ -333,7 +332,7 @@ export interface QueryStateMetadata {
  * the {@link QueryStateHandler query state handler} be called.
  */
 export interface InitialStateMetadata {
-	readonly origin: 'control';
+	readonly origin: 'self';
 	readonly source: 'initialization';
 	readonly cache: 'none';
 }
@@ -523,7 +522,6 @@ export interface QueryExecutionResult<T, E> {
 	next(): Promise<NextQueryState<T, E>>;
 }
 
-// TODO: rename `'state'` to `'context'`
 /**
  * Reset state target
  * @description At which level the state should be reset.
@@ -536,7 +534,7 @@ export interface QueryExecutionResult<T, E> {
  *
  * The context state will be reset to `idle` and the state function handler will be called.
  */
-export type ResetTarget = 'state' | 'handler';
+export type ResetTarget = 'context' | 'handler';
 
 /**
  * Reset state options
@@ -545,7 +543,7 @@ export type ResetTarget = 'state' | 'handler';
 export interface ResetOptions {
 	/**
 	 * Reset target
-	 * @default 'state'
+	 * @default 'context'
 	 */
 	target?: ResetTarget;
 }

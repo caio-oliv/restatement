@@ -77,7 +77,7 @@ export async function executeMutation<I, T, E>(
  */
 export function resetMutation<I, T, E>(
 	ctx: MutationContext<I, T, E>,
-	{ target = 'state' }: ResetOptions = {}
+	{ target = 'context' }: ResetOptions = {}
 ): void {
 	ctx.state = { status: 'idle', data: ctx.placeholder, error: null };
 

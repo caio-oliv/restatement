@@ -17,7 +17,7 @@ import {
 } from '@/controller/Control.mock';
 
 function filterControlState({ metadata }: QueryStateTransition<string, Error>): boolean {
-	return metadata.origin === 'control';
+	return metadata.origin === 'self';
 }
 
 describe('QueryControl state provider / query watcher', () => {
@@ -57,7 +57,7 @@ describe('QueryControl state provider / query watcher', () => {
 				'data#1',
 				{
 					cache: 'no-cache',
-					origin: 'control',
+					origin: 'self',
 					source: 'query',
 				} satisfies QueryStateMetadata,
 				queryApi1.cache
@@ -72,7 +72,7 @@ describe('QueryControl state provider / query watcher', () => {
 				} satisfies QueryState<string, Error>,
 				{
 					cache: 'no-cache',
-					origin: 'control',
+					origin: 'self',
 					source: 'query',
 				} satisfies QueryStateMetadata,
 				queryApi1.cache
@@ -86,7 +86,7 @@ describe('QueryControl state provider / query watcher', () => {
 				} satisfies QueryState<string, Error>,
 				{
 					cache: 'no-cache',
-					origin: 'control',
+					origin: 'self',
 					source: 'query',
 				} satisfies QueryStateMetadata,
 				queryApi1.cache
@@ -415,7 +415,7 @@ describe('QueryControl state provider', () => {
 				} satisfies QueryState<string, Error>,
 				{
 					cache: 'fresh',
-					origin: 'control',
+					origin: 'self',
 					source: 'query',
 				} satisfies QueryStateMetadata,
 				queryApi1.cache
@@ -429,7 +429,7 @@ describe('QueryControl state provider', () => {
 				} satisfies QueryState<string, Error>,
 				{
 					cache: 'fresh',
-					origin: 'control',
+					origin: 'self',
 					source: 'query',
 				} satisfies QueryStateMetadata,
 				queryApi1.cache
@@ -448,7 +448,7 @@ describe('QueryControl state provider', () => {
 				} satisfies QueryState<string, Error>,
 				{
 					cache: 'no-cache',
-					origin: 'control',
+					origin: 'self',
 					source: 'query',
 				} satisfies QueryStateMetadata,
 				queryApi2.cache
@@ -462,7 +462,7 @@ describe('QueryControl state provider', () => {
 				} satisfies QueryState<string, Error>,
 				{
 					cache: 'no-cache',
-					origin: 'control',
+					origin: 'self',
 					source: 'query',
 				} satisfies QueryStateMetadata,
 				queryApi2.cache
@@ -481,7 +481,7 @@ describe('QueryControl state provider', () => {
 				} satisfies QueryState<string, Error>,
 				{
 					cache: 'stale',
-					origin: 'control',
+					origin: 'self',
 					source: 'cache',
 				} satisfies QueryStateMetadata,
 				queryApi3.cache
@@ -495,7 +495,7 @@ describe('QueryControl state provider', () => {
 				} satisfies QueryState<string, Error>,
 				{
 					cache: 'stale',
-					origin: 'control',
+					origin: 'self',
 					source: 'background-query',
 				} satisfies QueryStateMetadata,
 				queryApi3.cache

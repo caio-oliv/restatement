@@ -70,7 +70,7 @@ describe('QueryControl state transition / reset query', () => {
 			status: 'success',
 		});
 
-		queryApi.reset({ target: 'state' });
+		queryApi.reset({ target: 'context' });
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: '123',
@@ -131,7 +131,7 @@ describe('QueryControl state transition / reset query', () => {
 			},
 			{
 				cache: 'none',
-				origin: 'control',
+				origin: 'self',
 				source: 'initialization',
 			} satisfies InitialStateMetadata,
 			queryApi.cache
@@ -226,7 +226,7 @@ describe('QueryControl state transition / reset query', () => {
 			},
 			{
 				cache: 'none',
-				origin: 'control',
+				origin: 'self',
 				source: 'initialization',
 			} satisfies InitialStateMetadata,
 			queryApi.cache

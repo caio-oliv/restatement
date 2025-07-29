@@ -342,7 +342,7 @@ describe('QueryControl function swap / filterFn', () => {
 				} satisfies QueryState<string, Error>,
 				{
 					cache: 'no-cache',
-					origin: 'control',
+					origin: 'self',
 					source: 'query',
 				} satisfies StateMetadata,
 				queryCtl.cache
@@ -369,7 +369,7 @@ describe('QueryControl function swap / filterFn', () => {
 				} satisfies QueryState<string, Error>,
 				{
 					cache: 'no-cache',
-					origin: 'control',
+					origin: 'self',
 					source: 'query',
 				} satisfies StateMetadata,
 				queryCtl.cache
@@ -415,7 +415,7 @@ describe('QueryControl function swap / filterFn', () => {
 			} satisfies QueryState<string, Error>,
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies StateMetadata,
 			queryCtl.cache
@@ -438,7 +438,7 @@ describe('QueryControl function swap / filterFn', () => {
 			} satisfies QueryState<string, Error>,
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies StateMetadata,
 			queryCtl.cache

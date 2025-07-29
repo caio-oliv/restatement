@@ -33,7 +33,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			'data#1',
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -48,7 +48,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -62,7 +62,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -93,7 +93,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -108,7 +108,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -122,7 +122,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -149,7 +149,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			'data#1',
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -164,7 +164,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -178,7 +178,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -197,7 +197,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			'data#1',
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -212,7 +212,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -226,7 +226,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -253,7 +253,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			'data#1',
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -268,7 +268,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -282,7 +282,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -301,7 +301,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -316,7 +316,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -330,7 +330,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -357,7 +357,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -372,7 +372,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -386,7 +386,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -405,7 +405,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			'data#1',
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -420,7 +420,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -434,7 +434,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -461,7 +461,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -476,7 +476,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -490,7 +490,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -509,7 +509,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -524,7 +524,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -538,7 +538,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -571,7 +571,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			'data#1',
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -586,7 +586,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -600,7 +600,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -633,7 +633,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			'data#1',
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -648,7 +648,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -679,7 +679,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -694,7 +694,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -708,7 +708,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -735,7 +735,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			'data#1',
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -750,7 +750,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -764,7 +764,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -785,7 +785,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			'data#1',
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -800,7 +800,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -814,7 +814,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -841,7 +841,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			'data#1',
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -856,7 +856,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -870,7 +870,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -889,7 +889,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			'data#1',
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -904,7 +904,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -931,7 +931,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			'data#1',
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -946,7 +946,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -960,7 +960,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -979,7 +979,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -994,7 +994,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1008,7 +1008,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1035,7 +1035,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1050,7 +1050,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1064,7 +1064,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1083,7 +1083,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			'data#1',
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1098,7 +1098,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1112,7 +1112,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1139,7 +1139,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1154,7 +1154,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1168,7 +1168,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1189,7 +1189,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			'data#1',
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1204,7 +1204,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1231,7 +1231,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1246,7 +1246,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1260,7 +1260,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1279,7 +1279,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1294,7 +1294,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1308,7 +1308,7 @@ describe('QueryControl handler execution / fresh query', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1341,7 +1341,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1356,7 +1356,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1370,7 +1370,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1403,7 +1403,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1418,7 +1418,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1449,7 +1449,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1464,7 +1464,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1478,7 +1478,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1506,7 +1506,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'stale_data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1521,7 +1521,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1538,7 +1538,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'background-query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1553,7 +1553,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'background-query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1584,7 +1584,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1599,7 +1599,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1613,7 +1613,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1640,7 +1640,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'stale_data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1655,7 +1655,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1672,7 +1672,7 @@ describe('QueryControl handler execution / stale query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'background-query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1687,7 +1687,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'background-query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1718,7 +1718,7 @@ describe('QueryControl handler execution / stale query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1733,7 +1733,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1747,7 +1747,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1774,7 +1774,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1789,7 +1789,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1803,7 +1803,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1824,7 +1824,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1839,7 +1839,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1853,7 +1853,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1880,7 +1880,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1895,7 +1895,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1909,7 +1909,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1928,7 +1928,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1943,7 +1943,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1970,7 +1970,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1985,7 +1985,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -1999,7 +1999,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2026,7 +2026,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'stale_data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2041,7 +2041,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2059,7 +2059,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'background-query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2074,7 +2074,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'background-query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2101,7 +2101,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2116,7 +2116,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2130,7 +2130,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2157,7 +2157,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'stale_data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2172,7 +2172,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2190,7 +2190,7 @@ describe('QueryControl handler execution / stale query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'background-query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2205,7 +2205,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'background-query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2232,7 +2232,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2247,7 +2247,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2261,7 +2261,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2280,7 +2280,7 @@ describe('QueryControl handler execution / stale query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2295,7 +2295,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2309,7 +2309,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2336,7 +2336,7 @@ describe('QueryControl handler execution / stale query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2351,7 +2351,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2365,7 +2365,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2384,7 +2384,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2399,7 +2399,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2413,7 +2413,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2440,7 +2440,7 @@ describe('QueryControl handler execution / stale query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2455,7 +2455,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2469,7 +2469,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2490,7 +2490,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2505,7 +2505,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2532,7 +2532,7 @@ describe('QueryControl handler execution / stale query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2547,7 +2547,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2561,7 +2561,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2588,7 +2588,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'stale_data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2603,7 +2603,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2621,7 +2621,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'background-query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2636,7 +2636,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'background-query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2663,7 +2663,7 @@ describe('QueryControl handler execution / stale query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2678,7 +2678,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2692,7 +2692,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2719,7 +2719,7 @@ describe('QueryControl handler execution / stale query', () => {
 			'stale_data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2734,7 +2734,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2752,7 +2752,7 @@ describe('QueryControl handler execution / stale query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'background-query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2767,7 +2767,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'background-query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2794,7 +2794,7 @@ describe('QueryControl handler execution / stale query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2809,7 +2809,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2823,7 +2823,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2842,7 +2842,7 @@ describe('QueryControl handler execution / stale query', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2857,7 +2857,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2871,7 +2871,7 @@ describe('QueryControl handler execution / stale query', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2904,7 +2904,7 @@ describe('QueryControl handler exception handling', () => {
 			'data#1',
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2919,7 +2919,7 @@ describe('QueryControl handler exception handling', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2933,7 +2933,7 @@ describe('QueryControl handler exception handling', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2952,7 +2952,7 @@ describe('QueryControl handler exception handling', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2967,7 +2967,7 @@ describe('QueryControl handler exception handling', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -2981,7 +2981,7 @@ describe('QueryControl handler exception handling', () => {
 			},
 			{
 				cache: 'no-cache',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3012,7 +3012,7 @@ describe('QueryControl handler exception handling', () => {
 			'data#1',
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3027,7 +3027,7 @@ describe('QueryControl handler exception handling', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3041,7 +3041,7 @@ describe('QueryControl handler exception handling', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3060,7 +3060,7 @@ describe('QueryControl handler exception handling', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3075,7 +3075,7 @@ describe('QueryControl handler exception handling', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3089,7 +3089,7 @@ describe('QueryControl handler exception handling', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3108,7 +3108,7 @@ describe('QueryControl handler exception handling', () => {
 			'data#1',
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3118,7 +3118,7 @@ describe('QueryControl handler exception handling', () => {
 			'data#1',
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3133,7 +3133,7 @@ describe('QueryControl handler exception handling', () => {
 			},
 			{
 				cache: 'fresh',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3164,7 +3164,7 @@ describe('QueryControl handler exception handling', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3179,7 +3179,7 @@ describe('QueryControl handler exception handling', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3193,7 +3193,7 @@ describe('QueryControl handler exception handling', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3212,7 +3212,7 @@ describe('QueryControl handler exception handling', () => {
 			new Error('invalid_key'),
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3227,7 +3227,7 @@ describe('QueryControl handler exception handling', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3241,7 +3241,7 @@ describe('QueryControl handler exception handling', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3260,7 +3260,7 @@ describe('QueryControl handler exception handling', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'query',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3270,7 +3270,7 @@ describe('QueryControl handler exception handling', () => {
 			'data#1',
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache
@@ -3285,7 +3285,7 @@ describe('QueryControl handler exception handling', () => {
 			},
 			{
 				cache: 'stale',
-				origin: 'control',
+				origin: 'self',
 				source: 'cache',
 			} satisfies QueryStateMetadata,
 			queryApi.cache

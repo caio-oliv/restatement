@@ -149,14 +149,14 @@ export async function executeQuery<K extends ReadonlyArray<unknown>, T, E>(
 	if ((cache === 'fresh' || cache === 'stale') && isCacheEntryFresh(entry, ctx.fresh)) {
 		// Fresh from cache (less time than fresh duration).
 		const state: QueryState<T, E> = { status: 'success', error: null, data: entry.data };
-		updateQuery(ctx, hash, { state, metadata: { origin: 'control', source: 'cache', cache } });
+		updateQuery(ctx, hash, { state, metadata: { origin: 'self', source: 'cache', cache } });
 		return { state, next: nullpromise };
 	}
 
 	if (cache === 'stale') {
 		// Stale from cache (greater time than fresh duration).
 		const state: QueryState<T, E> = { status: 'stale', error: null, data: entry.data };
-		updateQuery(ctx, hash, { state, metadata: { origin: 'control', source: 'cache', cache } });
+		updateQuery(ctx, hash, { state, metadata: { origin: 'self', source: 'cache', cache } });
 
 		// eslint-disable-next-line @typescript-eslint/return-await
 		return runBackgroundQuery(ctx, state, { key, hash }, { ttl, signal });
@@ -177,7 +177,7 @@ export async function executeQuery<K extends ReadonlyArray<unknown>, T, E>(
 export function useQueryKey<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	key: K,
-	{ target = 'state' }: ResetOptions = {}
+	{ target = 'context' }: ResetOptions = {}
 ): void {
 	const hash = ctx.keyHashFn(key);
 	ctx.subscriber.useTopic(hash);
@@ -196,7 +196,7 @@ export function useQueryKey<K extends ReadonlyArray<unknown>, T, E>(
  */
 export function resetQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
-	{ target = 'state' }: ResetOptions = {}
+	{ target = 'context' }: ResetOptions = {}
 ): void {
 	ctx.subscriber.unsubscribe();
 	ctx.state = { data: ctx.placeholder, error: null, status: 'idle' };
@@ -214,7 +214,7 @@ function stateInitialization<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>
 ): void {
 	ctx
-		.stateFn?.(ctx.state, { cache: 'none', origin: 'control', source: 'initialization' }, ctx.cache)
+		.stateFn?.(ctx.state, { cache: 'none', origin: 'self', source: 'initialization' }, ctx.cache)
 		?.catch(blackhole);
 }
 
@@ -263,14 +263,14 @@ export async function runActiveQuery<K extends ReadonlyArray<unknown>, T, E>(
 	{ cache = 'stale', ttl = ctx.ttl, signal = makeAbortSignal() }: RunActiveQueryOptions = {}
 ): Promise<QueryExecutionResult<T, E>> {
 	const state: QueryState<T, E> = { status: 'loading', data: ctx.state.data, error: null };
-	const metadata: QueryStateMetadata = { origin: 'control', source: 'query', cache };
+	const metadata: QueryStateMetadata = { origin: 'self', source: 'query', cache };
 
 	updateQuery(ctx, hash, { state, metadata });
 
 	const currPromise = ctx.subscriber.getCurrentState();
 	if (currPromise?.status === 'pending') {
 		currPromise.then((state: QueryState<T, E>) => {
-			updateQuery(ctx, hash, { state, metadata: { origin: 'control', source: 'query', cache } });
+			updateQuery(ctx, hash, { state, metadata: { origin: 'self', source: 'query', cache } });
 		});
 
 		return { state: await currPromise, next: nullpromise };
@@ -317,7 +317,7 @@ export async function runBackgroundQuery<K extends ReadonlyArray<unknown>, T, E>
 		currPromise.then((state: QueryState<T, E>) => {
 			updateQuery(ctx, hash, {
 				state,
-				metadata: { origin: 'control', source: 'background-query', cache: 'stale' },
+				metadata: { origin: 'self', source: 'background-query', cache: 'stale' },
 			});
 		});
 
@@ -434,7 +434,7 @@ export async function queryResolve<K extends ReadonlyArray<unknown>, T, E>(
 ): Promise<QueryState<T, E>> {
 	const state: QueryState<T, E> = { status: 'success', error: null, data };
 	await ctx.internalCache.set(hash, data, ctx.extractTTLFn(data, ttl)).catch(blackhole);
-	updateQuery(ctx, hash, { state, metadata: { origin: 'control', source, cache } });
+	updateQuery(ctx, hash, { state, metadata: { origin: 'self', source, cache } });
 	return state;
 }
 
@@ -459,7 +459,7 @@ export async function queryReject<K extends ReadonlyArray<unknown>, T, E>(
 	if (!ctx.keepCacheOnErrorFn(err as E)) {
 		await ctx.internalCache.delete(hash).catch(blackhole);
 	}
-	updateQuery(ctx, hash, { state, metadata: { origin: 'control', source, cache } });
+	updateQuery(ctx, hash, { state, metadata: { origin: 'self', source, cache } });
 	return state;
 }
 
@@ -495,7 +495,7 @@ export function updateQuery<K extends ReadonlyArray<unknown>, T, E>(
 	}
 	ctx.stateFn?.(ctx.state, metadata, ctx.cache)?.catch(blackhole);
 
-	if (metadata.origin === 'control') {
+	if (metadata.origin === 'self') {
 		ctx.subscriber.publishTopic(hash, {
 			state: ctx.state,
 			metadata: {
