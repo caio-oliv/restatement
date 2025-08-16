@@ -538,7 +538,6 @@ export type ResetTarget = 'context' | 'handler';
 
 /**
  * Reset state options
- * @description Available options to reset the state.
  */
 export interface ResetOptions {
 	/**

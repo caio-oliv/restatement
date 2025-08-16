@@ -18,97 +18,111 @@ import type { CacheStore } from '@/cache/CacheStore';
 import type { CacheManager } from '@/cache/CacheManager';
 
 /**
- * @summary Query subscriber
- * @description Query state subscriber
+ * Query subscriber
+ * @description Query state subscriber.
+ *
+ * {@link Subscriber} for {@link QueryProviderData query data} events and {@link QueryStatePromise query promise} state.
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export type QuerySubscriber<T, E> = Subscriber<QueryProviderData<T, E>, QueryStatePromise<T, E>>;
 
 /**
- * @summary Query provider
- * @description Query state provider
+ * Query provider
+ * @description Query state provider.
+ *
+ * {@link PubSub Provider} for {@link QueryProviderData query data} events and {@link QueryStatePromise query promise} state.
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export type QueryProvider<T, E> = PubSub<QueryProviderData<T, E>, QueryStatePromise<T, E>>;
 
 /**
- * @summary Query context
+ * Query context
+ * @description A query context describes the state and behavior of a particular query.
+ *
+ * It is an aggregate of every component that makes a query.
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export interface QueryContext<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	/**
-	 * @summary Idle state placeholder
+	 * Idle state placeholder
 	 */
 	readonly placeholder: T | null;
 	/**
-	 * @summary Cache store
+	 * Cache store
 	 * @description Internal cache store interface.
 	 */
 	readonly internalCache: CacheStore<string, T>;
 	/**
-	 * @summary Cache manager
+	 * Cache manager
 	 * @description Public cache interface for interacting with cached query data.
 	 */
 	readonly cache: CacheManager;
 	/**
-	 * @summary PubSub subscriber
+	 * PubSub subscriber
 	 */
 	readonly subscriber: QuerySubscriber<T, E>;
 	/**
-	 * @summary Retry policy
+	 * Retry policy
 	 */
 	readonly retryPolicy: RetryPolicy<E>;
 	/**
-	 * @summary Default TTL duration
+	 * Default TTL duration
 	 */
 	readonly ttl: Millisecond;
 	/**
-	 * @summary Cache fresh duration
+	 * Cache fresh duration
 	 */
 	readonly fresh: Millisecond;
 	/**
-	 * @summary Key hasher
+	 * Key hasher
 	 */
 	readonly keyHashFn: KeyHashFn<K>;
 	/**
-	 * @summary Query function
+	 * Query function
 	 */
 	queryFn: QueryFn<K, T>;
 	/**
-	 * @summary Retry handler
+	 * Retry handler
 	 * @description Callback executed **before** every retry
 	 */
 	retryHandleFn: RetryHandlerFn<E> | null;
 	/**
-	 * @summary Keep cache on error
+	 * Keep cache on error
 	 * @description Check whether the current cache entry should be kept after a failed query execution.
 	 */
 	keepCacheOnErrorFn: KeepCacheOnErrorFn<E>;
 	/**
-	 * @summary Extract TTL function
+	 * Extract TTL function
 	 */
 	extractTTLFn: ExtractTTLFn<T>;
 	/**
-	 * @summary Query state handler
+	 * Query state handler
 	 */
 	stateFn: QueryStateHandler<T, E> | null;
 	/**
-	 * @summary Query data handler
+	 * Query data handler
 	 */
 	dataFn: QueryDataHandler<T> | null;
 	/**
-	 * @summary Query error handler
+	 * Query error handler
 	 */
 	errorFn: QueryErrorHandler<E> | null;
 	/**
-	 * @summary Query state filter
+	 * Query state filter
 	 */
 	filterFn: QueryFilterFn<T, E>;
 	/**
-	 * @summary Query state
+	 * Query state
 	 */
 	state: QueryState<T, E>;
 }
 
 /**
- * @description Query context mutable attributes
+ * Query context mutable attributes
  */
 export type QueryContextMut<K extends ReadonlyArray<unknown>, T, E = unknown> = Pick<
 	QueryContext<K, T, E>,
@@ -124,7 +138,7 @@ export type QueryContextMut<K extends ReadonlyArray<unknown>, T, E = unknown> = 
 >;
 
 /**
- * @description Query context mutable functions
+ * Query context mutable functions
  */
 export type QueryContextMutFns<K extends ReadonlyArray<unknown>, T, E = unknown> = Pick<
 	QueryContext<K, T, E>,
@@ -139,47 +153,50 @@ export type QueryContextMutFns<K extends ReadonlyArray<unknown>, T, E = unknown>
 >;
 
 /**
- * @summary Query input
+ * Query input
  * @description Query input options that make up the query context.
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export interface QueryInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	/**
-	 * @summary Idle state placeholder
+	 * Idle state placeholder
 	 */
 	placeholder?: T | null;
 	/**
-	 * @summary Cache store
+	 * Cache store
 	 */
 	store: CacheStore<string, T>;
 	/**
-	 * @summary Query function
+	 * Query function
 	 * @description Async function that will be called to query the data `T`.
 	 */
 	queryFn: QueryFn<K, T>;
 	/**
-	 * @summary Key hasher
+	 * Key hasher
 	 */
 	keyHashFn?: KeyHashFn<K>;
 	/**
-	 * @summary Retry policy
+	 * Retry policy
 	 */
 	retryPolicy?: RetryPolicy<E>;
 	/**
-	 * @summary Retry handler
+	 * Retry handler
 	 * @description Callback executed **before** every retry
 	 */
 	retryHandleFn?: RetryHandlerFn<E> | null;
 	/**
-	 * @summary Keep cache on error
+	 * Keep cache on error
 	 * @description Check whether the current cache entry should be kept after a failed query execution.
 	 */
 	keepCacheOnErrorFn?: KeepCacheOnErrorFn<E>;
 	/**
-	 * @summary Extract TTL function
+	 * Extract TTL function
 	 */
 	extractTTLFn?: ExtractTTLFn<T>;
 	/**
-	 * @summary Default TTL duration
+	 * Default TTL duration
 	 * @description Time To Live (duration) of cache entries.
 	 *
 	 * ### Invariant
@@ -188,7 +205,7 @@ export interface QueryInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	 */
 	ttl?: Millisecond;
 	/**
-	 * @summary Cache fresh duration
+	 * Cache fresh duration
 	 * @description Duration in which cache entries will be fresh.
 	 *
 	 * ### Invariant
@@ -205,29 +222,29 @@ export interface QueryInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	 */
 	fresh?: Millisecond;
 	/**
-	 * @summary Query state handler
+	 * Query state handler
 	 */
 	stateFn?: QueryStateHandler<T, E> | null;
 	/**
-	 * @summary Query data handler
+	 * Query data handler
 	 */
 	dataFn?: QueryDataHandler<T> | null;
 	/**
-	 * @summary Query error handler
+	 * Query error handler
 	 */
 	errorFn?: QueryErrorHandler<E> | null;
 	/**
-	 * @summary Query state filter
+	 * Query state filter
 	 */
 	filterFn?: QueryFilterFn<T, E>;
 	/**
-	 * @summary State provider.
+	 * State provider.
 	 */
 	provider?: QueryProvider<T, E> | null;
 }
 
 /**
- * @summary Local query input
+ * Local query input
  * @description Local input options for a query context
  */
 export type LocalQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown> = Pick<

@@ -32,24 +32,27 @@ import {
 import { execAsyncOperation } from '@/core/RetryPolicy';
 
 /**
- * @summary Make a new query context
- * @param input query input
- * @param input.placeholder idle state placeholder
- * @param input.store cache store
- * @param input.queryFn query function
- * @param input.keyHashFn key hasher
- * @param input.retryPolicy retry policy
- * @param input.retryHandleFn retry handler
- * @param input.keepCacheOnErrorFn keep cache on error
- * @param input.extractTTLFn extract TTL function
- * @param input.ttl default TTL duration
- * @param input.fresh cache fresh duration
- * @param input.stateFn query state handler
- * @param input.dataFn query data handler
- * @param input.errorFn query error handler
- * @param input.filterFn query state filter
- * @param input.provider state provider
- * @returns query context
+ * Make a new query context
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
+ * @param input Query input
+ * @param input.placeholder Idle state placeholder
+ * @param input.store Cache store
+ * @param input.queryFn Query function
+ * @param input.keyHashFn Key hasher
+ * @param input.retryPolicy Retry policy
+ * @param input.retryHandleFn Retry handler
+ * @param input.keepCacheOnErrorFn Keep cache on error
+ * @param input.extractTTLFn Extract TTL function
+ * @param input.ttl Default TTL duration
+ * @param input.fresh Cache fresh duration
+ * @param input.stateFn Query state handler
+ * @param input.dataFn Query data handler
+ * @param input.errorFn Query error handler
+ * @param input.filterFn Query state filter
+ * @param input.provider State provider
+ * @returns Query context
  */
 export function makeQueryContext<K extends ReadonlyArray<unknown>, T, E = unknown>({
 	placeholder = null,
@@ -100,32 +103,38 @@ export function makeQueryContext<K extends ReadonlyArray<unknown>, T, E = unknow
 	return context;
 }
 
+/**
+ * Execute query options
+ */
 export interface ExecuteQueryOptions {
 	/**
-	 * @summary Cache directive
+	 * Cache directive
 	 * @default 'stale'
 	 */
 	cache?: CacheDirective;
 	/**
-	 * @summary Fallback TTL
+	 * Fallback TTL
 	 */
 	ttl?: Millisecond;
 	/**
-	 * @summary Abort signal
+	 * Abort signal
 	 */
 	signal?: AbortSignal;
 }
 
 /**
- * @summary Execute a query
- * @description Execute a query based on the provided cache directive.
- * @param ctx query context
- * @param key key value
- * @param options execute query options
- * @param options.cache cache directive
+ * Execute a query
+ * @description Execute a query based on the provided {@link CacheDirective cache directive}.
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
+ * @param ctx Query context
+ * @param key Key value
+ * @param options Execute query options
+ * @param options.cache Cache directive
  * @param options.ttl TTL
- * @param options.signal abort signal
- * @returns query execution result
+ * @param options.signal Abort signal
+ * @returns Query execution result
  */
 export async function executeQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
@@ -167,12 +176,19 @@ export async function executeQuery<K extends ReadonlyArray<unknown>, T, E>(
 }
 
 /**
- * @summary Use provided query key
- * @description Reset query state and subscribe to the provided key.
- * @param ctx query context
- * @param key key value
- * @param options reset options
- * @param options.target reset target
+ * Use provided query key
+ * @description Reset the {@link QueryState query state} and subscribe to the provided key.
+ *
+ * ##### Target option
+ *
+ * Refer to the {@link ResetTarget reset target} documentation for the `target` option.
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
+ * @param ctx Query context
+ * @param key Key value
+ * @param options Reset options
+ * @param options.target Reset target
  */
 export function useQueryKey<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
@@ -189,10 +205,18 @@ export function useQueryKey<K extends ReadonlyArray<unknown>, T, E>(
 }
 
 /**
- * @summary Reset query state and context
- * @param ctx query context
- * @param options reset options
- * @param options.target reset target
+ * Reset query context
+ * @description Reset the query to its {@link IdleQueryState initial state}.
+ *
+ * ##### Target option
+ *
+ * Refer to the {@link ResetTarget reset target} documentation for the `target` option.
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
+ * @param ctx Query context
+ * @param options Reset options
+ * @param options.target Reset target
  */
 export function resetQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
@@ -207,8 +231,12 @@ export function resetQuery<K extends ReadonlyArray<unknown>, T, E>(
 }
 
 /**
- * @summary Send initialization event
- * @param ctx query context
+ * Send initialization event
+ * @description Send an initialization event through the state handler.
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
+ * @param ctx Query context
  */
 function stateInitialization<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>
@@ -219,8 +247,13 @@ function stateInitialization<K extends ReadonlyArray<unknown>, T, E>(
 }
 
 /**
- * @summary Dispose the query
- * @param ctx query context
+ * Dispose the query
+ * @description Dispose the query by {@link Subscriber#unsubscribe unsubscribing} from
+ * the {@link QueryProvider provider}.
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
+ * @param ctx Query context
  */
 export function disposeQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>
@@ -228,34 +261,40 @@ export function disposeQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx.subscriber.unsubscribe();
 }
 
+/**
+ * Run active query options
+ */
 export interface RunActiveQueryOptions {
 	/**
-	 * @summary Cache directive
+	 * Cache directive
 	 * @default 'stale'
 	 */
 	cache?: CacheDirective;
 	/**
-	 * @summary Fallback TTL
+	 * Fallback TTL
 	 */
 	ttl?: Millisecond;
 	/**
-	 * @summary Abort signal
+	 * Abort signal
 	 */
 	signal?: AbortSignal;
 }
 
 /**
- * @summary Run active query
+ * Run active query
  * @description Try to reuse active query or run a new query in the foreground.
- * @param ctx query context
- * @param key key pair
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
+ * @param ctx Query context
+ * @param key Key pair
  * @param key.key key value
- * @param key.hash key hash
- * @param options run active query options
- * @param options.cache cache directive
+ * @param key.hash Key hash
+ * @param options Run active query options
+ * @param options.cache Cache directive
  * @param options.ttl TTL
- * @param options.signal abort signal
- * @returns query execution result
+ * @param options.signal Abort signal
+ * @returns Query execution result
  */
 export async function runActiveQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
@@ -281,30 +320,37 @@ export async function runActiveQuery<K extends ReadonlyArray<unknown>, T, E>(
 	return { state: await promise, next: nullpromise };
 }
 
+/**
+ * Run background query options
+ */
 export interface RunBackgroundQueryOptions {
 	/**
-	 * @summary Fallback TTL
+	 * Fallback TTL
 	 */
 	ttl?: Millisecond;
 	/**
-	 * @summary Abort signal
+	 * Abort signal
 	 */
 	signal?: AbortSignal;
 }
 
 /**
- * @summary Run background query
+ * Run background query
  * @description Return the {@link QueryExecutionResult} with the provided state and try
- * to reuse the active query or create a new one for the next background query.
- * @param ctx query context
- * @param state query state
- * @param key key pair
- * @param key.key key value
- * @param key.hash key hash
- * @param options run background query options
+ * to reuse the active query or create a new one for
+ * the {@link QueryExecutionResult#next next background query}.
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
+ * @param ctx Query context
+ * @param state Query state
+ * @param key Key pair
+ * @param key.key Key value
+ * @param key.hash Key hash
+ * @param options Run background query options
  * @param options.ttl TTL
- * @param options.signal abort signal
- * @returns query execution result
+ * @param options.signal Abort signal
+ * @returns Query execution result
  */
 export async function runBackgroundQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
@@ -337,47 +383,53 @@ export async function runBackgroundQuery<K extends ReadonlyArray<unknown>, T, E>
 	return { state, next: () => queryPromise };
 }
 
+/**
+ * Run query options
+ */
 export interface RunQueryOptions {
 	/**
-	 * @summary Cache directive
+	 * Cache directive
 	 * @default 'stale'
 	 */
 	cache?: CacheDirective;
 	/**
-	 * @summary State source
+	 * State source
 	 * @default 'query'
 	 */
 	source?: QueryStateNoCacheSource;
 	/**
-	 * @summary Fallback TTL
+	 * Fallback TTL
 	 */
 	ttl?: Millisecond;
 	/**
-	 * @summary Abort signal
+	 * Abort signal
 	 */
 	signal?: AbortSignal;
 }
 
 /**
- * Runs the query function
+ * Run the query function
  * @description
- * Runs the query function with the provided retry policy
- * and returns the new query state within a promise.
+ * Run the {@link QueryFn query function}, update the {@link QueryContext context}, and returns
+ * the new {@link QueryState query state} in a promise.
  *
- * ## Invariant
+ * ##### Safe `Promise`
  *
- * This function **does not** throw any errors. Callers can rely on the contract
- * that the promise returned by this function is safe to **not** be awaited.
- * @param ctx query context
- * @param key key pair
- * @param key.hash key hash
- * @param key.key key value
- * @param options run query options
- * @param options.cache cache directive
- * @param options.source query source
- * @param options.ttl fallback TTL
- * @param options.signal abort signal
- * @returns query state
+ * This function **does not** throw any errors. Callers can rely that the Promise
+ * returned by this function is safe to **not** be awaited.
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
+ * @param ctx Query context
+ * @param key Key pair
+ * @param key.hash Key hash
+ * @param key.key Key value
+ * @param options Run query options
+ * @param options.cache Cache directive
+ * @param options.source Query source
+ * @param options.ttl Fallback TTL
+ * @param options.signal Abort signal
+ * @returns Query state
  * @example
  * ```
  * // move `queryPromise` to somewhere else
@@ -414,15 +466,19 @@ export async function runQuery<K extends ReadonlyArray<unknown>, T, E>(
 }
 
 /**
- * @summary Resolve query execution
- * @description Resolve the query with the provided data, updates and returns the query state.
- * @param ctx query context
- * @param data data
- * @param hash key hash
- * @param cache cache directive
- * @param source query source
- * @param ttl fallback TTL
- * @returns query state
+ * Resolve query execution
+ * @description Resolve the query with the provided data, updates and returns
+ * the {@link QueryState query state}.
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
+ * @param ctx Query context
+ * @param data Data
+ * @param hash Key hash
+ * @param cache Cache directive
+ * @param source Query source
+ * @param ttl Fallback TTL
+ * @returns Query state
  */
 export async function queryResolve<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
@@ -439,14 +495,24 @@ export async function queryResolve<K extends ReadonlyArray<unknown>, T, E>(
 }
 
 /**
- * @summary Reject query execution
- * @description Reject the query with the provided error, updates and returns the query state.
- * @param ctx query context
- * @param err error
- * @param hash key hash
- * @param cache cache directive
- * @param source query source
- * @returns query state
+ * Reject query execution
+ * @description Reject the query with the provided error, updates and returns
+ * the {@link QueryState query state}.
+ *
+ * ##### Cache invalidation
+ *
+ * The cache will be removed based on
+ * the {@link QueryContext#keepCacheOnErrorFn keep cache on error function} from
+ * the query context.
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
+ * @param ctx Query context
+ * @param err Error
+ * @param hash Key hash
+ * @param cache Cache directive
+ * @param source Query source
+ * @returns Query state
  */
 export async function queryReject<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
@@ -464,13 +530,16 @@ export async function queryReject<K extends ReadonlyArray<unknown>, T, E>(
 }
 
 /**
- * @summary Update the query state
- * @description Update the query state, call function handlers and publish the new state.
- * @param ctx query context
- * @param hash key hash
- * @param event state event
- * @param event.state query state
- * @param event.metadata query state metadata
+ * Update the query state
+ * @description Update the {@link QueryState query state}, call function handlers and publish the new state.
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
+ * @param ctx Query context
+ * @param hash Key hash
+ * @param event State event
+ * @param event.state Query state
+ * @param event.metadata Query state metadata
  */
 export function updateQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
@@ -508,9 +577,12 @@ export function updateQuery<K extends ReadonlyArray<unknown>, T, E>(
 }
 
 /**
- * @summary Update {@link QueryContext `QueryContext`} functions
- * @param ctx query context
- * @param fns replacing functions
+ * Update {@link QueryContext `QueryContext`} functions
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
+ * @param ctx Query context
+ * @param fns Replacing functions
  */
 export function updateQueryContextFn<K extends ReadonlyArray<unknown>, T, E = unknown>(
 	ctx: QueryContext<K, T, E>,

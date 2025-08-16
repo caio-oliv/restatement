@@ -12,11 +12,11 @@ import type { CacheManager } from '@/cache/CacheManager';
 
 export class Query<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	/**
-	 * @summary Query context
+	 * Query context
 	 */
 	public readonly ctx: QueryContext<K, T, E>;
 	/**
-	 * @summary Cache
+	 * Cache
 	 */
 	public readonly cache: CacheManager;
 
@@ -25,6 +25,14 @@ export class Query<K extends ReadonlyArray<unknown>, T, E = unknown> {
 		this.cache = this.ctx.cache;
 	}
 
+	/**
+	 * Create a new query context
+	 * @typeParam K Tuple with the query function inputs
+	 * @typeParam T Return value of a successful query
+	 * @typeParam E Error from a failed {@link QueryFn query} execution
+	 * @param input Query input
+	 * @returns Query context
+	 */
 	public static create<K extends ReadonlyArray<unknown>, T, E = unknown>(
 		input: QueryInput<K, T, E>
 	): Query<K, T, E> {
@@ -32,45 +40,46 @@ export class Query<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	}
 
 	/**
-	 * @summary Execute a query
-	 * @description Execute a query based on the provided cache directive.
-	 * @param key key value
-	 * @param options execute query options
-	 * @returns query execution result
+	 * Execute a query
+	 * @description Refer to the {@link executeQuery} documentation for more details.
+	 * @param key Key value
+	 * @param options Execute query options
+	 * @returns Query execution result
 	 */
 	public execute(key: K, options?: ExecuteQueryOptions): Promise<QueryExecutionResult<T, E>> {
 		return executeQuery(this.ctx, key, options);
 	}
 
 	/**
-	 * @summary Use provided query key
-	 * @description Reset query state and subscribe to the provided key.
-	 * @param key key value
-	 * @param options reset query options
+	 * Use provided query key
+	 * @description Refer to the {@link useQueryKey} documentation for more details.
+	 * @param key Key value
+	 * @param options Reset options
 	 */
 	public use(key: K, options?: ResetOptions): void {
 		useQueryKey(this.ctx, key, options);
 	}
 
 	/**
-	 * @summary Reset query state and context
-	 * @param options reset query options
+	 * Reset query context
+	 * @description Refer to the {@link resetQuery} documentation for more details.
+	 * @param options Reset options
 	 */
 	public reset(options?: ResetOptions): void {
 		resetQuery(this.ctx, options);
 	}
 
 	/**
-	 * @summary Get query state
-	 * @description Get the current query state.
-	 * @returns query state
+	 * Get the {@link QueryState query state}
+	 * @returns Query state
 	 */
 	public getState(): QueryState<T, E> {
 		return this.ctx.state;
 	}
 
 	/**
-	 * @summary Dispose query
+	 * Dispose query
+	 * @description Refer to the {@link disposeQuery} documentation for more details.
 	 */
 	public dispose(): void {
 		disposeQuery(this.ctx);
