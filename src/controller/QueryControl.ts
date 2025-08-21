@@ -26,12 +26,12 @@ export class Query<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	}
 
 	/**
-	 * Create a new query context
+	 * Create a new query
 	 * @typeParam K Tuple with the query function inputs
 	 * @typeParam T Return value of a successful query
 	 * @typeParam E Error from a failed {@link QueryFn query} execution
 	 * @param input Query input
-	 * @returns Query context
+	 * @returns Query
 	 */
 	public static create<K extends ReadonlyArray<unknown>, T, E = unknown>(
 		input: QueryInput<K, T, E>

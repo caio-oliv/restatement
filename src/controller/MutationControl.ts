@@ -10,11 +10,11 @@ import {
 
 export class Mutation<I, T, E = unknown> {
 	/**
-	 * @summary Mutation context
+	 * Mutation context
 	 */
 	public readonly ctx: MutationContext<I, T, E>;
 	/**
-	 * @summary Cache manager
+	 * Cache manager
 	 */
 	public readonly cache: CacheManager;
 
@@ -23,31 +23,39 @@ export class Mutation<I, T, E = unknown> {
 		this.cache = this.ctx.cache;
 	}
 
+	/**
+	 * Create a new mutation
+	 * @typeParam I Mutation input
+	 * @typeParam T Return value of a successful mutation
+	 * @typeParam E Error from a failed {@link MutationFn mutation} execution
+	 * @param input Mutation input
+	 * @returns Mutation
+	 */
 	public static create<I, T, E = unknown>(input: MutationInput<I, T, E>): Mutation<I, T, E> {
 		return new Mutation(makeMutationContext(input));
 	}
 
 	/**
-	 * @summary Execute mutation
-	 * @param input mutation input
-	 * @param options execute mutation options
-	 * @returns mutation state
+	 * Execute mutation
+	 * @param input Mutation input
+	 * @param options Execute mutation options
+	 * @returns Mutation state
 	 */
 	public execute(input: I, options?: ExecuteMutationOptions): Promise<MutationState<T, E>> {
 		return executeMutation(this.ctx, input, options);
 	}
 
 	/**
-	 * @summary Reset mutation state
-	 * @param options reset mutation options
+	 * Reset mutation state
+	 * @param options Reset options
 	 */
 	public reset(options?: ResetOptions): void {
 		resetMutation(this.ctx, options);
 	}
 
 	/**
-	 * @summary Get mutation state
-	 * @returns mutation state
+	 * Get the {@link MutationState mutation state}
+	 * @returns Mutation state
 	 */
 	public getState(): MutationState<T, E> {
 		return this.ctx.state;

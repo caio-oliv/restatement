@@ -5,18 +5,21 @@ import { DEFAULT_RETRY_POLICY, defaultFilterFn } from '@/Default';
 import { blackhole, makeAbortSignal } from '@/Internal';
 
 /**
- * @summary Make a new mutation context
- * @param input mutation input
- * @param input.placeholder idle state placeholder
- * @param input.cache cache manager
- * @param input.mutationFn mutation function
- * @param input.retryPolicy retry policy
- * @param input.retryHandleFn retry handler
- * @param input.stateFn mutation state handler
- * @param input.dataFn mutation data handler
- * @param input.errorFn mutation error handler
- * @param input.filterFn mutation state filter
- * @returns mutation context
+ * Make a new mutation context
+ * @typeParam I Mutation input
+ * @typeParam T Return value of a successful mutation
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
+ * @param input Mutation input
+ * @param input.placeholder Idle state placeholder
+ * @param input.cache Cache manager
+ * @param input.mutationFn Mutation function
+ * @param input.retryPolicy Retry policy
+ * @param input.retryHandleFn Retry handler
+ * @param input.stateFn Mutation state handler
+ * @param input.dataFn Mutation data handler
+ * @param input.errorFn Mutation error handler
+ * @param input.filterFn Mutation state filter
+ * @returns Mutation context
  */
 export function makeMutationContext<I, T, E>({
 	placeholder = null,
@@ -43,20 +46,26 @@ export function makeMutationContext<I, T, E>({
 	};
 }
 
+/**
+ * Execute mutation options
+ */
 export interface ExecuteMutationOptions {
 	/**
-	 * @summary Abort signal
+	 * Abort signal
 	 */
 	signal?: AbortSignal;
 }
 
 /**
- * @summary Execute mutation
- * @param ctx mutation context
- * @param input mutation input
- * @param options execute mutation options
- * @param options.signal abort signal
- * @returns mutation state
+ * Execute mutation
+ * @typeParam I Mutation input
+ * @typeParam T Return value of a successful mutation
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
+ * @param ctx Mutation context
+ * @param input Mutation input
+ * @param options Execute mutation options
+ * @param options.signal Abort signal
+ * @returns Mutation state
  */
 export async function executeMutation<I, T, E>(
 	ctx: MutationContext<I, T, E>,
@@ -70,10 +79,13 @@ export async function executeMutation<I, T, E>(
 }
 
 /**
- * @summary Reset mutation state
- * @param ctx mutation context
- * @param options reset options
- * @param options.target reset target
+ * Reset mutation state
+ * @typeParam I Mutation input
+ * @typeParam T Return value of a successful mutation
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
+ * @param ctx Mutation context
+ * @param options Reset options
+ * @param options.target Reset target
  */
 export function resetMutation<I, T, E>(
 	ctx: MutationContext<I, T, E>,
@@ -87,18 +99,21 @@ export function resetMutation<I, T, E>(
 }
 
 /**
- * @summary Run the mutation function
- * @description Runs the mutation function with the provided retry policy
+ * Run the mutation function
+ * @description Run the mutation function with the provided retry policy
  * and returns the new mutation state within a promise.
  *
  * ## Invariant
  *
  * This function **does not** throw any errors. Callers can rely on the contract
  * that the promise returned by this function is safe to **not** be awaited.
- * @param ctx mutation context
- * @param input mutation input
- * @param signal abort signal
- * @returns mutation state
+ * @typeParam I Mutation input
+ * @typeParam T Return value of a successful mutation
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
+ * @param ctx Mutation context
+ * @param input Mutation input
+ * @param signal Abort signal
+ * @returns Mutation state
  */
 export async function runMutation<I, T, E>(
 	ctx: MutationContext<I, T, E>,
@@ -120,11 +135,14 @@ export async function runMutation<I, T, E>(
 }
 
 /**
- * @summary Resolve mutation execution
+ * Resolve mutation execution
  * @description Resolve the mutation with the provided data, updates and returns the mutation state.
- * @param ctx mutation context
- * @param data data
- * @returns mutation state
+ * @typeParam I Mutation input
+ * @typeParam T Return value of a successful mutation
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
+ * @param ctx Mutation context
+ * @param data Data
+ * @returns Mutation state
  */
 export function mutationResolve<I, T, E>(
 	ctx: MutationContext<I, T, E>,
@@ -136,11 +154,14 @@ export function mutationResolve<I, T, E>(
 }
 
 /**
- * @summary Reject mutation execution
+ * Reject mutation execution
  * @description Reject the mutation with the provided error, updates and returns the mutation state.
- * @param ctx mutation context
- * @param error error
- * @returns mutation state
+ * @typeParam I Mutation input
+ * @typeParam T Return value of a successful mutation
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
+ * @param ctx Mutation context
+ * @param error Error
+ * @returns Mutation state
  */
 export function mutationReject<I, T, E>(
 	ctx: MutationContext<I, T, E>,
@@ -152,10 +173,13 @@ export function mutationReject<I, T, E>(
 }
 
 /**
- * @summary Update the mutation state
+ * Update the mutation state
  * @description Update the mutation state and call function handlers.
- * @param ctx mutation context
- * @param state mutation state
+ * @typeParam I Mutation input
+ * @typeParam T Return value of a successful mutation
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
+ * @param ctx Mutation context
+ * @param state Mutation state
  */
 export function updateMutation<I, T, E>(
 	ctx: MutationContext<I, T, E>,

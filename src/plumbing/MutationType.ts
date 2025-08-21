@@ -11,100 +11,109 @@ import type {
 } from '@/lib';
 
 /**
- * @summary Mutation context
+ * Mutation context
+ * @description A mutation context describes the state and behavior of a particular mutation.
+ *
+ * It is an aggregate of every component that makes a mutation.
+ * @typeParam I Mutation input
+ * @typeParam T Return value of a successful mutation
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
  */
 export interface MutationContext<I, T, E = unknown> {
 	/**
-	 * @summary Idle state placeholder
+	 * Idle state placeholder
 	 */
 	readonly placeholder: T | null;
 	/**
-	 * @summary Cache manager
+	 * Cache manager
 	 * @description Public cache interface for interacting with cached data.
 	 */
 	readonly cache: CacheManager;
 	/**
-	 * @summary Retry policy
+	 * Retry policy
 	 */
 	readonly retryPolicy: RetryPolicy<E>;
 	/**
-	 * @summary Mutation function
+	 * Mutation function
 	 */
 	mutationFn: MutationFn<I, T>;
 	/**
-	 * @summary Retry handler
+	 * Retry handler
 	 * @description Callback executed **before** every retry
 	 */
 	retryHandleFn: RetryHandlerFn<E> | null;
 	/**
-	 * @summary Mutation state handler
+	 * Mutation state handler
 	 */
 	stateFn: MutationStateHandler<T, E> | null;
 	/**
-	 * @summary Mutation data handler
+	 * Mutation data handler
 	 */
 	dataFn: MutationDataHandler<T> | null;
 	/**
-	 * @summary Mutation error handler
+	 * Mutation error handler
 	 */
 	errorFn: MutationErrorHandler<E> | null;
 	/**
-	 * @summary Mutation state filter
+	 * Mutation state filter
 	 */
 	filterFn: MutationFilterFn<T, E>;
 	/**
-	 * @summary Mutation state
+	 * Mutation state
 	 */
 	state: MutationState<T, E>;
 }
 
 /**
- * @summary Mutation input
+ * Mutation input
  * @description Mutation input options that make up the mutation context.
+ * @typeParam I Mutation input
+ * @typeParam T Return value of a successful mutation
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
  */
 export interface MutationInput<I, T, E = unknown> {
 	/**
-	 * @summary Idle state placeholder
+	 * Idle state placeholder
 	 */
 	placeholder?: T | null;
 	/**
-	 * @summary Cache manager
+	 * Cache manager
 	 * @description Public cache interface for interacting with cached data.
 	 */
 	cache: CacheManager;
 	/**
-	 * @summary Mutation function
+	 * Mutation function
 	 */
 	mutationFn: MutationFn<I, T>;
 	/**
-	 * @summary Retry policy
+	 * Retry policy
 	 */
 	retryPolicy?: RetryPolicy<E>;
 	/**
-	 * @summary Retry handler
+	 * Retry handler
 	 * @description Callback executed **before** every retry
 	 */
 	retryHandleFn?: RetryHandlerFn<E> | null;
 	/**
-	 * @summary Mutation state handler
+	 * Mutation state handler
 	 */
 	stateFn?: MutationStateHandler<T, E> | null;
 	/**
-	 * @summary Mutation data handler
+	 * Mutation data handler
 	 */
 	dataFn?: MutationDataHandler<T> | null;
 	/**
-	 * @summary Mutation error handler
+	 * Mutation error handler
 	 */
 	errorFn?: MutationErrorHandler<E> | null;
 	/**
-	 * @summary Mutation state filter
+	 * Mutation state filter
 	 */
 	filterFn?: MutationFilterFn<T, E>;
 }
 
 /**
- * @summary Local mutation input
+ * Local mutation input
  * @description Local input options for a mutation context
  */
 export type LocalMutationInput<I, T, E = unknown> = Pick<
