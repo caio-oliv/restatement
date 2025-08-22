@@ -699,7 +699,7 @@ export type MutationDataHandler<T> = (data: T, cache: CacheHandler) => Promise<v
  * Mutation error handler
  * @description Handler function that is executed for **every**
  * new {@link MutationState mutation state} that has an `error` field.
- * @param data Mutation state `error` field
+ * @param error Mutation state `error` field
  * @param cache Cache handler
  * @typeParam E Error from a failed {@link MutationFn mutation} execution
  */

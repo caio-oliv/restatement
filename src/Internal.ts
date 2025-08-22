@@ -8,26 +8,26 @@ export function blackhole(): void {
 }
 
 /**
- * @description Function that returns a resolved promise with `null`.
- * @returns null promise
+ * Function that returns a resolved promise with `null`.
+ * @returns Null promise
  */
 export function nullpromise(): Promise<null> {
 	return Promise.resolve(null);
 }
 
 /**
- * @param o potentially an object
- * @returns true if argument is an object
+ * @param o Potentially an object
+ * @returns `true` if argument is an object
  */
 function isObject(o: unknown): boolean {
 	return Object.prototype.toString.call(o) === '[object Object]';
 }
 
 /**
- * @summary Verify if argument is a plain object `{}`.
+ * Verify if argument is a plain object `{}`.
  * @description Copied form library {@link https://github.com/jonschlinkert/is-plain-object is-plain-object}.
- * @param o potentially an object
- * @returns true if argument is a plain object
+ * @param o Potentially an object
+ * @returns `true` if argument is a plain object
  * @see {@link https://github.com/jonschlinkert/is-plain-object is-plain-object}
  */
 export function isPlainObject(o: unknown): boolean {
@@ -56,9 +56,9 @@ export function isPlainObject(o: unknown): boolean {
 }
 
 /**
- * @description Create a new sorted object by keys
- * @param obj object
- * @returns new sorted object
+ * Create a new sorted object by keys
+ * @param obj Object
+ * @returns New sorted object
  */
 export function sortObjectByKeys(obj: object): object {
 	const sortedKeys = Object.keys(obj).sort();
@@ -73,9 +73,9 @@ export function sortObjectByKeys(obj: object): object {
 
 /**
  * @description Json stringify replacer to sort plain objects by keys for **reproducible serialization**
- * @param _key object key
- * @param value potentially an object
- * @returns object with sorted keys
+ * @param _key Object key
+ * @param value Potentially an object
+ * @returns Object with sorted keys
  */
 export function jsonStringifyObjectSorter(_key: string, value: unknown): unknown {
 	if (!isPlainObject(value)) {
@@ -87,8 +87,8 @@ export function jsonStringifyObjectSorter(_key: string, value: unknown): unknown
 
 /**
  * Augments a promise object to provide the current promise status as a property.
- * @param query promise object
- * @returns observable promise
+ * @param query Promise object
+ * @returns Observable promise
  */
 export function makeObservablePromise<T>(query: Promise<T>): ObservablePromise<T> {
 	(query as { status: PromiseStatus } & Promise<T>).status = 'pending';
@@ -106,7 +106,7 @@ export function makeObservablePromise<T>(query: Promise<T>): ObservablePromise<T
 
 /**
  * Execute a promise in background and immediately returns
- * @param func async function
+ * @param func Async function
  */
 export function syncPromiseResolver<Fn extends () => void | Promise<void>>(func: Fn): void {
 	try {
@@ -117,8 +117,8 @@ export function syncPromiseResolver<Fn extends () => void | Promise<void>>(func:
 }
 
 /**
- * @summary create a `AbortSignal`
- * @returns abort signal
+ * Create a `AbortSignal`
+ * @returns Abort signal
  */
 export function makeAbortSignal(): AbortSignal {
 	return new AbortController().signal;

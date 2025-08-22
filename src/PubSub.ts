@@ -1,7 +1,13 @@
 import { syncPromiseResolver } from '@/Internal';
 
+/**
+ * Listener function
+ */
 export type Listener<in T> = (topic: string, data: T) => void | Promise<void>;
 
+/**
+ * Unsubscriber function handler
+ */
 export type UnsubscribeHandle = () => void;
 
 interface ListenerState<in T, out S> {
@@ -16,8 +22,8 @@ interface ListenerState<in T, out S> {
 }
 
 /**
- * @description Make default {@link ListenerState}
- * @returns default {@link ListenerState}
+ * Make default {@link ListenerState}
+ * @returns Default {@link ListenerState}
  */
 function makeListenerState<T, S>(): ListenerState<T, S> {
 	return {
@@ -26,11 +32,20 @@ function makeListenerState<T, S>(): ListenerState<T, S> {
 	};
 }
 
+/**
+ * Publisher-Subscriber
+ */
 export class PubSub<in out T, out S> {
 	public constructor() {
 		this.#listenerMap = new Map<string, ListenerState<T, S>>();
 	}
 
+	/**
+	 * Subscribe a listener to a topic
+	 * @param topic Topic
+	 * @param listener Listener function
+	 * @returns Unsubscriber handle
+	 */
 	public subscribe(topic: string, listener: Listener<T>): UnsubscribeHandle {
 		const state = this.#listenerMap.get(topic) ?? makeListenerState();
 		state.listeners.add(listener);
@@ -38,6 +53,11 @@ export class PubSub<in out T, out S> {
 		return () => this.unsubscribe(topic, listener);
 	}
 
+	/**
+	 * Unsubscribe a listener from a topic
+	 * @param topic Topic
+	 * @param listener Listener function
+	 */
 	public unsubscribe(topic: string, listener: Listener<T>): void {
 		const state = this.#listenerMap.get(topic);
 		if (!state) return;
@@ -46,10 +66,20 @@ export class PubSub<in out T, out S> {
 		if (state.listeners.size === 0) this.#listenerMap.delete(topic);
 	}
 
+	/**
+	 * Unsubscribe all listeners from a topic
+	 * @param topic Topic
+	 */
 	public unsubscribeAll(topic: string): void {
 		this.#listenerMap.delete(topic);
 	}
 
+	/**
+	 * Publish a data value to a topic
+	 * @param topic Topic
+	 * @param data Data
+	 * @param ignore Ignore list
+	 */
 	public publish(topic: string, data: T, ignore: Array<Listener<T>> = []): void {
 		const state = this.#listenerMap.get(topic);
 		if (!state) return;
@@ -60,6 +90,11 @@ export class PubSub<in out T, out S> {
 		}
 	}
 
+	/**
+	 * Get the topic state
+	 * @param topic Topic
+	 * @returns Topic state
+	 */
 	public getState(topic: string): S | null {
 		const state = this.#listenerMap.get(topic);
 		if (!state) return null;
@@ -67,6 +102,12 @@ export class PubSub<in out T, out S> {
 		return state.state;
 	}
 
+	/**
+	 * Set the topic state
+	 * @param topic Topic
+	 * @param state State
+	 * @returns `true` if the state was set
+	 */
 	public setState(topic: string, state: S): boolean {
 		const lState = this.#listenerMap.get(topic);
 		if (!lState) {
@@ -77,10 +118,19 @@ export class PubSub<in out T, out S> {
 		return true;
 	}
 
+	/**
+	 * Returns a iterator of all topics
+	 * @returns Topic iterator
+	 */
 	public topics(): IteratorObject<string, BuiltinIteratorReturn> {
 		return this.#listenerMap.keys();
 	}
 
+	/**
+	 * Get the subscriber count from a topic
+	 * @param topic Topic
+	 * @returns Subscriber count
+	 */
 	public subscriberCount(topic: string): number {
 		return this.#listenerMap.get(topic)?.listeners.size ?? 0;
 	}
@@ -89,15 +139,44 @@ export class PubSub<in out T, out S> {
 }
 
 export interface Subscriber<in T, out S> {
+	/**
+	 * Change the subscriber topic
+	 * @param topic Optional new topic
+	 */
 	useTopic(topic: string | null): void;
+	/**
+	 * Get current topic
+	 * @returns topic
+	 */
 	currentTopic(): string | null;
 
+	/**
+	 * Get the state from a topic
+	 * @returns Current state
+	 */
 	getCurrentState(): S | null;
+	/**
+	 * Set the state of a topic
+	 * @param state Topic state
+	 */
 	setCurrentState(state: S): boolean;
 
+	/**
+	 * Publish value to current topic
+	 * @param data Data
+	 * @returns `true` if the value was published
+	 */
 	publish(data: T): boolean;
+	/**
+	 * Publish value to provided topic
+	 * @param topic Topic
+	 * @param data Data
+	 */
 	publishTopic(topic: string, data: T): void;
 
+	/**
+	 * Unsubscribe itself from the provider
+	 */
 	unsubscribe(): void;
 }
 

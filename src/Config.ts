@@ -79,10 +79,10 @@ export type PartialMutationConfig<T = unknown, E = unknown> = Partial<
 export type PartialRetryConfig<E = unknown> = Partial<RetryConfig<E>>;
 
 /**
- * @description Make a {@link RestatementConfig} object.
- * @param store cache store instance
- * @param config partial restatement config
- * @returns restatement config
+ * Make a {@link RestatementConfig} object.
+ * @param store Cache store instance
+ * @param config Partial restatement config
+ * @returns Restatement config
  */
 // eslint-disable-next-line complexity
 export function restatementConfig<T = unknown, E = unknown>(
@@ -117,8 +117,8 @@ export function restatementConfig<T = unknown, E = unknown>(
 }
 
 /**
- * @description Make a {@link CacheManagerInput `CacheManagerInput`} based on the {@link RestatementConfig global config}.
- * @param config config object
+ * Make a {@link CacheManagerInput `CacheManagerInput`} based on the {@link RestatementConfig global config}.
+ * @param config Config object
  * @returns CacheManager input
  */
 export function makeCacheManagerInput<T = unknown, E = unknown>(
@@ -133,8 +133,8 @@ export function makeCacheManagerInput<T = unknown, E = unknown>(
 }
 
 /**
- * @description Make a {@link CacheManager `CacheManager`} based on the {@link RestatementConfig global config}.
- * @param config config object
+ * Make a {@link CacheManager `CacheManager`} based on the {@link RestatementConfig global config}.
+ * @param config Config object
  * @returns CacheManager instance
  */
 export function makeCacheManager<T = unknown, E = unknown>(
@@ -144,10 +144,10 @@ export function makeCacheManager<T = unknown, E = unknown>(
 }
 
 /**
- * @description Make a {@link QueryInput `QueryInput`} based on the {@link RestatementConfig global config}.
- * @param config config object
- * @param local local query input
- * @returns query input
+ * Make a {@link QueryInput `QueryInput`} based on the {@link RestatementConfig global config}.
+ * @param config Config object
+ * @param local Local query input
+ * @returns Query input
  */
 export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>(
 	config: RestatementConfig<T, E>,
@@ -173,10 +173,10 @@ export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>
 }
 
 /**
- * @description Make a {@link MutationInput `MutationInput`} based on the {@link RestatementConfig global config}.
- * @param config config object
- * @param local local mutation input
- * @returns mutation input
+ * Make a {@link MutationInput `MutationInput`} based on the {@link RestatementConfig global config}.
+ * @param config Config object
+ * @param local Local mutation input
+ * @returns Mutation input
  */
 export function makeMutationInput<I, T, E = unknown>(
 	config: RestatementConfig<T, E>,

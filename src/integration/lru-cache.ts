@@ -62,6 +62,9 @@ namespace LRUCache {
 	}
 }
 
+/**
+ * Required LRU cache options
+ */
 export const REQUIRED_LRU_CACHE_OPTIONS = {
 	allowStale: false,
 	noUpdateTTL: true,
@@ -69,6 +72,9 @@ export const REQUIRED_LRU_CACHE_OPTIONS = {
 	updateAgeOnHas: false,
 } as const;
 
+/**
+ * LRU cache adapter
+ */
 export class LRUCacheAdapter<K = unknown, V = unknown> implements CacheStore<K, V> {
 	public readonly cache: LRUCache.LRUCache<K, V>;
 
