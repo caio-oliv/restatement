@@ -1,6 +1,6 @@
 import type { CacheHandler, KeyHashFn, Millisecond } from '@/core/Type';
-import type { QueryProvider } from '@/plumbing/QueryType';
-import type { CacheStore } from '@/cache/CacheStore';
+import type { QueryProvider } from '@/query/QueryContext';
+import type { CacheStore } from '@/core/Cache';
 import { defaultKeyHashFn, DEFAULT_TTL_DURATION } from '@/Default';
 
 /**

@@ -10,17 +10,13 @@ import {
 	waitUntil,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
-import {
-	delayedTestTransformer,
-	mockQueryHandler,
-	testTransformer,
-} from '@/controller/Control.mock';
+import { delayedTestTransformer, mockQueryHandler, testTransformer } from '@/test/TestHelper.mock';
 
 function filterControlState({ metadata }: QueryStateTransition<string, Error>): boolean {
 	return metadata.origin === 'self';
 }
 
-describe('QueryControl state provider / query watcher', () => {
+describe('Query state provider / query watcher', () => {
 	it('subscribe to query changes', async () => {
 		const store = makeCache<string>();
 		const provider: QueryProvider<string, Error> = new PubSub();
@@ -281,7 +277,7 @@ describe('QueryControl state provider / query watcher', () => {
 	});
 });
 
-describe('QueryControl state provider', () => {
+describe('Query state provider', () => {
 	it('share query function execution', async () => {
 		const store = makeCache<string>();
 		const provider: QueryProvider<string, Error> = new PubSub();
@@ -525,7 +521,7 @@ describe('QueryControl state provider', () => {
 	});
 });
 
-describe('QueryControl state provider / in-flight migration', () => {
+describe('Query state provider / in-flight migration', () => {
 	it('change subscribed key withing query execution', async () => {
 		const store = makeCache<string>();
 		const provider: QueryProvider<string, Error> = new PubSub();

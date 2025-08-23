@@ -1,9 +1,9 @@
 import { assert, describe, expect, it, vi } from 'vitest';
 import { CacheManager, Mutation, NoRetryPolicy } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
-import { mockMutationHandler, testTransformer } from '@/controller/Control.mock';
+import { mockMutationHandler, testTransformer } from '@/test/TestHelper.mock';
 
-describe('MutationControl handler execution', () => {
+describe('Mutation handler execution', () => {
 	it('"idle" to "loading" to "success"', async () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
@@ -308,7 +308,7 @@ describe('MutationControl handler execution', () => {
 	});
 });
 
-describe('MutationControl handler exception handling', () => {
+describe('Mutation handler exception handling', () => {
 	it('"idle" to "loading" to "success"', async () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });

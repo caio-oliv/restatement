@@ -1,5 +1,5 @@
 import type { MutationState, ResetOptions } from '@/core/Type';
-import type { MutationContext, MutationInput } from '@/plumbing/MutationType';
+import type { MutationContext, MutationInput } from '@/mutation/MutationContext';
 import { execAsyncOperation } from '@/core/RetryPolicy';
 import { DEFAULT_RETRY_POLICY, defaultFilterFn } from '@/Default';
 import { blackhole, makeAbortSignal } from '@/Internal';

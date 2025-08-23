@@ -8,9 +8,9 @@ import {
 	waitUntil,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
-import { testTransformer, mockQueryHandler } from '@/controller/Control.mock';
+import { testTransformer, mockQueryHandler } from '@/test/TestHelper.mock';
 
-describe('QueryControl handler execution / no-cache query', () => {
+describe('Query handler execution / no-cache query', () => {
 	it('idle to loading to success', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
@@ -548,7 +548,7 @@ describe('QueryControl handler execution / no-cache query', () => {
 	});
 });
 
-describe('QueryControl handler execution / fresh query', () => {
+describe('Query handler execution / fresh query', () => {
 	it('idle to loading to success from query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
@@ -1318,7 +1318,7 @@ describe('QueryControl handler execution / fresh query', () => {
 	});
 });
 
-describe('QueryControl handler execution / stale query', () => {
+describe('Query handler execution / stale query', () => {
 	it('idle to loading to success from query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
@@ -2881,7 +2881,7 @@ describe('QueryControl handler execution / stale query', () => {
 	});
 });
 
-describe('QueryControl handler exception handling', () => {
+describe('Query handler exception handling', () => {
 	it('handler exception for no-cache query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);

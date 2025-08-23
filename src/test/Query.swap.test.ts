@@ -13,9 +13,9 @@ import {
 	type QueryContextMutFns,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
-import { mockQueryHandler, testTransformer } from '@/controller/Control.mock';
+import { mockQueryHandler, testTransformer } from '@/test/TestHelper.mock';
 
-describe('QueryControl function swap', () => {
+describe('Query function swap', () => {
 	it('swap all context functions', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
@@ -45,7 +45,7 @@ describe('QueryControl function swap', () => {
 	});
 });
 
-describe('QueryControl function swap / queryFn', () => {
+describe('Query function swap / queryFn', () => {
 	it('use same queryFn on retries while swaped mid-air', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
@@ -271,7 +271,7 @@ describe('QueryControl function swap / queryFn', () => {
 	});
 });
 
-describe('QueryControl function swap / filterFn', () => {
+describe('Query function swap / filterFn', () => {
 	it('swap filterFn mid-air / loading query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
@@ -452,7 +452,7 @@ describe('QueryControl function swap / filterFn', () => {
 	});
 });
 
-describe('QueryControl function swap / keepCacheOnErrorFn', () => {
+describe('Query function swap / keepCacheOnErrorFn', () => {
 	it('swap keepCacheOnErrorFn before the error and after the query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
@@ -557,7 +557,7 @@ describe('QueryControl function swap / keepCacheOnErrorFn', () => {
 	});
 });
 
-describe('QueryControl function swap / retryHandleFn', () => {
+describe('Query function swap / retryHandleFn', () => {
 	it('swap retryHandleFn after retrying the query operation', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);

@@ -14,7 +14,7 @@ import type {
 } from '@/core/Type';
 import type { PubSub, Subscriber } from '@/PubSub';
 import type { RetryHandlerFn, RetryPolicy } from '@/core/RetryPolicy';
-import type { CacheStore } from '@/cache/CacheStore';
+import type { CacheStore } from '@/core/Cache';
 import type { CacheManager } from '@/cache/CacheManager';
 
 /**

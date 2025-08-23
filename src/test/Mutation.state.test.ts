@@ -1,9 +1,9 @@
 import { assert, describe, it, vi } from 'vitest';
 import { CacheManager, type MutationStateTransition, Mutation, NoRetryPolicy } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
-import { testTransformer } from '@/controller/Control.mock';
+import { testTransformer } from '@/test/TestHelper.mock';
 
-describe('MutationControl state transition', () => {
+describe('Mutation state transition', () => {
 	it('"idle" to "loading" to "success"', async () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
@@ -181,7 +181,7 @@ describe('MutationControl state transition', () => {
 	});
 });
 
-describe('MutationControl state transition / reset query', () => {
+describe('Mutation state transition / reset query', () => {
 	it('reset state to idle', async () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });
@@ -257,7 +257,7 @@ describe('MutationControl state transition / reset query', () => {
 	});
 });
 
-describe('MutationControl state transition / filter', () => {
+describe('Mutation state transition / filter', () => {
 	it('filter out "loading" state', async () => {
 		const store = makeCache<string>();
 		const cache = new CacheManager({ store });

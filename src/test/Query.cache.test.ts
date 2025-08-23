@@ -1,9 +1,9 @@
 import { assert, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_TTL_DURATION, defaultKeyHashFn, NoRetryPolicy, Query, waitUntil } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
-import { testTransformer } from '@/controller/Control.mock';
+import { testTransformer } from '@/test/TestHelper.mock';
 
-describe('QueryControl cache usage / no-cache query', () => {
+describe('Query cache usage / no-cache query', () => {
 	it('fill the cache when making a query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
@@ -113,7 +113,7 @@ describe('QueryControl cache usage / no-cache query', () => {
 	});
 });
 
-describe('QueryControl cache usage / fresh query', () => {
+describe('Query cache usage / fresh query', () => {
 	it('fill the cache when making a query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
@@ -243,7 +243,7 @@ describe('QueryControl cache usage / fresh query', () => {
 	});
 });
 
-describe('QueryControl cache usage / stale query', () => {
+describe('Query cache usage / stale query', () => {
 	it('fill the cache when making a query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
@@ -375,7 +375,7 @@ describe('QueryControl cache usage / stale query', () => {
 	});
 });
 
-describe('QueryControl cache exception handling', () => {
+describe('Query cache exception handling', () => {
 	it('handle exception when getting a cache entry', async () => {
 		const store = makeCache<string>();
 		const storeSpy = vi.spyOn(store, 'getEntry');

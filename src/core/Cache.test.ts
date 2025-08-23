@@ -1,7 +1,7 @@
 import { it, describe, assert } from 'vitest';
 import { type CacheEntry, cacheEntryDuration, isCacheEntryFresh } from '@/lib';
 
-describe('CacheHelper', () => {
+describe('Cache helper', () => {
 	it('get cache entry duration', () => {
 		const entry: CacheEntry<string> = {
 			data: 'value',

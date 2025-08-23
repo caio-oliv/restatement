@@ -7,13 +7,9 @@ import {
 	type InitialStateMetadata,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
-import {
-	delayedTestTransformer,
-	testTransformer,
-	mockQueryHandler,
-} from '@/controller/Control.mock';
+import { delayedTestTransformer, testTransformer, mockQueryHandler } from '@/test/TestHelper.mock';
 
-describe('QueryControl state transition / reset query', () => {
+describe('Query state transition / reset query', () => {
 	it('reset query state to idle', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
@@ -139,7 +135,7 @@ describe('QueryControl state transition / reset query', () => {
 	});
 });
 
-describe('QueryControl state transition / reset query', () => {
+describe('Query state transition / reset query', () => {
 	it('reset the state when using another key', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
@@ -234,7 +230,7 @@ describe('QueryControl state transition / reset query', () => {
 	});
 });
 
-describe('QueryControl state transition / no-cache query', () => {
+describe('Query state transition / no-cache query', () => {
 	// success
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {
 		const store = makeCache<string>();
@@ -584,7 +580,7 @@ describe('QueryControl state transition / no-cache query', () => {
 	});
 });
 
-describe('QueryControl state transition / fresh query', () => {
+describe('Query state transition / fresh query', () => {
 	// success from query
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {
 		const store = makeCache<string>();
@@ -1105,7 +1101,7 @@ describe('QueryControl state transition / fresh query', () => {
 	});
 });
 
-describe('QueryControl state transition / stale query', () => {
+describe('Query state transition / stale query', () => {
 	// success from query
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {
 		const store = makeCache<string>();

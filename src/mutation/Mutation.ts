@@ -1,12 +1,12 @@
 import type { MutationState, ResetOptions } from '@/core/Type';
-import type { MutationContext, MutationInput } from '@/plumbing/MutationType';
+import type { MutationContext, MutationInput } from '@/mutation/MutationContext';
 import type { CacheManager } from '@/cache/CacheManager';
 import {
 	executeMutation,
 	makeMutationContext,
 	resetMutation,
 	type ExecuteMutationOptions,
-} from '@/plumbing/Mutation';
+} from '@/mutation/MutationModule';
 
 export class Mutation<I, T, E = unknown> {
 	/**

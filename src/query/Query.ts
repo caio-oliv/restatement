@@ -1,5 +1,5 @@
 import type { QueryState, QueryExecutionResult, ResetOptions } from '@/core/Type';
-import type { QueryContext, QueryInput } from '@/plumbing/QueryType';
+import type { QueryContext, QueryInput } from '@/query/QueryContext';
 import {
 	disposeQuery,
 	executeQuery,
@@ -7,7 +7,7 @@ import {
 	resetQuery,
 	useQueryKey,
 	type ExecuteQueryOptions,
-} from '@/plumbing/Query';
+} from '@/query/QueryModule';
 import type { CacheManager } from '@/cache/CacheManager';
 
 export class Query<K extends ReadonlyArray<unknown>, T, E = unknown> {

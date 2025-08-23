@@ -15,9 +15,9 @@ import type {
 	QueryContextMutFns,
 	QueryInput,
 	QueryProvider,
-} from '@/plumbing/QueryType';
+} from '@/query/QueryContext';
 import { blackhole, makeAbortSignal, makeObservablePromise, nullpromise } from '@/Internal';
-import { isCacheEntryFresh } from '@/cache/CacheHelper';
+import { isCacheEntryFresh } from '@/core/Cache';
 import { DummySubscriber, SubscriberHandle } from '@/PubSub';
 import { CacheManager } from '@/cache/CacheManager';
 import {

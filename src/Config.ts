@@ -7,9 +7,9 @@ import type {
 	QueryFilterFn,
 } from '@/core/Type';
 import type { RetryHandlerFn, RetryPolicy } from '@/core/RetryPolicy';
-import type { QueryProvider, QueryInput, LocalQueryInput } from '@/plumbing/QueryType';
-import type { LocalMutationInput, MutationInput } from '@/plumbing/MutationType';
-import type { CacheStore } from '@/cache/CacheStore';
+import type { QueryProvider, QueryInput, LocalQueryInput } from '@/query/QueryContext';
+import type { LocalMutationInput, MutationInput } from '@/mutation/MutationContext';
+import type { CacheStore } from '@/core/Cache';
 import { type CacheManagerInput, CacheManager } from '@/cache/CacheManager';
 import { PubSub } from '@/PubSub';
 import {
