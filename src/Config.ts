@@ -1,4 +1,5 @@
 import type {
+	CacheHandler,
 	ExtractTTLFn,
 	KeepCacheOnErrorFn,
 	KeyHashFn,
@@ -36,6 +37,7 @@ export interface CacheConfig {
 	readonly ttl: Millisecond;
 	readonly fresh: Millisecond;
 	readonly store: CacheStore<string, unknown>;
+	readonly handler: CacheHandler;
 }
 
 export interface QueryConfig<T = unknown, E = unknown> {
@@ -89,14 +91,20 @@ export function restatementConfig<T = unknown, E = unknown>(
 	store: CacheStore<string, E>,
 	config: PartialRestatementConfig<T, E> = {}
 ): RestatementConfig<T, E> {
+	const ttl = config.cache?.ttl ?? DEFAULT_TTL_DURATION;
+	const fresh = config.cache?.fresh ?? DEFAULT_FRESH_DURATION;
+	const provider = config.provider ?? new PubSub();
+	const keyHashFn = config.keyHashFn ?? defaultKeyHashFn;
+
 	return {
 		cache: {
-			ttl: config.cache?.ttl ?? DEFAULT_TTL_DURATION,
-			fresh: config.cache?.fresh ?? DEFAULT_FRESH_DURATION,
+			ttl,
+			fresh,
 			store,
+			handler: new CacheManager({ store, keyHashFn, provider, ttl }),
 		},
-		provider: config.provider ?? new PubSub(),
-		keyHashFn: config.keyHashFn ?? defaultKeyHashFn,
+		provider,
+		keyHashFn,
 		keepCacheOnErrorFn: config.keepCacheOnErrorFn ?? defaultKeepCacheOnErrorFn,
 		query: {
 			retry: {
