@@ -24,7 +24,7 @@ import {
 
 export interface RestatementConfig<T = unknown, E = unknown> {
 	readonly cache: CacheConfig;
-	readonly provider: QueryProvider<T, E>;
+	readonly provider: QueryProvider<T, E> | null;
 	readonly keyHashFn: KeyHashFn<ReadonlyArray<unknown>>;
 	readonly keepCacheOnErrorFn: KeepCacheOnErrorFn<E>;
 
@@ -127,7 +127,7 @@ export function makeCacheManagerInput<T = unknown, E = unknown>(
 	return {
 		store: config.cache.store,
 		keyHashFn: config.keyHashFn,
-		provider: config.provider as QueryProvider<unknown, unknown>,
+		provider: config.provider as QueryProvider<unknown, unknown> | null,
 		ttl: config.cache.ttl,
 	};
 }
@@ -168,7 +168,7 @@ export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>
 		dataFn: local.dataFn ?? null,
 		errorFn: local.errorFn ?? null,
 		filterFn: local.filterFn ?? config.query.filterFn,
-		provider: config.provider as QueryProvider<T, E>,
+		provider: config.provider,
 	};
 }
 
