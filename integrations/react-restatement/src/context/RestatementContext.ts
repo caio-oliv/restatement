@@ -4,8 +4,9 @@ import type { RestatementConfig } from 'restatement';
 export const RestatementContext = createContext({} as RestatementConfig);
 
 /**
- * @returns Restatement Context data
+ * Get restatement config from the context
+ * @returns Restatement config
  */
-export function useRestatementContext<T = unknown, E = unknown>(): RestatementConfig<T, E> {
+export function useRestatementConfig<T = unknown, E = unknown>(): RestatementConfig<T, E> {
 	return useContext(RestatementContext) as RestatementConfig<T, E>;
 }
