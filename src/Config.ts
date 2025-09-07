@@ -135,6 +135,7 @@ export function makeCacheManagerInput<T = unknown, E = unknown>(
 	return {
 		store: config.cache.store,
 		keyHashFn: config.keyHashFn,
+		extractTTLFn: config.query.extractTTLFn as ExtractTTLFn<unknown>,
 		provider: config.provider as QueryProvider<unknown, unknown> | null,
 		ttl: config.cache.ttl,
 	};

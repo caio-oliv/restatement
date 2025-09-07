@@ -1,6 +1,25 @@
 import { assert, describe, expect, it, vi } from 'vitest';
-import { CacheManager, type QueryProviderData, PubSub, type QueryProvider } from '@/lib';
+import {
+	CacheManager,
+	type QueryProviderData,
+	PubSub,
+	type QueryProvider,
+	type Millisecond,
+} from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
+
+interface Response<T> {
+	is: 'response';
+	data: T;
+	expired: Millisecond;
+}
+
+function isResponse(res: unknown): Response<unknown> | null {
+	if (typeof res === 'object' && res !== null && 'is' in res && res.is === 'response') {
+		return res as Response<unknown>;
+	}
+	return null;
+}
 
 interface UserMock {
 	id: number;
@@ -51,6 +70,30 @@ describe('CacheManager', () => {
 			state: { status: 'success', data, error: null },
 			metadata: { cache: 'none', origin: 'provider', source: 'mutation' },
 		} satisfies QueryProviderData<typeof data, Error>);
+	});
+
+	it('extract ttl from value', async () => {
+		function extractTTLFn(data: unknown, fallbackTTL: Millisecond): Millisecond {
+			const res = isResponse(data);
+			if (res === null) return fallbackTTL;
+
+			return Math.max(res.expired - Date.now(), 0);
+		}
+		const store = makeCache();
+		const cache = new CacheManager({ store, extractTTLFn });
+
+		const data = generateUserMock(1);
+		const response: Response<UserMock> = {
+			is: 'response',
+			data,
+			expired: Date.now() + 3_000,
+		};
+
+		await cache.set(['user', 'id:1'], response, 10_000);
+
+		const entry = (await store.getEntry(cache.keyHashFn(['user', 'id:1'])))!;
+
+		assert.isAtMost(entry.ttl, 3_000);
 	});
 
 	it('set value with custom ttl', async () => {

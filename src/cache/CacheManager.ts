@@ -1,7 +1,7 @@
-import type { CacheHandler, KeyHashFn, Millisecond } from '@/core/Type';
+import type { CacheHandler, ExtractTTLFn, KeyHashFn, Millisecond } from '@/core/Type';
 import type { QueryProvider } from '@/query/QueryContext';
 import type { CacheStore } from '@/core/Cache';
-import { defaultKeyHashFn, DEFAULT_TTL_DURATION } from '@/Default';
+import { defaultKeyHashFn, DEFAULT_TTL_DURATION, defaultExtractTTLFn } from '@/Default';
 
 /**
  * Cache manager input
@@ -11,6 +11,10 @@ export interface CacheManagerInput<T = unknown, E = unknown> {
 	 * Key hash function
 	 */
 	keyHashFn?: KeyHashFn<ReadonlyArray<unknown>>;
+	/**
+	 * Extract TTL function
+	 */
+	extractTTLFn?: ExtractTTLFn<T>;
 	/**
 	 * Default TTL duration
 	 */
@@ -36,6 +40,10 @@ export class CacheManager implements CacheHandler {
 	 */
 	public readonly keyHashFn: KeyHashFn<ReadonlyArray<unknown>>;
 	/**
+	 * Extract TTL function
+	 */
+	public readonly extractTTLFn: ExtractTTLFn<unknown>;
+	/**
 	 * Default TTL duration
 	 * @description Time To Live of cache entries.
 	 */
@@ -44,11 +52,13 @@ export class CacheManager implements CacheHandler {
 	public constructor({
 		keyHashFn = defaultKeyHashFn,
 		ttl = DEFAULT_TTL_DURATION,
+		extractTTLFn = defaultExtractTTLFn,
 		store,
 		provider = null,
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	}: CacheManagerInput<any, any>) {
 		this.keyHashFn = keyHashFn;
+		this.extractTTLFn = extractTTLFn;
 		this.ttl = ttl;
 		this.#internalCache = store;
 		this.#provider = provider;
@@ -60,7 +70,7 @@ export class CacheManager implements CacheHandler {
 		ttl: Millisecond = this.ttl
 	): Promise<void> {
 		const hash = this.keyHashFn(key);
-		await this.#internalCache.set(hash, data, ttl);
+		await this.#internalCache.set(hash, data, this.extractTTLFn(data, ttl));
 		this.#provider?.publish(hash, {
 			state: { data, error: null, status: 'success' },
 			metadata: { source: 'mutation', origin: 'provider', cache: 'none' },
