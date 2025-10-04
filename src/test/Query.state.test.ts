@@ -1,7 +1,7 @@
 import { assert, describe, expect, it, vi } from 'vitest';
 import {
 	defaultKeyHashFn,
-	NoRetryPolicy,
+	NO_RETRY_POLICY,
 	Query,
 	waitUntil,
 	type InitialStateMetadata,
@@ -13,8 +13,11 @@ describe('Query state transition / reset query', () => {
 	it('reset query state to idle', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -43,12 +46,11 @@ describe('Query state transition / reset query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
-		const retryPolicy = new NoRetryPolicy();
 		const queryApi = Query.create<[string], string, Error>({
 			placeholder: '123',
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			...handler,
 		});
 
@@ -83,12 +85,11 @@ describe('Query state transition / reset query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
-		const retryPolicy = new NoRetryPolicy();
 		const queryApi = Query.create<[string], string, Error>({
 			placeholder: '123',
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			...handler,
 		});
 
@@ -140,11 +141,10 @@ describe('Query state transition / reset query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
-		const retryPolicy = new NoRetryPolicy();
 		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			...handler,
 		});
 
@@ -179,11 +179,10 @@ describe('Query state transition / reset query', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
-		const retryPolicy = new NoRetryPolicy();
 		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			...handler,
 		});
 
@@ -235,8 +234,11 @@ describe('Query state transition / no-cache query', () => {
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -267,8 +269,11 @@ describe('Query state transition / no-cache query', () => {
 	it('start the query state as "idle" and change to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -299,8 +304,11 @@ describe('Query state transition / no-cache query', () => {
 	it('start the query state as "idle" and change to "loading" after start of execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -341,8 +349,11 @@ describe('Query state transition / no-cache query', () => {
 	it('start the query state as "success" and change to "loading" and to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -401,8 +412,11 @@ describe('Query state transition / no-cache query', () => {
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -461,8 +475,11 @@ describe('Query state transition / no-cache query', () => {
 	it('start the query state as "error" and change to "loading" and to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -521,8 +538,11 @@ describe('Query state transition / no-cache query', () => {
 	it('start the query state as "error" and change to "loading" and to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -585,8 +605,11 @@ describe('Query state transition / fresh query', () => {
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -617,8 +640,11 @@ describe('Query state transition / fresh query', () => {
 	it('start the query state as "idle" and change to "success" after result from cache', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -651,8 +677,11 @@ describe('Query state transition / fresh query', () => {
 	it('start the query state as "idle" and change to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -683,8 +712,11 @@ describe('Query state transition / fresh query', () => {
 	it('start the query state as "idle" and change to "loading" after start of execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -729,11 +761,10 @@ describe('Query state transition / fresh query', () => {
 	it('start the query state as "success" and change to "loading" and to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
 		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			fresh: 50,
 		});
 
@@ -800,8 +831,11 @@ describe('Query state transition / fresh query', () => {
 	it('start the query state as "success" and change to "success" after result from cache', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -854,8 +888,11 @@ describe('Query state transition / fresh query', () => {
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -918,8 +955,11 @@ describe('Query state transition / fresh query', () => {
 	it('start the query state as "error" and change to "loading" and to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -982,8 +1022,11 @@ describe('Query state transition / fresh query', () => {
 	it('start the query state as "error" and change to "success" after result from cache', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1040,8 +1083,11 @@ describe('Query state transition / fresh query', () => {
 	it('start the query state as "error" and change to "loading" and to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1106,8 +1152,11 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "idle" and change to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1138,8 +1187,11 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "idle" and change to "success" after result from cache', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1172,11 +1224,10 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "idle" and change to "stale" and to "success" after background query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
 		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			fresh: 50,
 			ttl: 200,
 		});
@@ -1234,11 +1285,10 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "idle" and change to "stale" and to "error" after background query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
 		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			fresh: 50,
 			ttl: 200,
 		});
@@ -1296,8 +1346,11 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "idle" and change to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1328,8 +1381,11 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "idle" and change to "loading" after start of execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1374,8 +1430,11 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "success" and change to "loading" and to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1440,8 +1499,11 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "success" and change to "success" after result from cache', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1494,11 +1556,10 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "idle" and change to "stale" and to "success" after background query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
 		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			fresh: 50,
 			ttl: 200,
 		});
@@ -1574,11 +1635,10 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "idle" and change to "stale" and to "error" after background query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
 		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			fresh: 50,
 			ttl: 200,
 		});
@@ -1654,8 +1714,11 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1720,8 +1783,11 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "error" and change to "loading" and to "success" after successful execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1784,8 +1850,11 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "error" and change to "loading" and to "success" after result from cache', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1842,11 +1911,10 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "error" and change to "stale" and to "success" after background query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
 		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			fresh: 50,
 			ttl: 200,
 		});
@@ -1924,11 +1992,10 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "error" and change to "stale" and to "error" after background query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
 		const queryApi = Query.create<[string], string, Error>({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			fresh: 50,
 			ttl: 200,
 		});
@@ -2004,8 +2071,11 @@ describe('Query state transition / stale query', () => {
 	it('start the query state as "success" and change to "loading" and to "error" after failed execution', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create<[string], string, Error>({ store, queryFn, retryPolicy });
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+		});
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,

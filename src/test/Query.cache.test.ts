@@ -1,5 +1,5 @@
 import { assert, describe, expect, it, vi } from 'vitest';
-import { DEFAULT_TTL_DURATION, defaultKeyHashFn, NoRetryPolicy, Query, waitUntil } from '@/lib';
+import { DEFAULT_TTL_DURATION, defaultKeyHashFn, NO_RETRY_POLICY, Query, waitUntil } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { testTransformer } from '@/test/TestHelper.mock';
 
@@ -7,8 +7,7 @@ describe('Query cache usage / no-cache query', () => {
 	it('fill the cache when making a query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create({ store, queryFn, retryPolicy });
+		const queryApi = Query.create({ store, queryFn, retryPolicy: NO_RETRY_POLICY });
 
 		await queryApi.execute(['key#1'], { cache: 'no-cache' });
 
@@ -20,8 +19,13 @@ describe('Query cache usage / no-cache query', () => {
 	it('update the cache remaking the same query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 100, ttl: 1_000 });
+		const queryApi = Query.create({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+			fresh: 100,
+			ttl: 1_000,
+		});
 
 		await queryApi.execute(['key#1'], { cache: 'no-cache' });
 
@@ -62,8 +66,13 @@ describe('Query cache usage / no-cache query', () => {
 	it('remove the cache with a failed query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 100, ttl: 1_000 });
+		const queryApi = Query.create({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+			fresh: 100,
+			ttl: 1_000,
+		});
 
 		queryFn.mockResolvedValueOnce('valid_result');
 
@@ -85,11 +94,10 @@ describe('Query cache usage / no-cache query', () => {
 	it('not remove the cache with a failed query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
 		const queryApi = Query.create({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			fresh: 100,
 			ttl: 1_000,
 			keepCacheOnErrorFn: () => true,
@@ -117,8 +125,7 @@ describe('Query cache usage / fresh query', () => {
 	it('fill the cache when making a query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create({ store, queryFn, retryPolicy });
+		const queryApi = Query.create({ store, queryFn, retryPolicy: NO_RETRY_POLICY });
 
 		await queryApi.execute(['key#1'], { cache: 'fresh' });
 
@@ -130,8 +137,13 @@ describe('Query cache usage / fresh query', () => {
 	it('update the cache remaking the same query when the cache is not fresh', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 20, ttl: 1_000 });
+		const queryApi = Query.create({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+			fresh: 20,
+			ttl: 1_000,
+		});
 
 		await queryApi.execute(['key#1'], { cache: 'fresh' });
 
@@ -172,8 +184,13 @@ describe('Query cache usage / fresh query', () => {
 	it('remove the cache with a failed query when the cache is not fresh', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 20, ttl: 1_000 });
+		const queryApi = Query.create({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+			fresh: 20,
+			ttl: 1_000,
+		});
 
 		queryFn.mockResolvedValueOnce('valid_result');
 
@@ -197,8 +214,7 @@ describe('Query cache usage / fresh query', () => {
 	it('remove the cache with a failed query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 0 });
+		const queryApi = Query.create({ store, queryFn, retryPolicy: NO_RETRY_POLICY, fresh: 0 });
 
 		await store.set(defaultKeyHashFn(['invalid']), 'valid_result', DEFAULT_TTL_DURATION);
 
@@ -218,11 +234,10 @@ describe('Query cache usage / fresh query', () => {
 	it('not remove the cache with a failed query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
 		const queryApi = Query.create({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			fresh: 0,
 			keepCacheOnErrorFn: () => true,
 		});
@@ -247,8 +262,7 @@ describe('Query cache usage / stale query', () => {
 	it('fill the cache when making a query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create({ store, queryFn, retryPolicy });
+		const queryApi = Query.create({ store, queryFn, retryPolicy: NO_RETRY_POLICY });
 
 		await queryApi.execute(['key#1'], { cache: 'stale' });
 
@@ -260,8 +274,13 @@ describe('Query cache usage / stale query', () => {
 	it('update the cache remaking the same query when the cache is stale', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 0, ttl: 1_000 });
+		const queryApi = Query.create({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+			fresh: 0,
+			ttl: 1_000,
+		});
 
 		await queryApi.execute(['key#1'], { cache: 'stale' });
 
@@ -303,8 +322,13 @@ describe('Query cache usage / stale query', () => {
 	it('remove the cache with a failed query when the cache is stale', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 0, ttl: 1_000 });
+		const queryApi = Query.create({
+			store,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+			fresh: 0,
+			ttl: 1_000,
+		});
 
 		queryFn.mockResolvedValueOnce('valid_result');
 
@@ -327,8 +351,7 @@ describe('Query cache usage / stale query', () => {
 	it('remove the cache with a failed query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 0 });
+		const queryApi = Query.create({ store, queryFn, retryPolicy: NO_RETRY_POLICY, fresh: 0 });
 
 		await store.set(defaultKeyHashFn(['invalid']), 'valid_result', DEFAULT_TTL_DURATION);
 
@@ -349,11 +372,10 @@ describe('Query cache usage / stale query', () => {
 	it('not remove the cache with a failed query', async () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
 		const queryApi = Query.create({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			fresh: 0,
 			keepCacheOnErrorFn: () => true,
 		});
@@ -380,8 +402,7 @@ describe('Query cache exception handling', () => {
 		const store = makeCache<string>();
 		const storeSpy = vi.spyOn(store, 'getEntry');
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create({ store, queryFn, retryPolicy });
+		const queryApi = Query.create({ store, queryFn, retryPolicy: NO_RETRY_POLICY });
 
 		await queryApi.execute(['key#1'], { cache: 'stale' });
 
@@ -414,8 +435,7 @@ describe('Query cache exception handling', () => {
 		const store = makeCache<string>();
 		const storeSpy = vi.spyOn(store, 'set');
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create({ store, queryFn, retryPolicy });
+		const queryApi = Query.create({ store, queryFn, retryPolicy: NO_RETRY_POLICY });
 
 		storeSpy.mockRejectedValueOnce(new Error('service_unavailable'));
 
@@ -448,8 +468,7 @@ describe('Query cache exception handling', () => {
 		const store = makeCache<string>();
 		const storeSpy = vi.spyOn(store, 'delete');
 		const queryFn = vi.fn(testTransformer);
-		const retryPolicy = new NoRetryPolicy();
-		const queryApi = Query.create({ store, queryFn, retryPolicy, fresh: 0 });
+		const queryApi = Query.create({ store, queryFn, retryPolicy: NO_RETRY_POLICY, fresh: 0 });
 
 		storeSpy.mockRejectedValueOnce(new Error('service_unavailable'));
 		queryFn.mockResolvedValueOnce('valid_result');

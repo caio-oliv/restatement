@@ -4,6 +4,7 @@ export * from '@/core/RetryPolicy';
 export * from '@/core/Cache';
 export * from '@/PubSub';
 export * from '@/Default';
+export * from '@/cache/NoCache';
 export * from '@/cache/CacheManager';
 export * from '@/Helper';
 export * from '@/query/QueryContext';

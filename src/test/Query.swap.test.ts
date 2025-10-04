@@ -4,13 +4,13 @@ import {
 	DEFAULT_TTL_DURATION,
 	defaultFilterFn,
 	FixedBackoffTimer,
-	NoRetryPolicy,
 	Query,
 	updateQueryContextFn,
 	waitUntil,
 	type QueryState,
 	type StateMetadata,
 	type QueryContextMutFns,
+	NO_RETRY_POLICY,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { mockQueryHandler, testTransformer } from '@/test/TestHelper.mock';
@@ -276,11 +276,10 @@ describe('Query function swap / filterFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
-		const retryPolicy = new NoRetryPolicy();
 		const queryCtl = Query.create<[string], string, Error>({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			...handler,
 		});
 
@@ -319,11 +318,10 @@ describe('Query function swap / filterFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
-		const retryPolicy = new NoRetryPolicy();
 		const queryCtl = Query.create<[string], string, Error>({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			...handler,
 		});
 
@@ -387,11 +385,10 @@ describe('Query function swap / filterFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
-		const retryPolicy = new NoRetryPolicy();
 		const queryCtl = Query.create<[string], string, Error>({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			fresh: 50,
 			ttl: 100,
 			...handler,
@@ -457,11 +454,10 @@ describe('Query function swap / keepCacheOnErrorFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
-		const retryPolicy = new NoRetryPolicy();
 		const queryCtl = Query.create<[string], string, Error>({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			fresh: 50,
 			ttl: 100,
 			...handler,
@@ -510,11 +506,10 @@ describe('Query function swap / keepCacheOnErrorFn', () => {
 		const store = makeCache<string>();
 		const queryFn = vi.fn(testTransformer);
 		const handler = mockQueryHandler<string>();
-		const retryPolicy = new NoRetryPolicy();
 		const queryCtl = Query.create<[string], string, Error>({
 			store,
 			queryFn,
-			retryPolicy,
+			retryPolicy: NO_RETRY_POLICY,
 			fresh: 50,
 			ttl: 100,
 			...handler,

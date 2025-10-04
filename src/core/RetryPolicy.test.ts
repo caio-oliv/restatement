@@ -1,5 +1,5 @@
 import { assert, describe, it, expect, vi } from 'vitest';
-import { execAsyncOperation, NoRetryPolicy, type Millisecond, type OperationResult } from '@/lib';
+import { execAsyncOperation, NO_RETRY_POLICY, type Millisecond, type OperationResult } from '@/lib';
 
 async function failedOperation(): Promise<void> {
 	throw new Error('failed');
@@ -20,9 +20,7 @@ function retryPolicyMock<E>() {
 
 describe('retryAsyncOperation', () => {
 	it('resolve operation', async () => {
-		const noRetry = new NoRetryPolicy();
-
-		const value = await execAsyncOperation<string>(successOperation, noRetry);
+		const value = await execAsyncOperation<string>(successOperation, NO_RETRY_POLICY);
 
 		assert.strictEqual(value, 'OK');
 	});
@@ -97,25 +95,25 @@ describe('retryAsyncOperation', () => {
 
 describe('NoRetryPolicy', () => {
 	it('should not retry', () => {
-		const policy = new NoRetryPolicy();
+		const policy = NO_RETRY_POLICY;
 
 		assert.strictEqual(policy.shouldRetry(), false);
 	});
 
 	it('retry limit as zero', () => {
-		const policy = new NoRetryPolicy();
+		const policy = NO_RETRY_POLICY;
 
 		assert.strictEqual(policy.limit, 0);
 	});
 
 	it('must return negative delay', () => {
-		const policy = new NoRetryPolicy();
+		const policy = NO_RETRY_POLICY;
 
 		assert.strictEqual(policy.delay(), -1);
 	});
 
 	it('noop notify', () => {
-		const policy = new NoRetryPolicy();
+		const policy = NO_RETRY_POLICY;
 
 		assert.strictEqual(policy.notify(), undefined);
 	});

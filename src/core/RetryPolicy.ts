@@ -130,6 +130,8 @@ export class NoRetryPolicy implements RetryPolicy {
 	}
 }
 
+export const NO_RETRY_POLICY = new NoRetryPolicy();
+
 /**
  * Wait until timeout
  * @param time Wait time in {@link Millisecond milliseconds}
