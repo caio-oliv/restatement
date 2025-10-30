@@ -65,6 +65,22 @@ export interface MutationContext<I, T, E = unknown> {
 }
 
 /**
+ * Mutation context mutable attributes
+ */
+export type MutationContextMut<I, T, E = unknown> = Pick<
+	MutationContext<I, T, E>,
+	'mutationFn' | 'retryHandleFn' | 'stateFn' | 'dataFn' | 'errorFn' | 'filterFn' | 'state'
+>;
+
+/**
+ * Mutation context mutable functions
+ */
+export type MutationContextMutFns<I, T, E = unknown> = Pick<
+	MutationContext<I, T, E>,
+	'mutationFn' | 'retryHandleFn' | 'stateFn' | 'dataFn' | 'errorFn' | 'filterFn'
+>;
+
+/**
  * Mutation input
  * @description Mutation input options that make up the mutation context.
  * @typeParam I Mutation input

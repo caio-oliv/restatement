@@ -1,5 +1,9 @@
 import type { MutationState, ResetOptions } from '@/core/Type';
-import type { MutationContext, MutationInput } from '@/mutation/MutationContext';
+import type {
+	MutationContext,
+	MutationContextMutFns,
+	MutationInput,
+} from '@/mutation/MutationContext';
 import { execAsyncOperation } from '@/core/RetryPolicy';
 import { DEFAULT_RETRY_POLICY, defaultFilterFn } from '@/Default';
 import { blackhole, makeAbortSignal } from '@/Internal';
@@ -198,4 +202,24 @@ export function updateMutation<I, T, E>(
 		ctx.errorFn?.(ctx.state.error, ctx.cache)?.catch(blackhole);
 	}
 	ctx.stateFn?.(ctx.state, ctx.cache)?.catch(blackhole);
+}
+
+/**
+ * Update {@link MutationContext `MutationContext`} functions
+ * @typeParam I Mutation input
+ * @typeParam T Return value of a successful mutation
+ * @typeParam E Error from a failed {@link MutationFn mutation} execution
+ * @param ctx Mutation context
+ * @param fns Replacing functions
+ */
+export function updateMutationContextFn<I, T, E = unknown>(
+	ctx: MutationContext<I, T, E>,
+	fns: Partial<MutationContextMutFns<I, T, E>>
+): void {
+	if (fns.mutationFn !== undefined) ctx.mutationFn = fns.mutationFn;
+	if (fns.retryHandleFn !== undefined) ctx.retryHandleFn = fns.retryHandleFn;
+	if (fns.stateFn !== undefined) ctx.stateFn = fns.stateFn;
+	if (fns.dataFn !== undefined) ctx.dataFn = fns.dataFn;
+	if (fns.errorFn !== undefined) ctx.errorFn = fns.errorFn;
+	if (fns.filterFn !== undefined) ctx.filterFn = fns.filterFn;
 }

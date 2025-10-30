@@ -62,14 +62,16 @@ export function immediateRetryDelay(): number {
 	return 0;
 }
 
-export type TestTransformerFn = (keys: [string, ...Array<string>]) => Promise<string>;
+export type TestKeys = [string, ...Array<string>];
+
+export type TestTransformerFn = (keys: TestKeys) => Promise<string>;
 
 /**
  * @description Function for tests that returns data if a hash (pound, sharp) symbol ('#') is found.
  * @param keys - key string
  * @returns promise with data result
  */
-export async function testTransformer(keys: [string, ...Array<string>]): Promise<string> {
+export async function testTransformer(keys: TestKeys): Promise<string> {
 	const key = keys[0];
 	if (!key.startsWith('key#')) {
 		throw new Error('invalid_key');
@@ -89,7 +91,7 @@ export async function testTransformer(keys: [string, ...Array<string>]): Promise
  * @returns Delayed {@link testTransformer}
  */
 export function delayedTestTransformer(delay: number): TestTransformerFn {
-	return async (keys: [string, ...Array<string>]): Promise<string> => {
+	return async (keys: TestKeys): Promise<string> => {
 		await waitUntil(delay);
 		return await testTransformer(keys);
 	};
