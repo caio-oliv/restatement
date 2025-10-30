@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react';
 import { useEffect, useRef } from 'react';
 import { waitUntil } from 'restatement';
 import { useQuery } from '@/lib';
-import { testQueyFn, type TestKeys, testRestatementConfig } from '@/test/Helper.mock';
+import { testQueryFn, type TestKeys, testRestatementConfig } from '@/test/Helper.mock';
 import { makeRestatementProviderWrapper } from '@/test/Component.mock';
 
 interface TestCompProps {
@@ -14,7 +14,7 @@ interface TestCompProps {
 describe('useQuery', () => {
 	it('make query within a component', async () => {
 		const config = testRestatementConfig();
-		const queryFn = vi.fn(testQueyFn);
+		const queryFn = vi.fn(testQueryFn);
 		const stateFn = vi.fn();
 
 		const { rerender, result, unmount } = renderHook(
@@ -72,7 +72,7 @@ describe('useQuery', () => {
 
 	it('re-render in the middle of a query', async () => {
 		const config = testRestatementConfig();
-		const queryFn = vi.fn(testQueyFn);
+		const queryFn = vi.fn(testQueryFn);
 		const stateFn = vi.fn();
 
 		const { rerender, result, unmount } = renderHook(

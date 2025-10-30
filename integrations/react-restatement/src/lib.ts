@@ -4,3 +4,4 @@ export * from '@/hooks/useQueryCache';
 export * from '@/hooks/useCacheStore';
 export * from '@/hooks/useQueryProvider';
 export * from '@/hooks/useQuery';
+export * from '@/hooks/useMutation';
