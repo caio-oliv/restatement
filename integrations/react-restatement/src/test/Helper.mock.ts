@@ -35,7 +35,7 @@ export type TestKeys = [string, ...Array<string | number>];
  * @param key."1" Test key arguments
  * @returns Query result promise
  */
-export async function testQueyFn([control, ...args]: TestKeys): Promise<string> {
+export async function testQueryFn([control, ...args]: TestKeys): Promise<string> {
 	const [result, delay] = control.split(':');
 	if (result !== 'ok') {
 		throw new Error('invalid');
