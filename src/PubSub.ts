@@ -21,11 +21,15 @@ interface ListenerState<in T, out S> {
 	state: S | null;
 }
 
+export type PubSubSetStateFn<in out S> = (old: S | null) => S;
+
+export type PubSubUpdateStateValue<S> = S | PubSubSetStateFn<S>;
+
 /**
  * Make default {@link ListenerState}
  * @returns Default {@link ListenerState}
  */
-function makeListenerState<T, S>(): ListenerState<T, S> {
+function listenerState<T, S>(): ListenerState<T, S> {
 	return {
 		listeners: new Set(),
 		state: null,
@@ -35,7 +39,7 @@ function makeListenerState<T, S>(): ListenerState<T, S> {
 /**
  * Publisher-Subscriber
  */
-export class PubSub<in out T, out S> {
+export class PubSub<in out T, in out S> {
 	public constructor() {
 		this.#listenerMap = new Map<string, ListenerState<T, S>>();
 	}
@@ -47,7 +51,7 @@ export class PubSub<in out T, out S> {
 	 * @returns Unsubscriber handle
 	 */
 	public subscribe(topic: string, listener: Listener<T>): UnsubscribeHandle {
-		const state = this.#listenerMap.get(topic) ?? makeListenerState();
+		const state = this.#listenerMap.get(topic) ?? listenerState();
 		state.listeners.add(listener);
 		this.#listenerMap.set(topic, state);
 		return () => this.unsubscribe(topic, listener);
@@ -108,12 +112,16 @@ export class PubSub<in out T, out S> {
 	 * @param state State
 	 * @returns `true` if the state was set
 	 */
-	public setState(topic: string, state: S): boolean {
+	public setState(topic: string, state: PubSubUpdateStateValue<S>): boolean {
 		const lState = this.#listenerMap.get(topic);
 		if (!lState) {
 			return false;
 		}
-		lState.state = state;
+		if (typeof state === 'function') {
+			lState.state = (state as PubSubSetStateFn<S>)(lState.state);
+		} else {
+			lState.state = state;
+		}
 		this.#listenerMap.set(topic, lState);
 		return true;
 	}
@@ -138,7 +146,7 @@ export class PubSub<in out T, out S> {
 	readonly #listenerMap: Map<string, ListenerState<T, S>>;
 }
 
-export interface Subscriber<in T, out S> {
+export interface Subscriber<in T, in out S> {
 	/**
 	 * Change the subscriber topic
 	 * @param topic Optional new topic
@@ -154,12 +162,12 @@ export interface Subscriber<in T, out S> {
 	 * Get the state from a topic
 	 * @returns Current state
 	 */
-	getCurrentState(): S | null;
+	getState(): S | null;
 	/**
 	 * Set the state of a topic
 	 * @param state Topic state
 	 */
-	setCurrentState(state: S): boolean;
+	setState(state: PubSubUpdateStateValue<S>): boolean;
 
 	/**
 	 * Publish value to current topic
@@ -205,13 +213,13 @@ export class SubscriberHandle<T, S> implements Subscriber<T, S> {
 		return this.#topic;
 	}
 
-	public getCurrentState(): S | null {
+	public getState(): S | null {
 		if (this.#topic === null) return null;
 
 		return this.#provider.getState(this.#topic);
 	}
 
-	public setCurrentState(state: S): boolean {
+	public setState(state: S): boolean {
 		if (this.#topic === null) return false;
 
 		return this.#provider.setState(this.#topic, state);
@@ -257,12 +265,12 @@ export class DummySubscriber<T, S> implements Subscriber<T, S> {
 	}
 
 	// eslint-disable-next-line class-methods-use-this, @typescript-eslint/class-methods-use-this
-	public getCurrentState(): S | null {
+	public getState(): S | null {
 		return null;
 	}
 
 	// eslint-disable-next-line class-methods-use-this, @typescript-eslint/class-methods-use-this
-	public setCurrentState(): boolean {
+	public setState(): boolean {
 		return false;
 	}
 

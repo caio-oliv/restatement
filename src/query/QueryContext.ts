@@ -9,8 +9,8 @@ import type {
 	QueryErrorHandler,
 	QueryFilterFn,
 	QueryProviderData,
-	QueryStatePromise,
 	ExtractTTLFn,
+	QuerySharedState,
 } from '@/core/Type';
 import type { PubSub, Subscriber } from '@/PubSub';
 import type { RetryHandlerFn, RetryPolicy } from '@/core/RetryPolicy';
@@ -19,23 +19,19 @@ import type { CacheManager } from '@/cache/CacheManager';
 
 /**
  * Query subscriber
- * @description Query state subscriber.
- *
- * {@link Subscriber} for {@link QueryProviderData query data} events and {@link QueryStatePromise query promise} state.
+ * @description {@link Subscriber} for {@link QueryProviderData query data} events and {@link QuerySharedState query shared state}.
  * @typeParam T Return value of a successful query
  * @typeParam E Error from a failed {@link QueryFn query} execution
  */
-export type QuerySubscriber<T, E> = Subscriber<QueryProviderData<T, E>, QueryStatePromise<T, E>>;
+export type QuerySubscriber<T, E> = Subscriber<QueryProviderData<T, E>, QuerySharedState<T, E>>;
 
 /**
  * Query provider
- * @description Query state provider.
- *
- * {@link PubSub Provider} for {@link QueryProviderData query data} events and {@link QueryStatePromise query promise} state.
+ * @description {@link PubSub Provider} for {@link QueryProviderData query data} events and {@link QuerySharedState query shared state}.
  * @typeParam T Return value of a successful query
  * @typeParam E Error from a failed {@link QueryFn query} execution
  */
-export type QueryProvider<T, E> = PubSub<QueryProviderData<T, E>, QueryStatePromise<T, E>>;
+export type QueryProvider<T, E> = PubSub<QueryProviderData<T, E>, QuerySharedState<T, E>>;
 
 /**
  * Query context

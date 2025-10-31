@@ -404,20 +404,33 @@ describe('SubscriberHandle shared state', () => {
 
 		handle.useTopic('event#1');
 
-		const setted = handle.setCurrentState('state1');
+		const setted = handle.setState('state1');
 
 		assert.strictEqual(setted, true);
-		assert.strictEqual(handle.getCurrentState(), 'state1');
+		assert.strictEqual(handle.getState(), 'state1');
+	});
+
+	it('set the state of a topic using a function', () => {
+		const pubsub = new PubSub();
+		const handle = new SubscriberHandle(vi.fn(), pubsub);
+
+		handle.useTopic('event#1');
+		handle.setState('prev-state');
+
+		const setted = handle.setState((old: string) => (old.startsWith('prev') ? 'new-state' : ''));
+
+		assert.strictEqual(setted, true);
+		assert.strictEqual(handle.getState(), 'new-state');
 	});
 
 	it('not set the state of a topic that does not exist', () => {
 		const pubsub = new PubSub();
 		const handle = new SubscriberHandle(vi.fn(), pubsub);
 
-		const setted = handle.setCurrentState('state1');
+		const setted = handle.setState('state1');
 
 		assert.strictEqual(setted, false);
-		assert.strictEqual(handle.getCurrentState(), null);
+		assert.strictEqual(handle.getState(), null);
 	});
 });
 
@@ -429,8 +442,8 @@ describe('DummySubscriber', () => {
 
 		assert.deepStrictEqual(sub.currentTopic(), 'topic#2');
 
-		assert.deepStrictEqual(sub.setCurrentState(), false);
-		assert.deepStrictEqual(sub.getCurrentState(), null);
+		assert.deepStrictEqual(sub.setState(), false);
+		assert.deepStrictEqual(sub.getState(), null);
 
 		assert.deepStrictEqual(sub.publish(), false);
 

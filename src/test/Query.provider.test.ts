@@ -510,10 +510,15 @@ describe('Query state provider', () => {
 		expect(handler2.stateFn).toHaveBeenCalledTimes(2);
 		expect(handler3.stateFn).toHaveBeenCalledTimes(2);
 
-		const promise = provider.getState(defaultKeyHashFn(['key#1']));
-		assert.isNotNull(promise);
-		assert.strictEqual(promise?.status, 'fulfilled');
-		assert.deepStrictEqual(await promise, { data: 'data#1', error: null, status: 'success' });
+		const shared = provider.getState(defaultKeyHashFn(['key#1']))!;
+		assert.isNotNull(shared);
+		assert.isNotNull(shared.promise);
+		assert.strictEqual(shared.promise?.status, 'fulfilled');
+		assert.deepStrictEqual(await shared.promise, {
+			data: 'data#1',
+			error: null,
+			status: 'success',
+		});
 
 		assert.deepStrictEqual(state1, null);
 		assert.deepStrictEqual(state2, null);

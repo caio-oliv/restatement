@@ -397,6 +397,19 @@ export interface ObservablePromise<T> extends Promise<T> {
 export type QueryStatePromise<T, E> = ObservablePromise<QueryState<T, E>>;
 
 /**
+ * Query shared state
+ * @description State shared by all queries subscribed to the same key.
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
+ */
+export interface QuerySharedState<T, E> {
+	/**
+	 * Query state promise
+	 */
+	promise: QueryStatePromise<T, E> | null;
+}
+
+/**
  * Query state transition
  * @description A object that represents the transition of a {@link QueryState query state}.
  * @typeParam T Return value of a successful query

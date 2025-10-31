@@ -16,7 +16,7 @@ import type {
 	QueryInput,
 	QueryProvider,
 } from '@/query/QueryContext';
-import { blackhole, makeAbortSignal, makeObservablePromise, nullpromise } from '@/Internal';
+import { blackhole, makeAbortSignal, observablePromise, nullpromise } from '@/Internal';
 import { isCacheEntryFresh } from '@/core/Cache';
 import { DummySubscriber, SubscriberHandle } from '@/PubSub';
 import { CacheManager } from '@/cache/CacheManager';
@@ -205,6 +205,20 @@ export function useQueryKey<K extends ReadonlyArray<unknown>, T, E>(
 }
 
 /**
+ * Returns the current query key hash
+ * @typeParam K Tuple with the query function inputs
+ * @typeParam T Return value of a successful query
+ * @typeParam E Error from a failed {@link QueryFn query} execution
+ * @param ctx Query context
+ * @returns Key hash
+ */
+export function getQueryHash<K extends ReadonlyArray<unknown>, T, E>(
+	ctx: QueryContext<K, T, E>
+): string | null {
+	return ctx.subscriber.currentTopic();
+}
+
+/**
  * Reset query context
  * @description Reset the query to its {@link IdleQueryState initial state}.
  *
@@ -306,17 +320,17 @@ export async function runActiveQuery<K extends ReadonlyArray<unknown>, T, E>(
 
 	updateQuery(ctx, hash, { state, metadata });
 
-	const currPromise = ctx.subscriber.getCurrentState();
-	if (currPromise?.status === 'pending') {
-		currPromise.then((state: QueryState<T, E>) => {
+	const shared = ctx.subscriber.getState();
+	if (shared?.promise?.status === 'pending') {
+		shared.promise.then((state: QueryState<T, E>) => {
 			updateQuery(ctx, hash, { state, metadata: { origin: 'self', source: 'query', cache } });
 		});
 
-		return { state: await currPromise, next: nullpromise };
+		return { state: await shared.promise, next: nullpromise };
 	}
 
 	const promise = runQuery(ctx, { key, hash }, { cache, source: 'query', ttl, signal });
-	ctx.subscriber.setCurrentState(makeObservablePromise(promise));
+	ctx.subscriber.setState({ promise: observablePromise(promise) });
 	return { state: await promise, next: nullpromise };
 }
 
@@ -358,29 +372,29 @@ export async function runBackgroundQuery<K extends ReadonlyArray<unknown>, T, E>
 	{ key, hash }: KeyPair<K>,
 	{ ttl = ctx.ttl, signal = makeAbortSignal() }: RunBackgroundQueryOptions = {}
 ): Promise<QueryExecutionResult<T, E>> {
-	const currPromise = ctx.subscriber.getCurrentState();
-	if (currPromise?.status === 'pending') {
-		currPromise.then((state: QueryState<T, E>) => {
+	const shared = ctx.subscriber.getState();
+	if (shared?.promise?.status === 'pending') {
+		shared.promise.then((state: QueryState<T, E>) => {
 			updateQuery(ctx, hash, {
 				state,
 				metadata: { origin: 'self', source: 'background-query', cache: 'stale' },
 			});
 		});
 
-		return { state, next: () => currPromise };
+		return { state, next: async () => await shared.promise };
 	}
 
 	/**
 	 * `runQuery` should run in the background, so it's promise
 	 * **must not** be awaited.
 	 */
-	const queryPromise = runQuery(
+	const promise = runQuery(
 		ctx,
 		{ key, hash },
 		{ cache: 'stale', source: 'background-query', ttl, signal }
 	);
-	ctx.subscriber.setCurrentState(makeObservablePromise(queryPromise));
-	return { state, next: () => queryPromise };
+	ctx.subscriber.setState({ promise: observablePromise(promise) });
+	return { state, next: () => promise };
 }
 
 /**

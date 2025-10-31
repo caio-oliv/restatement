@@ -90,7 +90,7 @@ export function jsonStringifyObjectSorter(_key: string, value: unknown): unknown
  * @param query Promise object
  * @returns Observable promise
  */
-export function makeObservablePromise<T>(query: Promise<T>): ObservablePromise<T> {
+export function observablePromise<T>(query: Promise<T>): ObservablePromise<T> {
 	(query as { status: PromiseStatus } & Promise<T>).status = 'pending';
 	query.then(
 		() => {
