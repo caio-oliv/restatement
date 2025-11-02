@@ -1,9 +1,10 @@
 import { describe, it, vi, expect, assert } from 'vitest';
 import {
 	type QueryState,
-	type QueryStateMetadata,
 	type QueryStateTransition,
 	type QueryProvider,
+	type QueryStateHandlerEvent,
+	type QueryDataHandlerEvent,
 	Query,
 	PubSub,
 	defaultKeyHashFn,
@@ -12,8 +13,8 @@ import {
 import { makeCache } from '@/integration/LRUCache.mock';
 import { delayedTestTransformer, mockQueryHandler, testTransformer } from '@/test/TestHelper.mock';
 
-function filterControlState({ metadata }: QueryStateTransition<string, Error>): boolean {
-	return metadata.origin === 'self';
+function filterControlState({ event }: QueryStateTransition<string, Error>): boolean {
+	return event.origin === 'self';
 }
 
 describe('Query state provider / query watcher', () => {
@@ -52,39 +53,34 @@ describe('Query state provider / query watcher', () => {
 				1,
 				'data#1',
 				{
-					cache: 'no-cache',
+					type: 'transition',
 					origin: 'self',
-					source: 'query',
-				} satisfies QueryStateMetadata,
+					metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+					state: { status: 'success', data: 'data#1', error: null },
+				} satisfies QueryDataHandlerEvent<string>,
 				queryApi1.cache
 			);
 
 			expect(handler1.stateFn).toHaveBeenNthCalledWith(
 				1,
+				{ data: null, error: null, status: 'loading' } satisfies QueryState<string, Error>,
 				{
-					data: null,
-					error: null,
-					status: 'loading',
-				} satisfies QueryState<string, Error>,
-				{
-					cache: 'no-cache',
+					type: 'transition',
 					origin: 'self',
-					source: 'query',
-				} satisfies QueryStateMetadata,
+					metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+					state: { data: null, error: null, status: 'loading' },
+				} satisfies QueryStateHandlerEvent<string, Error>,
 				queryApi1.cache
 			);
 			expect(handler1.stateFn).toHaveBeenNthCalledWith(
 				2,
+				{ data: 'data#1', error: null, status: 'success' } satisfies QueryState<string, Error>,
 				{
-					data: 'data#1',
-					error: null,
-					status: 'success',
-				} satisfies QueryState<string, Error>,
-				{
-					cache: 'no-cache',
+					type: 'transition',
 					origin: 'self',
-					source: 'query',
-				} satisfies QueryStateMetadata,
+					metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+					state: { data: 'data#1', error: null, status: 'success' },
+				} satisfies QueryStateHandlerEvent<string, Error>,
 				queryApi1.cache
 			);
 
@@ -100,39 +96,34 @@ describe('Query state provider / query watcher', () => {
 				1,
 				'data#1',
 				{
-					cache: 'no-cache',
+					type: 'transition',
 					origin: 'provider',
-					source: 'query',
-				} satisfies QueryStateMetadata,
+					metadata: { cache: 'no-cache', origin: 'provider', source: 'query' },
+					state: { status: 'success', data: 'data#1', error: null },
+				} satisfies QueryDataHandlerEvent<string>,
 				queryApi2.cache
 			);
 
 			expect(handler2.stateFn).toHaveBeenNthCalledWith(
 				1,
+				{ data: null, error: null, status: 'loading' } satisfies QueryState<string, Error>,
 				{
-					data: null,
-					error: null,
-					status: 'loading',
-				} satisfies QueryState<string, Error>,
-				{
-					cache: 'no-cache',
+					type: 'transition',
 					origin: 'provider',
-					source: 'query',
-				} satisfies QueryStateMetadata,
+					metadata: { cache: 'no-cache', origin: 'provider', source: 'query' },
+					state: { data: null, error: null, status: 'loading' },
+				} satisfies QueryStateHandlerEvent<string, Error>,
 				queryApi2.cache
 			);
 			expect(handler2.stateFn).toHaveBeenNthCalledWith(
 				2,
+				{ data: 'data#1', error: null, status: 'success' } satisfies QueryState<string, Error>,
 				{
-					data: 'data#1',
-					error: null,
-					status: 'success',
-				} satisfies QueryState<string, Error>,
-				{
-					cache: 'no-cache',
+					type: 'transition',
 					origin: 'provider',
-					source: 'query',
-				} satisfies QueryStateMetadata,
+					metadata: { cache: 'no-cache', origin: 'provider', source: 'query' },
+					state: { data: 'data#1', error: null, status: 'success' },
+				} satisfies QueryStateHandlerEvent<string, Error>,
 				queryApi2.cache
 			);
 
@@ -404,30 +395,24 @@ describe('Query state provider', () => {
 
 			expect(handler1.stateFn).toHaveBeenNthCalledWith(
 				1,
+				{ data: null, error: null, status: 'loading' } satisfies QueryState<string, Error>,
 				{
-					data: null,
-					error: null,
-					status: 'loading',
-				} satisfies QueryState<string, Error>,
-				{
-					cache: 'fresh',
+					type: 'transition',
 					origin: 'self',
-					source: 'query',
-				} satisfies QueryStateMetadata,
+					metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+					state: { data: null, error: null, status: 'loading' },
+				} satisfies QueryStateHandlerEvent<string, Error>,
 				queryApi1.cache
 			);
 			expect(handler1.stateFn).toHaveBeenNthCalledWith(
 				2,
+				{ data: 'data#1', error: null, status: 'success' } satisfies QueryState<string, Error>,
 				{
-					data: 'data#1',
-					error: null,
-					status: 'success',
-				} satisfies QueryState<string, Error>,
-				{
-					cache: 'fresh',
+					type: 'transition',
 					origin: 'self',
-					source: 'query',
-				} satisfies QueryStateMetadata,
+					metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+					state: { data: 'data#1', error: null, status: 'success' },
+				} satisfies QueryStateHandlerEvent<string, Error>,
 				queryApi1.cache
 			);
 		}
@@ -437,30 +422,24 @@ describe('Query state provider', () => {
 
 			expect(handler2.stateFn).toHaveBeenNthCalledWith(
 				1,
+				{ data: null, error: null, status: 'loading' } satisfies QueryState<string, Error>,
 				{
-					data: null,
-					error: null,
-					status: 'loading',
-				} satisfies QueryState<string, Error>,
-				{
-					cache: 'no-cache',
+					type: 'transition',
 					origin: 'self',
-					source: 'query',
-				} satisfies QueryStateMetadata,
+					metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+					state: { data: null, error: null, status: 'loading' },
+				} satisfies QueryStateHandlerEvent<string, Error>,
 				queryApi2.cache
 			);
 			expect(handler2.stateFn).toHaveBeenNthCalledWith(
 				2,
+				{ data: 'data#1', error: null, status: 'success' } satisfies QueryState<string, Error>,
 				{
-					data: 'data#1',
-					error: null,
-					status: 'success',
-				} satisfies QueryState<string, Error>,
-				{
-					cache: 'no-cache',
+					type: 'transition',
 					origin: 'self',
-					source: 'query',
-				} satisfies QueryStateMetadata,
+					metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+					state: { data: 'data#1', error: null, status: 'success' },
+				} satisfies QueryStateHandlerEvent<string, Error>,
 				queryApi2.cache
 			);
 		}
@@ -470,30 +449,24 @@ describe('Query state provider', () => {
 
 			expect(handler3.stateFn).toHaveBeenNthCalledWith(
 				1,
+				{ data: 'data_stale#1', error: null, status: 'stale' } satisfies QueryState<string, Error>,
 				{
-					data: 'data_stale#1',
-					error: null,
-					status: 'stale',
-				} satisfies QueryState<string, Error>,
-				{
-					cache: 'stale',
+					type: 'transition',
 					origin: 'self',
-					source: 'cache',
-				} satisfies QueryStateMetadata,
+					metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+					state: { data: 'data_stale#1', error: null, status: 'stale' },
+				} satisfies QueryStateHandlerEvent<string, Error>,
 				queryApi3.cache
 			);
 			expect(handler3.stateFn).toHaveBeenNthCalledWith(
 				2,
+				{ data: 'data#1', error: null, status: 'success' } satisfies QueryState<string, Error>,
 				{
-					data: 'data#1',
-					error: null,
-					status: 'success',
-				} satisfies QueryState<string, Error>,
-				{
-					cache: 'stale',
+					type: 'transition',
 					origin: 'self',
-					source: 'background-query',
-				} satisfies QueryStateMetadata,
+					metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+					state: { data: 'data#1', error: null, status: 'success' },
+				} satisfies QueryStateHandlerEvent<string, Error>,
 				queryApi3.cache
 			);
 		}

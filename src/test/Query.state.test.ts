@@ -4,7 +4,7 @@ import {
 	NO_RETRY_POLICY,
 	Query,
 	waitUntil,
-	type InitialStateMetadata,
+	type InitializationQueryEvent,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { delayedTestTransformer, testTransformer, mockQueryHandler } from '@/test/TestHelper.mock';
@@ -127,10 +127,9 @@ describe('Query state transition / reset query', () => {
 				status: 'idle',
 			},
 			{
-				cache: 'none',
+				type: 'initialization',
 				origin: 'self',
-				source: 'initialization',
-			} satisfies InitialStateMetadata,
+			} satisfies InitializationQueryEvent,
 			queryApi.cache
 		);
 	});
@@ -220,10 +219,9 @@ describe('Query state transition / reset query', () => {
 				status: 'idle',
 			},
 			{
-				cache: 'none',
+				type: 'initialization',
 				origin: 'self',
-				source: 'initialization',
-			} satisfies InitialStateMetadata,
+			} satisfies InitializationQueryEvent,
 			queryApi.cache
 		);
 	});

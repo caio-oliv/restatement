@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-	type QueryStateMetadata,
+	type QueryStateHandlerEvent,
 	DEFAULT_TTL_DURATION,
 	defaultKeyHashFn,
 	NO_RETRY_POLICY,
@@ -31,39 +31,34 @@ describe('Query handler execution / no-cache query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -90,39 +85,34 @@ describe('Query handler execution / no-cache query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -145,25 +135,23 @@ describe('Query handler execution / no-cache query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
@@ -174,10 +162,11 @@ describe('Query handler execution / no-cache query', () => {
 				status: 'success',
 			},
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -193,25 +182,23 @@ describe('Query handler execution / no-cache query', () => {
 			2,
 			'data#1',
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'data#1', error: null, status: 'loading' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
@@ -222,10 +209,11 @@ describe('Query handler execution / no-cache query', () => {
 				status: 'success',
 			},
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -248,39 +236,34 @@ describe('Query handler execution / no-cache query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -296,39 +279,34 @@ describe('Query handler execution / no-cache query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'data#1', error: null, status: 'loading' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -351,25 +329,23 @@ describe('Query handler execution / no-cache query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
@@ -380,10 +356,11 @@ describe('Query handler execution / no-cache query', () => {
 				status: 'error',
 			},
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -399,39 +376,34 @@ describe('Query handler execution / no-cache query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -454,39 +426,34 @@ describe('Query handler execution / no-cache query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -502,25 +469,23 @@ describe('Query handler execution / no-cache query', () => {
 			2,
 			new Error('invalid_key'),
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
@@ -531,10 +496,11 @@ describe('Query handler execution / no-cache query', () => {
 				status: 'error',
 			},
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -563,39 +529,34 @@ describe('Query handler execution / fresh query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -624,25 +585,23 @@ describe('Query handler execution / fresh query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -669,39 +628,34 @@ describe('Query handler execution / fresh query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -724,39 +678,34 @@ describe('Query handler execution / fresh query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -774,39 +723,34 @@ describe('Query handler execution / fresh query', () => {
 			2,
 			'data#1',
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'data#1', error: null, status: 'loading' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -829,25 +773,23 @@ describe('Query handler execution / fresh query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
@@ -858,10 +800,11 @@ describe('Query handler execution / fresh query', () => {
 				status: 'success',
 			},
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -877,25 +820,23 @@ describe('Query handler execution / fresh query', () => {
 			2,
 			'data#1',
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -918,39 +859,34 @@ describe('Query handler execution / fresh query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -966,39 +902,34 @@ describe('Query handler execution / fresh query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'data#1', error: null, status: 'loading' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1021,39 +952,34 @@ describe('Query handler execution / fresh query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1069,39 +995,34 @@ describe('Query handler execution / fresh query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1124,39 +1045,34 @@ describe('Query handler execution / fresh query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1174,25 +1090,23 @@ describe('Query handler execution / fresh query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1215,39 +1129,34 @@ describe('Query handler execution / fresh query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1263,39 +1172,34 @@ describe('Query handler execution / fresh query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1324,39 +1228,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1385,25 +1284,23 @@ describe('Query handler execution / stale query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1436,39 +1333,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1493,25 +1385,23 @@ describe('Query handler execution / stale query', () => {
 			2,
 			'stale_data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'stale_data#1', error: null, status: 'stale' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'stale_data#1', error: null, status: 'stale' },
 			{
-				data: 'stale_data#1',
-				error: null,
-				status: 'stale',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'stale_data#1', error: null, status: 'stale' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1525,25 +1415,23 @@ describe('Query handler execution / stale query', () => {
 			3,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'background-query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'background-query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1576,39 +1464,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1632,25 +1515,23 @@ describe('Query handler execution / stale query', () => {
 			2,
 			'stale_data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'stale_data#1', error: null, status: 'stale' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'stale_data#1', error: null, status: 'stale' },
 			{
-				data: 'stale_data#1',
-				error: null,
-				status: 'stale',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'stale_data#1', error: null, status: 'stale' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1664,25 +1545,23 @@ describe('Query handler execution / stale query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'background-query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'background-query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1709,39 +1588,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1764,39 +1638,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1814,39 +1683,34 @@ describe('Query handler execution / stale query', () => {
 			2,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'data#1', error: null, status: 'loading' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1869,39 +1733,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1917,25 +1776,23 @@ describe('Query handler execution / stale query', () => {
 			2,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -1964,39 +1821,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2020,25 +1872,23 @@ describe('Query handler execution / stale query', () => {
 			2,
 			'stale_data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'stale_data#1', error: null, status: 'stale' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'stale_data#1', error: null, status: 'stale' },
 			{
-				data: 'stale_data#1',
-				error: null,
-				status: 'stale',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'stale_data#1', error: null, status: 'stale' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2053,25 +1903,23 @@ describe('Query handler execution / stale query', () => {
 			3,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'background-query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'background-query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2100,39 +1948,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2156,25 +1999,23 @@ describe('Query handler execution / stale query', () => {
 			2,
 			'stale_data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'stale_data#1', error: null, status: 'stale' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'stale_data#1', error: null, status: 'stale' },
 			{
-				data: 'stale_data#1',
-				error: null,
-				status: 'stale',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'stale_data#1', error: null, status: 'stale' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2189,25 +2030,23 @@ describe('Query handler execution / stale query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'background-query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'background-query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2230,39 +2069,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2278,39 +2112,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'data#1', error: null, status: 'loading' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2333,39 +2162,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2381,39 +2205,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2436,39 +2255,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2486,25 +2300,23 @@ describe('Query handler execution / stale query', () => {
 			1,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2533,39 +2345,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2589,25 +2396,23 @@ describe('Query handler execution / stale query', () => {
 			1,
 			'stale_data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'stale_data#1', error: null, status: 'stale' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'stale_data#1', error: null, status: 'stale' },
 			{
-				data: 'stale_data#1',
-				error: null,
-				status: 'stale',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'stale_data#1', error: null, status: 'stale' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2622,25 +2427,23 @@ describe('Query handler execution / stale query', () => {
 			2,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'background-query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'background-query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2669,39 +2472,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2725,25 +2523,23 @@ describe('Query handler execution / stale query', () => {
 			1,
 			'stale_data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'stale_data#1', error: null, status: 'stale' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'stale_data#1', error: null, status: 'stale' },
 			{
-				data: 'stale_data#1',
-				error: null,
-				status: 'stale',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'stale_data#1', error: null, status: 'stale' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2758,25 +2554,23 @@ describe('Query handler execution / stale query', () => {
 			2,
 			new Error('invalid_key'),
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'background-query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'background-query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2805,39 +2599,34 @@ describe('Query handler execution / stale query', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2853,39 +2642,34 @@ describe('Query handler execution / stale query', () => {
 			2,
 			new Error('invalid_key'),
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2914,39 +2698,34 @@ describe('Query handler exception handling', () => {
 			1,
 			'data#1',
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -2962,39 +2741,34 @@ describe('Query handler exception handling', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'data#1', error: null, status: 'loading' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'no-cache',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -3021,39 +2795,34 @@ describe('Query handler exception handling', () => {
 			1,
 			'data#1',
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -3069,39 +2838,34 @@ describe('Query handler exception handling', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'data#1', error: null, status: 'loading' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -3117,35 +2881,34 @@ describe('Query handler exception handling', () => {
 			2,
 			'data#1',
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.dataFn).toHaveBeenNthCalledWith(
 			3,
 			'data#1',
 			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			5,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'fresh',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'fresh', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -3172,39 +2935,34 @@ describe('Query handler exception handling', () => {
 			1,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			1,
+			{ data: null, error: null, status: 'loading' },
 			{
-				data: null,
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			2,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -3220,39 +2978,34 @@ describe('Query handler exception handling', () => {
 			1,
 			new Error('invalid_key'),
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			3,
+			{ data: 'data#1', error: null, status: 'loading' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'loading',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			4,
+			{ data: null, error: new Error('invalid_key'), status: 'error' },
 			{
-				data: null,
-				error: new Error('invalid_key'),
-				status: 'error',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: null, error: new Error('invalid_key'), status: 'error' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
@@ -3268,35 +3021,34 @@ describe('Query handler exception handling', () => {
 			2,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'query',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'query' },
+				state: { data: 'data#1', error: null, status: 'loading' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 		expect(handler.dataFn).toHaveBeenNthCalledWith(
 			3,
 			'data#1',
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 
 		expect(handler.stateFn).toHaveBeenNthCalledWith(
 			5,
+			{ data: 'data#1', error: null, status: 'success' },
 			{
-				data: 'data#1',
-				error: null,
-				status: 'success',
-			},
-			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies QueryStateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { data: 'data#1', error: null, status: 'success' },
+			} satisfies QueryStateHandlerEvent<string, unknown>,
 			queryApi.cache
 		);
 

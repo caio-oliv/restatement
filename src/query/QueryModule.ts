@@ -1,6 +1,6 @@
 import type {
 	QueryState,
-	QueryProviderData,
+	QueryProviderEvent,
 	KeyPair,
 	KeyHashFn,
 	CacheDirective,
@@ -9,6 +9,10 @@ import type {
 	QueryExecutionResult,
 	Millisecond,
 	ResetOptions,
+	TransitionQueryEvent,
+	MutationQueryEvent,
+	ErrorTransitionQueryEvent,
+	QueryDataHandlerEvent,
 } from '@/core/Type';
 import type {
 	QueryContext,
@@ -94,7 +98,7 @@ export function makeQueryContext<K extends ReadonlyArray<unknown>, T, E = unknow
 		errorFn,
 		filterFn,
 		subscriber: provider
-			? new SubscriberHandle(function listener(hash: string, data: QueryProviderData<T, E>) {
+			? new SubscriberHandle(function listener(hash: string, data: QueryProviderEvent<T, E>) {
 					updateQuery(context, hash, data);
 				}, provider)
 			: new DummySubscriber(),
@@ -158,14 +162,24 @@ export async function executeQuery<K extends ReadonlyArray<unknown>, T, E>(
 	if ((cache === 'fresh' || cache === 'stale') && isCacheEntryFresh(entry, ctx.fresh)) {
 		// Fresh from cache (less time than fresh duration).
 		const state: QueryState<T, E> = { status: 'success', error: null, data: entry.data };
-		updateQuery(ctx, hash, { state, metadata: { origin: 'self', source: 'cache', cache } });
+		updateQuery(ctx, hash, {
+			type: 'transition',
+			origin: 'self',
+			state,
+			metadata: { origin: 'self', source: 'cache', cache },
+		});
 		return { state, next: nullpromise };
 	}
 
 	if (cache === 'stale') {
 		// Stale from cache (greater time than fresh duration).
 		const state: QueryState<T, E> = { status: 'stale', error: null, data: entry.data };
-		updateQuery(ctx, hash, { state, metadata: { origin: 'self', source: 'cache', cache } });
+		updateQuery(ctx, hash, {
+			type: 'transition',
+			origin: 'self',
+			state,
+			metadata: { origin: 'self', source: 'cache', cache },
+		});
 
 		// eslint-disable-next-line @typescript-eslint/return-await
 		return runBackgroundQuery(ctx, state, { key, hash }, { ttl, signal });
@@ -255,9 +269,7 @@ export function resetQuery<K extends ReadonlyArray<unknown>, T, E>(
 function stateInitialization<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>
 ): void {
-	ctx
-		.stateFn?.(ctx.state, { cache: 'none', origin: 'self', source: 'initialization' }, ctx.cache)
-		?.catch(blackhole);
+	ctx.stateFn?.(ctx.state, { type: 'initialization', origin: 'self' }, ctx.cache)?.catch(blackhole);
 }
 
 /**
@@ -318,12 +330,17 @@ export async function runActiveQuery<K extends ReadonlyArray<unknown>, T, E>(
 	const state: QueryState<T, E> = { status: 'loading', data: ctx.state.data, error: null };
 	const metadata: QueryStateMetadata = { origin: 'self', source: 'query', cache };
 
-	updateQuery(ctx, hash, { state, metadata });
+	updateQuery(ctx, hash, { type: 'transition', origin: 'self', state, metadata });
 
 	const shared = ctx.subscriber.getState();
 	if (shared?.promise?.status === 'pending') {
 		shared.promise.then((state: QueryState<T, E>) => {
-			updateQuery(ctx, hash, { state, metadata: { origin: 'self', source: 'query', cache } });
+			updateQuery(ctx, hash, {
+				type: 'transition',
+				origin: 'self',
+				state,
+				metadata,
+			});
 		});
 
 		return { state: await shared.promise, next: nullpromise };
@@ -376,6 +393,8 @@ export async function runBackgroundQuery<K extends ReadonlyArray<unknown>, T, E>
 	if (shared?.promise?.status === 'pending') {
 		shared.promise.then((state: QueryState<T, E>) => {
 			updateQuery(ctx, hash, {
+				type: 'transition',
+				origin: 'self',
 				state,
 				metadata: { origin: 'self', source: 'background-query', cache: 'stale' },
 			});
@@ -504,7 +523,12 @@ export async function queryResolve<K extends ReadonlyArray<unknown>, T, E>(
 ): Promise<QueryState<T, E>> {
 	const state: QueryState<T, E> = { status: 'success', error: null, data };
 	await ctx.internalCache.set(hash, data, ctx.extractTTLFn(data, ttl)).catch(blackhole);
-	updateQuery(ctx, hash, { state, metadata: { origin: 'self', source, cache } });
+	updateQuery(ctx, hash, {
+		type: 'transition',
+		origin: 'self',
+		state,
+		metadata: { origin: 'self', source, cache },
+	});
 	return state;
 }
 
@@ -539,7 +563,12 @@ export async function queryReject<K extends ReadonlyArray<unknown>, T, E>(
 	if (!ctx.keepCacheOnErrorFn(err as E)) {
 		await ctx.internalCache.delete(hash).catch(blackhole);
 	}
-	updateQuery(ctx, hash, { state, metadata: { origin: 'self', source, cache } });
+	updateQuery(ctx, hash, {
+		type: 'transition',
+		origin: 'self',
+		state,
+		metadata: { origin: 'self', source, cache },
+	});
 	return state;
 }
 
@@ -558,34 +587,57 @@ export async function queryReject<K extends ReadonlyArray<unknown>, T, E>(
 export function updateQuery<K extends ReadonlyArray<unknown>, T, E>(
 	ctx: QueryContext<K, T, E>,
 	hash: string,
-	{ state, metadata }: QueryProviderData<T, E>
+	event: QueryProviderEvent<T, E>
 ): void {
 	if (ctx.subscriber.currentTopic() !== hash) {
 		return;
 	}
 
-	if (!ctx.filterFn({ current: ctx.state, next: state, metadata })) {
+	if (!ctx.filterFn({ current: ctx.state, event })) {
 		return;
 	}
 
-	ctx.state = state;
+	if (event.type === 'invalidation') {
+		// TODO: execute query to revalidate result
+		return;
+	}
+
+	propagateQueryUpdate(ctx, hash, event);
+}
+
+/**
+ *
+ * @param ctx Query context
+ * @param hash Key hash
+ * @param event Mutation or Transition event
+ */
+function propagateQueryUpdate<K extends ReadonlyArray<unknown>, T, E>(
+	ctx: QueryContext<K, T, E>,
+	hash: string,
+	event: MutationQueryEvent<T> | TransitionQueryEvent<T, E>
+): void {
+	ctx.state = event.state;
 
 	if (ctx.state.data !== null) {
-		ctx.dataFn?.(ctx.state.data, metadata, ctx.cache)?.catch(blackhole);
+		ctx.dataFn?.(ctx.state.data, event as QueryDataHandlerEvent<T>, ctx.cache)?.catch(blackhole);
 	}
 	if (ctx.state.error !== null) {
-		ctx.errorFn?.(ctx.state.error, metadata, ctx.cache)?.catch(blackhole);
+		ctx
+			.errorFn?.(ctx.state.error, event as ErrorTransitionQueryEvent<E>, ctx.cache)
+			?.catch(blackhole);
 	}
-	ctx.stateFn?.(ctx.state, metadata, ctx.cache)?.catch(blackhole);
+	ctx.stateFn?.(ctx.state, event, ctx.cache)?.catch(blackhole);
 
-	if (metadata.origin === 'self') {
+	if (event.origin === 'self') {
 		ctx.subscriber.publishTopic(hash, {
+			type: 'transition',
+			origin: 'provider',
 			state: ctx.state,
 			metadata: {
 				origin: 'provider',
-				source: metadata.source,
-				cache: metadata.cache,
-			} as QueryStateMetadata,
+				source: event.metadata.source,
+				cache: event.metadata.cache,
+			},
 		});
 	}
 }

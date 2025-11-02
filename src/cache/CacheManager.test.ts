@@ -1,10 +1,10 @@
 import { assert, describe, expect, it, vi } from 'vitest';
 import {
 	CacheManager,
-	type QueryProviderData,
 	PubSub,
 	type QueryProvider,
 	type Millisecond,
+	type MutationQueryEvent,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 
@@ -67,9 +67,10 @@ describe('CacheManager', () => {
 		assert.deepStrictEqual(await cache.get(key), data);
 
 		expect(listener).toHaveBeenNthCalledWith(1, hash, {
+			type: 'mutation',
+			origin: 'provider',
 			state: { status: 'success', data, error: null },
-			metadata: { cache: 'none', origin: 'provider', source: 'mutation' },
-		} satisfies QueryProviderData<typeof data, Error>);
+		} satisfies MutationQueryEvent<typeof data>);
 	});
 
 	it('extract ttl from value', async () => {

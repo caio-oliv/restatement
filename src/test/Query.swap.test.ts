@@ -8,9 +8,9 @@ import {
 	updateQueryContextFn,
 	waitUntil,
 	type QueryState,
-	type StateMetadata,
 	type QueryContextMutFns,
 	NO_RETRY_POLICY,
+	type QueryStateHandlerEvent,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { mockQueryHandler, testTransformer } from '@/test/TestHelper.mock';
@@ -284,7 +284,8 @@ describe('Query function swap / filterFn', () => {
 		});
 
 		{
-			queryCtl.ctx.filterFn = ({ next }) => next.status !== 'loading';
+			queryCtl.ctx.filterFn = ({ event }) =>
+				event.type === 'transition' && event.state.status !== 'loading';
 
 			const result = await queryCtl.execute(['key#true'], { cache: 'no-cache' });
 
@@ -333,16 +334,16 @@ describe('Query function swap / filterFn', () => {
 
 			expect(handler.stateFn).toHaveBeenNthCalledWith(
 				2,
+				{ status: 'error', data: null, error: new Error('manual_error_1') } satisfies QueryState<
+					string,
+					Error
+				>,
 				{
-					status: 'error',
-					data: null,
-					error: new Error('manual_error_1'),
-				} satisfies QueryState<string, Error>,
-				{
-					cache: 'no-cache',
+					type: 'transition',
 					origin: 'self',
-					source: 'query',
-				} satisfies StateMetadata,
+					metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+					state: { status: 'error', data: null, error: new Error('manual_error_1') },
+				} satisfies QueryStateHandlerEvent<string, Error>,
 				queryCtl.cache
 			);
 
@@ -353,23 +354,21 @@ describe('Query function swap / filterFn', () => {
 			});
 		}
 		{
-			queryCtl.ctx.filterFn = ({ next }) => next.status !== 'error';
+			queryCtl.ctx.filterFn = ({ event }) =>
+				event.type === 'transition' && event.state.status !== 'error';
 
 			const result = await queryCtl.execute(['key#true'], { cache: 'no-cache' });
 
 			// error state supressed.
 			expect(handler.stateFn).toHaveBeenNthCalledWith(
 				3,
+				{ status: 'loading', data: null, error: null } satisfies QueryState<string, Error>,
 				{
-					status: 'loading',
-					data: null,
-					error: null,
-				} satisfies QueryState<string, Error>,
-				{
-					cache: 'no-cache',
+					type: 'transition',
 					origin: 'self',
-					source: 'query',
-				} satisfies StateMetadata,
+					metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+					state: { status: 'loading', data: null, error: null },
+				} satisfies QueryStateHandlerEvent<string, Error>,
 				queryCtl.cache
 			);
 
@@ -399,7 +398,8 @@ describe('Query function swap / filterFn', () => {
 
 		const queryPromise = queryCtl.execute(['key#true'], { cache: 'stale' });
 
-		queryCtl.ctx.filterFn = ({ metadata }) => metadata.source !== 'background-query';
+		queryCtl.ctx.filterFn = ({ event }) =>
+			event.type === 'transition' && event.metadata.source !== 'background-query';
 
 		const queryResult = await queryPromise;
 
@@ -411,10 +411,11 @@ describe('Query function swap / filterFn', () => {
 				error: null,
 			} satisfies QueryState<string, Error>,
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies StateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { status: 'stale', data: 'stale_data', error: null },
+			} satisfies QueryStateHandlerEvent<string, Error>,
 			queryCtl.cache
 		);
 
@@ -434,10 +435,11 @@ describe('Query function swap / filterFn', () => {
 				error: null,
 			} satisfies QueryState<string, Error>,
 			{
-				cache: 'stale',
+				type: 'transition',
 				origin: 'self',
-				source: 'cache',
-			} satisfies StateMetadata,
+				metadata: { cache: 'stale', origin: 'self', source: 'cache' },
+				state: { status: 'stale', data: 'stale_data', error: null },
+			} satisfies QueryStateHandlerEvent<string, Error>,
 			queryCtl.cache
 		);
 

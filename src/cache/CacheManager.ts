@@ -1,6 +1,6 @@
 import type { CacheHandler, ExtractTTLFn, KeyHashFn, Millisecond } from '@/core/Type';
-import type { QueryProvider } from '@/query/QueryContext';
 import type { CacheStore } from '@/core/Cache';
+import type { QueryProvider } from '@/query/QueryContext';
 import { defaultKeyHashFn, DEFAULT_TTL_DURATION, defaultExtractTTLFn } from '@/Default';
 
 /**
@@ -72,8 +72,9 @@ export class CacheManager implements CacheHandler {
 		const hash = this.keyHashFn(key);
 		await this.#internalCache.set(hash, data, this.extractTTLFn(data, ttl));
 		this.#provider?.publish(hash, {
-			state: { data, error: null, status: 'success' },
-			metadata: { source: 'mutation', origin: 'provider', cache: 'none' },
+			type: 'mutation',
+			origin: 'provider',
+			state: { status: 'success', data, error: null },
 		});
 	}
 
@@ -85,11 +86,17 @@ export class CacheManager implements CacheHandler {
 	public async delete<K extends ReadonlyArray<unknown>>(key: K): Promise<void> {
 		const hash = this.keyHashFn(key);
 		await this.#internalCache.delete(hash);
+		this.#provider?.publish(hash, { type: 'invalidation', origin: 'provider' });
 	}
 
 	public async invalidate<K extends ReadonlyArray<unknown>>(key: K): Promise<void> {
 		const hash = this.keyHashFn(key);
 		await this.#internalCache.deletePrefix(hash);
+		for (const topic of this.#provider?.topics() ?? []) {
+			if (topic.startsWith(hash)) {
+				this.#provider?.publish(topic, { type: 'invalidation', origin: 'provider' });
+			}
+		}
 	}
 
 	readonly #internalCache: CacheStore<string, unknown>;

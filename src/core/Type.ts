@@ -114,11 +114,10 @@ export type ExtractTTLFn<T> = (data: T, fallbackTTL: Millisecond) => Millisecond
  * in {@link QueryFn query functions}.
  */
 export interface CacheHandler {
+	// TODO: document which events are emitted by these methods
 	/**
 	 * Set a cache entry and update all queries that are subscribed to this key.
 	 * @description The primary way to mutate the data on already resolved queries.
-	 *
-	 * The provided state will have the {@link MutationStateMetadata mutation metadata}.
 	 * @typeParam K Tuple with the query inputs
 	 * @typeParam T Data that will be cached
 	 * @param key Query key
@@ -323,50 +322,56 @@ export interface QueryStateMetadata {
 	readonly cache: CacheDirective;
 }
 
-/**
- * Initial state metadata
- * @description Describe meta information about the {@link IdleQueryState initial query state}.
- *
- * This metadata is only provided when the query state is reset with
- * the {@link ResetOptions#target target option} to `handler`, making
- * the {@link QueryStateHandler query state handler} be called.
- */
-export interface InitialStateMetadata {
+// TODO: detail when each of those events are emitted.
+
+export interface InitializationQueryEvent {
+	readonly type: 'initialization';
 	readonly origin: 'self';
-	readonly source: 'initialization';
-	readonly cache: 'none';
 }
 
-/**
- * Mutation state metadata
- * @description Describe meta information about the mutated query state.
- *
- * Provided by setting a cache entry through the {@link CacheHandler CacheHandler} interface.
- */
-export interface MutationStateMetadata {
+export interface InvalidationQueryEvent {
+	readonly type: 'invalidation';
 	readonly origin: 'provider';
-	readonly source: 'mutation';
-	readonly cache: 'none';
 }
 
 /**
- * State metadata
- * @description Union of all metadata the {@link QueryState query state} can have.
+ * Mutation query event
  */
-export type StateMetadata = QueryStateMetadata | MutationStateMetadata | InitialStateMetadata;
+export interface MutationQueryEvent<T> {
+	readonly type: 'mutation';
+	readonly origin: 'provider';
+	readonly state: SuccessQueryState<T>;
+}
+
+export interface TransitionQueryEvent<T, E> {
+	readonly type: 'transition';
+	readonly origin: 'provider' | 'self';
+	readonly state: QueryState<T, E>;
+	readonly metadata: QueryStateMetadata;
+}
+
+export interface SuccessTransitionQueryEvent<T> extends TransitionQueryEvent<T, never> {
+	readonly state:
+		| IdleQueryState<T>
+		| LoadingQueryState<T>
+		| StaleQueryState<T>
+		| SuccessQueryState<T>;
+}
+
+export interface ErrorTransitionQueryEvent<E> extends TransitionQueryEvent<never, E> {
+	readonly state: ErrorQueryState<E>;
+}
 
 /**
- * Query provider data
- * @description Data composed by the {@link QueryState query state} and
- * its {@link StateMetadata metadata} that is propagated by
- * the {@link QueryProvider query provider}.
+ * Query provider event
+ * @description Events that can be emitted through the {@link QueryProvider query provider}.
  * @typeParam T Return value of a successful query
  * @typeParam E Error from a failed {@link QueryFn query} execution
  */
-export interface QueryProviderData<T, E> {
-	readonly state: QueryState<T, E>;
-	readonly metadata: StateMetadata;
-}
+export type QueryProviderEvent<T, E> =
+	| InvalidationQueryEvent
+	| MutationQueryEvent<T>
+	| TransitionQueryEvent<T, E>;
 
 /**
  * Promise status
@@ -421,13 +426,9 @@ export interface QueryStateTransition<T, E> {
 	 */
 	readonly current: QueryState<T, E>;
 	/**
-	 * Next query state
+	 * Query provider event
 	 */
-	readonly next: QueryState<T, E>;
-	/**
-	 * Metadata of the **next** query state
-	 */
-	readonly metadata: StateMetadata;
+	readonly event: QueryProviderEvent<T, E>;
 }
 
 /**
@@ -440,6 +441,11 @@ export interface QueryStateTransition<T, E> {
  */
 export type QueryFilterFn<T, E> = (transition: QueryStateTransition<T, E>) => boolean;
 
+export type QueryStateHandlerEvent<T, E> =
+	| InitializationQueryEvent
+	| MutationQueryEvent<T>
+	| TransitionQueryEvent<T, E>;
+
 /**
  * Query state handler
  * @description Handler function that is executed for **every** new {@link QueryState query state}.
@@ -451,9 +457,11 @@ export type QueryFilterFn<T, E> = (transition: QueryStateTransition<T, E>) => bo
  */
 export type QueryStateHandler<T, E> = (
 	state: QueryState<T, E>,
-	metadata: StateMetadata,
+	event: QueryStateHandlerEvent<T, E>,
 	cache: CacheHandler
 ) => Promise<void>;
+
+export type QueryDataHandlerEvent<T> = MutationQueryEvent<T> | SuccessTransitionQueryEvent<T>;
 
 /**
  * Query data handler
@@ -466,7 +474,7 @@ export type QueryStateHandler<T, E> = (
  */
 export type QueryDataHandler<T> = (
 	data: T,
-	metadata: StateMetadata,
+	event: QueryDataHandlerEvent<T>,
 	cache: CacheHandler
 ) => Promise<void>;
 
@@ -481,7 +489,7 @@ export type QueryDataHandler<T> = (
  */
 export type QueryErrorHandler<E> = (
 	error: E,
-	metadata: StateMetadata,
+	event: ErrorTransitionQueryEvent<E>,
 	cache: CacheHandler
 ) => Promise<void>;
 

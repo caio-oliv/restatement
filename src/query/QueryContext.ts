@@ -8,7 +8,7 @@ import type {
 	QueryDataHandler,
 	QueryErrorHandler,
 	QueryFilterFn,
-	QueryProviderData,
+	QueryProviderEvent,
 	ExtractTTLFn,
 	QuerySharedState,
 } from '@/core/Type';
@@ -19,19 +19,19 @@ import type { CacheManager } from '@/cache/CacheManager';
 
 /**
  * Query subscriber
- * @description {@link Subscriber} for {@link QueryProviderData query data} events and {@link QuerySharedState query shared state}.
+ * @description {@link Subscriber} for {@link QueryProviderEvent query events} and {@link QuerySharedState shared state}.
  * @typeParam T Return value of a successful query
  * @typeParam E Error from a failed {@link QueryFn query} execution
  */
-export type QuerySubscriber<T, E> = Subscriber<QueryProviderData<T, E>, QuerySharedState<T, E>>;
+export type QuerySubscriber<T, E> = Subscriber<QueryProviderEvent<T, E>, QuerySharedState<T, E>>;
 
 /**
  * Query provider
- * @description {@link PubSub Provider} for {@link QueryProviderData query data} events and {@link QuerySharedState query shared state}.
+ * @description {@link PubSub Provider} for {@link QueryProviderEvent query events} and {@link QuerySharedState shared state}.
  * @typeParam T Return value of a successful query
  * @typeParam E Error from a failed {@link QueryFn query} execution
  */
-export type QueryProvider<T, E> = PubSub<QueryProviderData<T, E>, QuerySharedState<T, E>>;
+export type QueryProvider<T, E> = PubSub<QueryProviderEvent<T, E>, QuerySharedState<T, E>>;
 
 /**
  * Query context
