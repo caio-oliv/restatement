@@ -13,6 +13,7 @@ import type {
 	MutationQueryEvent,
 	ErrorTransitionQueryEvent,
 	QueryDataHandlerEvent,
+	GenericQueryKey,
 } from '@/core/Type';
 import type {
 	QueryContext,
@@ -58,7 +59,7 @@ import { execAsyncOperation } from '@/core/RetryPolicy';
  * @param input.provider State provider
  * @returns Query context
  */
-export function makeQueryContext<K extends ReadonlyArray<unknown>, T, E = unknown>({
+export function makeQueryContext<K extends GenericQueryKey, T, E = unknown>({
 	placeholder = null,
 	store,
 	queryFn,
@@ -140,7 +141,7 @@ export interface ExecuteQueryOptions {
  * @param options.signal Abort signal
  * @returns Query execution result
  */
-export async function executeQuery<K extends ReadonlyArray<unknown>, T, E>(
+export async function executeQuery<K extends GenericQueryKey, T, E>(
 	ctx: QueryContext<K, T, E>,
 	key: K,
 	{ cache = 'stale', ttl = ctx.ttl, signal = makeAbortSignal() }: ExecuteQueryOptions = {}
@@ -204,7 +205,7 @@ export async function executeQuery<K extends ReadonlyArray<unknown>, T, E>(
  * @param options Reset options
  * @param options.target Reset target
  */
-export function useQueryKey<K extends ReadonlyArray<unknown>, T, E>(
+export function useQueryKey<K extends GenericQueryKey, T, E>(
 	ctx: QueryContext<K, T, E>,
 	key: K,
 	{ target = 'context' }: ResetOptions = {}
@@ -226,7 +227,7 @@ export function useQueryKey<K extends ReadonlyArray<unknown>, T, E>(
  * @param ctx Query context
  * @returns Key hash
  */
-export function getQueryHash<K extends ReadonlyArray<unknown>, T, E>(
+export function getQueryHash<K extends GenericQueryKey, T, E>(
 	ctx: QueryContext<K, T, E>
 ): string | null {
 	return ctx.subscriber.currentTopic();
@@ -246,7 +247,7 @@ export function getQueryHash<K extends ReadonlyArray<unknown>, T, E>(
  * @param options Reset options
  * @param options.target Reset target
  */
-export function resetQuery<K extends ReadonlyArray<unknown>, T, E>(
+export function resetQuery<K extends GenericQueryKey, T, E>(
 	ctx: QueryContext<K, T, E>,
 	{ target = 'context' }: ResetOptions = {}
 ): void {
@@ -266,9 +267,7 @@ export function resetQuery<K extends ReadonlyArray<unknown>, T, E>(
  * @typeParam E Error from a failed {@link QueryFn query} execution
  * @param ctx Query context
  */
-function stateInitialization<K extends ReadonlyArray<unknown>, T, E>(
-	ctx: QueryContext<K, T, E>
-): void {
+function stateInitialization<K extends GenericQueryKey, T, E>(ctx: QueryContext<K, T, E>): void {
 	ctx.stateFn?.(ctx.state, { type: 'initialization', origin: 'self' }, ctx.cache)?.catch(blackhole);
 }
 
@@ -281,9 +280,7 @@ function stateInitialization<K extends ReadonlyArray<unknown>, T, E>(
  * @typeParam E Error from a failed {@link QueryFn query} execution
  * @param ctx Query context
  */
-export function disposeQuery<K extends ReadonlyArray<unknown>, T, E>(
-	ctx: QueryContext<K, T, E>
-): void {
+export function disposeQuery<K extends GenericQueryKey, T, E>(ctx: QueryContext<K, T, E>): void {
 	ctx.subscriber.unsubscribe();
 }
 
@@ -322,7 +319,7 @@ export interface RunActiveQueryOptions {
  * @param options.signal Abort signal
  * @returns Query execution result
  */
-export async function runActiveQuery<K extends ReadonlyArray<unknown>, T, E>(
+export async function runActiveQuery<K extends GenericQueryKey, T, E>(
 	ctx: QueryContext<K, T, E>,
 	{ key, hash }: KeyPair<K>,
 	{ cache = 'stale', ttl = ctx.ttl, signal = makeAbortSignal() }: RunActiveQueryOptions = {}
@@ -383,7 +380,7 @@ export interface RunBackgroundQueryOptions {
  * @param options.signal Abort signal
  * @returns Query execution result
  */
-export async function runBackgroundQuery<K extends ReadonlyArray<unknown>, T, E>(
+export async function runBackgroundQuery<K extends GenericQueryKey, T, E>(
 	ctx: QueryContext<K, T, E>,
 	state: QueryState<T, E>,
 	{ key, hash }: KeyPair<K>,
@@ -475,7 +472,7 @@ export interface RunQueryOptions {
  * runQuery(ctx, { key, hash }, { source: 'background-query' });
  * ```
  */
-export async function runQuery<K extends ReadonlyArray<unknown>, T, E>(
+export async function runQuery<K extends GenericQueryKey, T, E>(
 	ctx: QueryContext<K, T, E>,
 	{ key, hash }: KeyPair<K>,
 	{
@@ -513,7 +510,7 @@ export async function runQuery<K extends ReadonlyArray<unknown>, T, E>(
  * @param ttl Fallback TTL
  * @returns Query state
  */
-export async function queryResolve<K extends ReadonlyArray<unknown>, T, E>(
+export async function queryResolve<K extends GenericQueryKey, T, E>(
 	ctx: QueryContext<K, T, E>,
 	data: T,
 	hash: string,
@@ -552,7 +549,7 @@ export async function queryResolve<K extends ReadonlyArray<unknown>, T, E>(
  * @param source Query source
  * @returns Query state
  */
-export async function queryReject<K extends ReadonlyArray<unknown>, T, E>(
+export async function queryReject<K extends GenericQueryKey, T, E>(
 	ctx: QueryContext<K, T, E>,
 	err: unknown,
 	hash: string,
@@ -584,7 +581,7 @@ export async function queryReject<K extends ReadonlyArray<unknown>, T, E>(
  * @param event.state Query state
  * @param event.metadata Query state metadata
  */
-export function updateQuery<K extends ReadonlyArray<unknown>, T, E>(
+export function updateQuery<K extends GenericQueryKey, T, E>(
 	ctx: QueryContext<K, T, E>,
 	hash: string,
 	event: QueryProviderEvent<T, E>
@@ -611,7 +608,7 @@ export function updateQuery<K extends ReadonlyArray<unknown>, T, E>(
  * @param hash Key hash
  * @param event Mutation or Transition event
  */
-function propagateQueryUpdate<K extends ReadonlyArray<unknown>, T, E>(
+function propagateQueryUpdate<K extends GenericQueryKey, T, E>(
 	ctx: QueryContext<K, T, E>,
 	hash: string,
 	event: MutationQueryEvent<T> | TransitionQueryEvent<T, E>
@@ -650,7 +647,7 @@ function propagateQueryUpdate<K extends ReadonlyArray<unknown>, T, E>(
  * @param ctx Query context
  * @param fns Replacing functions
  */
-export function updateQueryContextFn<K extends ReadonlyArray<unknown>, T, E = unknown>(
+export function updateQueryContextFn<K extends GenericQueryKey, T, E = unknown>(
 	ctx: QueryContext<K, T, E>,
 	fns: Partial<QueryContextMutFns<K, T, E>>
 ): void {

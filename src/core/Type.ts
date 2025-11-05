@@ -26,14 +26,17 @@ export type Millisecond = number;
 export type CacheDirective = 'no-cache' | 'fresh' | 'stale';
 
 /**
+ * Generic query key
+ * @description Base type for all query key tuple.
+ */
+export type GenericQueryKey = ReadonlyArray<unknown>;
+
+/**
  * Query function type
  * @typeParam K Tuple with the query function inputs
  * @typeParam T Return value of a successful query
  */
-export type QueryFn<K extends ReadonlyArray<unknown>, T> = (
-	key: K,
-	signal: AbortSignal
-) => Promise<T>;
+export type QueryFn<K extends GenericQueryKey, T> = (key: K, signal: AbortSignal) => Promise<T>;
 
 /**
  * Key hash function
@@ -53,7 +56,7 @@ export type QueryFn<K extends ReadonlyArray<unknown>, T> = (
  * ```
  * @typeParam K Tuple with the query function inputs
  */
-export type KeyHashFn<K extends ReadonlyArray<unknown>> = (key: K) => string;
+export type KeyHashFn<K extends GenericQueryKey> = (key: K) => string;
 
 /**
  * Key value and hash pair
@@ -68,7 +71,7 @@ export type KeyHashFn<K extends ReadonlyArray<unknown>> = (key: K) => string;
  * const pair: KeyPair<[string, number]> = { key, hash };
  * ```
  */
-export interface KeyPair<K extends ReadonlyArray<unknown>> {
+export interface KeyPair<K extends GenericQueryKey> {
 	readonly key: K;
 	readonly hash: string;
 }
@@ -124,14 +127,14 @@ export interface CacheHandler {
 	 * @param data Sucessful query data
 	 * @param ttl Cache entry TTL
 	 */
-	set<K extends ReadonlyArray<unknown>, T>(key: K, data: T, ttl?: Millisecond): Promise<void>;
+	set<K extends GenericQueryKey, T>(key: K, data: T, ttl?: Millisecond): Promise<void>;
 	/**
 	 * Get the cached data with the provided query key.
 	 * @typeParam K Tuple with the query inputs
 	 * @param key Query key
 	 * @returns Optional cached data
 	 */
-	get<K extends ReadonlyArray<unknown>, T>(key: K): Promise<T | undefined>;
+	get<K extends GenericQueryKey, T>(key: K): Promise<T | undefined>;
 	/**
 	 * Invalidate all cache entries that match the prefix of the provided key.
 	 * @typeParam K Tuple with the query inputs
@@ -145,13 +148,13 @@ export interface CacheHandler {
 	 * console.log(await cache.get(['account', 'organization', 42])); // Expected output: { ... }
 	 * ```
 	 */
-	invalidate<K extends ReadonlyArray<unknown>>(key: K): Promise<void>;
+	invalidate<K extends GenericQueryKey>(key: K): Promise<void>;
 	/**
 	 * Delete a cache entry with the provided key.
 	 * @typeParam K Tuple with the query inputs
 	 * @param key Query key
 	 */
-	delete<K extends ReadonlyArray<unknown>>(key: K): Promise<void>;
+	delete<K extends GenericQueryKey>(key: K): Promise<void>;
 }
 
 /**

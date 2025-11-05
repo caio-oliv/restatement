@@ -11,6 +11,7 @@ import type {
 	QueryProviderEvent,
 	ExtractTTLFn,
 	QuerySharedState,
+	GenericQueryKey,
 } from '@/core/Type';
 import type { PubSub, Subscriber } from '@/PubSub';
 import type { RetryHandlerFn, RetryPolicy } from '@/core/RetryPolicy';
@@ -42,7 +43,7 @@ export type QueryProvider<T, E> = PubSub<QueryProviderEvent<T, E>, QuerySharedSt
  * @typeParam T Return value of a successful query
  * @typeParam E Error from a failed {@link QueryFn query} execution
  */
-export interface QueryContext<K extends ReadonlyArray<unknown>, T, E = unknown> {
+export interface QueryContext<K extends GenericQueryKey, T, E = unknown> {
 	/**
 	 * Idle state placeholder
 	 */
@@ -120,7 +121,7 @@ export interface QueryContext<K extends ReadonlyArray<unknown>, T, E = unknown> 
 /**
  * Query context mutable attributes
  */
-export type QueryContextMut<K extends ReadonlyArray<unknown>, T, E = unknown> = Pick<
+export type QueryContextMut<K extends GenericQueryKey, T, E = unknown> = Pick<
 	QueryContext<K, T, E>,
 	| 'queryFn'
 	| 'retryHandleFn'
@@ -136,7 +137,7 @@ export type QueryContextMut<K extends ReadonlyArray<unknown>, T, E = unknown> = 
 /**
  * Query context mutable functions
  */
-export type QueryContextMutFns<K extends ReadonlyArray<unknown>, T, E = unknown> = Pick<
+export type QueryContextMutFns<K extends GenericQueryKey, T, E = unknown> = Pick<
 	QueryContext<K, T, E>,
 	| 'queryFn'
 	| 'retryHandleFn'
@@ -155,7 +156,7 @@ export type QueryContextMutFns<K extends ReadonlyArray<unknown>, T, E = unknown>
  * @typeParam T Return value of a successful query
  * @typeParam E Error from a failed {@link QueryFn query} execution
  */
-export interface QueryInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
+export interface QueryInput<K extends GenericQueryKey, T, E = unknown> {
 	/**
 	 * Idle state placeholder
 	 */
@@ -243,7 +244,7 @@ export interface QueryInput<K extends ReadonlyArray<unknown>, T, E = unknown> {
  * Local query input
  * @description Local input options for a query context
  */
-export type LocalQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown> = Pick<
+export type LocalQueryInput<K extends GenericQueryKey, T, E = unknown> = Pick<
 	QueryInput<K, T, E>,
 	| 'placeholder'
 	| 'queryFn'

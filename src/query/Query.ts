@@ -1,4 +1,4 @@
-import type { QueryState, QueryExecutionResult, ResetOptions } from '@/core/Type';
+import type { QueryState, QueryExecutionResult, ResetOptions, GenericQueryKey } from '@/core/Type';
 import type { QueryContext, QueryInput } from '@/query/QueryContext';
 import {
 	disposeQuery,
@@ -10,7 +10,7 @@ import {
 } from '@/query/QueryModule';
 import type { CacheManager } from '@/cache/CacheManager';
 
-export class Query<K extends ReadonlyArray<unknown>, T, E = unknown> {
+export class Query<K extends GenericQueryKey, T, E = unknown> {
 	/**
 	 * Query context
 	 */
@@ -33,7 +33,7 @@ export class Query<K extends ReadonlyArray<unknown>, T, E = unknown> {
 	 * @param input Query input
 	 * @returns Query
 	 */
-	public static create<K extends ReadonlyArray<unknown>, T, E = unknown>(
+	public static create<K extends GenericQueryKey, T, E = unknown>(
 		input: QueryInput<K, T, E>
 	): Query<K, T, E> {
 		return new Query(makeQueryContext(input));

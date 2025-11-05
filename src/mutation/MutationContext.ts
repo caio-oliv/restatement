@@ -1,14 +1,13 @@
 import type {
-	CacheManager,
-	RetryPolicy,
 	MutationFn,
-	RetryHandlerFn,
 	MutationFilterFn,
 	MutationStateHandler,
 	MutationDataHandler,
 	MutationErrorHandler,
 	MutationState,
-} from '@/lib';
+} from '@/core/Type';
+import type { CacheManager } from '@/cache/CacheManager';
+import type { RetryHandlerFn, RetryPolicy } from '@/core/RetryPolicy';
 
 /**
  * Mutation context

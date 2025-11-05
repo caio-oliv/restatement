@@ -1,4 +1,4 @@
-import type { Millisecond } from '@/core/Type';
+import type { GenericQueryKey, Millisecond } from '@/core/Type';
 import { type BackoffTimer, JitterExponentialBackoffTimer } from '@/core/BackoffTimer';
 import { BasicRetryPolicy, type RetryPolicy } from '@/core/RetryPolicy';
 import { jsonStringifyObjectSorter } from '@/Internal';
@@ -44,7 +44,7 @@ export const DEFAULT_RETRY_POLICY: RetryPolicy = new BasicRetryPolicy(
  * @param key Key data
  * @returns Key string hash
  */
-export function defaultKeyHashFn<T extends ReadonlyArray<unknown>>(key: T): string {
+export function defaultKeyHashFn<T extends GenericQueryKey>(key: T): string {
 	let hash = '';
 	for (const item of key) {
 		hash += JSON.stringify(item, jsonStringifyObjectSorter);

@@ -1,6 +1,7 @@
 import type {
 	CacheHandler,
 	ExtractTTLFn,
+	GenericQueryKey,
 	KeepCacheOnErrorFn,
 	KeyHashFn,
 	Millisecond,
@@ -158,7 +159,7 @@ export function makeCacheManager<T = unknown, E = unknown>(
  * @param local Local query input
  * @returns Query input
  */
-export function makeQueryInput<K extends ReadonlyArray<unknown>, T, E = unknown>(
+export function makeQueryInput<K extends GenericQueryKey, T, E = unknown>(
 	config: RestatementConfig<T, E>,
 	local: LocalQueryInput<K, T, E>
 ): Required<QueryInput<K, T, E>> {

@@ -1,4 +1,10 @@
-import type { CacheHandler, ExtractTTLFn, KeyHashFn, Millisecond } from '@/core/Type';
+import type {
+	CacheHandler,
+	ExtractTTLFn,
+	GenericQueryKey,
+	KeyHashFn,
+	Millisecond,
+} from '@/core/Type';
 import type { CacheStore } from '@/core/Cache';
 import type { QueryProvider } from '@/query/QueryContext';
 import { defaultKeyHashFn, DEFAULT_TTL_DURATION, defaultExtractTTLFn } from '@/Default';
@@ -64,7 +70,7 @@ export class CacheManager implements CacheHandler {
 		this.#provider = provider;
 	}
 
-	public async set<K extends ReadonlyArray<unknown>, T>(
+	public async set<K extends GenericQueryKey, T>(
 		key: K,
 		data: T,
 		ttl: Millisecond = this.ttl
@@ -78,18 +84,18 @@ export class CacheManager implements CacheHandler {
 		});
 	}
 
-	public async get<K extends ReadonlyArray<unknown>, T>(key: K): Promise<T | undefined> {
+	public async get<K extends GenericQueryKey, T>(key: K): Promise<T | undefined> {
 		const hash = this.keyHashFn(key);
 		return (await this.#internalCache.get(hash)) as T | undefined;
 	}
 
-	public async delete<K extends ReadonlyArray<unknown>>(key: K): Promise<void> {
+	public async delete<K extends GenericQueryKey>(key: K): Promise<void> {
 		const hash = this.keyHashFn(key);
 		await this.#internalCache.delete(hash);
 		this.#provider?.publish(hash, { type: 'invalidation', origin: 'provider' });
 	}
 
-	public async invalidate<K extends ReadonlyArray<unknown>>(key: K): Promise<void> {
+	public async invalidate<K extends GenericQueryKey>(key: K): Promise<void> {
 		const hash = this.keyHashFn(key);
 		await this.#internalCache.deletePrefix(hash);
 		for (const topic of this.#provider?.topics() ?? []) {
