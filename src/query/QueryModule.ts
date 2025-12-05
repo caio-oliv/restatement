@@ -17,6 +17,7 @@ import type {
 } from '@/core/Type';
 import type {
 	QueryContext,
+	QueryStatistic,
 	QueryContextMutFns,
 	QueryInput,
 	QueryProvider,
@@ -35,6 +36,24 @@ import {
 	DEFAULT_FRESH_DURATION,
 } from '@/Default';
 import { execAsyncOperation } from '@/core/RetryPolicy';
+
+/**
+ * Initialize a new {@link QueryStatistic query statistic} object
+ * @returns Query statistic
+ */
+export function initQueryStatistic(): QueryStatistic {
+	return {
+		cache_hit: 0,
+		cache_miss: 0,
+		cache_delete_on_error: 0,
+		last_cache_directive: null,
+		events_filtered: 0,
+		events_processed: 0,
+		events_originated_from_self: 0,
+		events_originated_from_provider: 0,
+		handler_executions: 0,
+	};
+}
 
 /**
  * Make a new query context
@@ -103,6 +122,7 @@ export function makeQueryContext<K extends GenericQueryKey, T, E = unknown>({
 					updateQuery(context, hash, data);
 				}, provider)
 			: new DummySubscriber(),
+		stat: initQueryStatistic(),
 	};
 
 	return context;
@@ -344,7 +364,7 @@ export async function runActiveQuery<K extends GenericQueryKey, T, E>(
 	}
 
 	const promise = runQuery(ctx, { key, hash }, { cache, source: 'query', ttl, signal });
-	ctx.subscriber.setState({ promise: observablePromise(promise) });
+	ctx.subscriber.setState({ promise: observablePromise(promise), key });
 	return { state: await promise, next: nullpromise };
 }
 
@@ -409,7 +429,7 @@ export async function runBackgroundQuery<K extends GenericQueryKey, T, E>(
 		{ key, hash },
 		{ cache: 'stale', source: 'background-query', ttl, signal }
 	);
-	ctx.subscriber.setState({ promise: observablePromise(promise) });
+	ctx.subscriber.setState({ promise: observablePromise(promise), key });
 	return { state, next: () => promise };
 }
 
@@ -577,9 +597,7 @@ export async function queryReject<K extends GenericQueryKey, T, E>(
  * @typeParam E Error from a failed {@link QueryFn query} execution
  * @param ctx Query context
  * @param hash Key hash
- * @param event State event
- * @param event.state Query state
- * @param event.metadata Query state metadata
+ * @param event Query event
  */
 export function updateQuery<K extends GenericQueryKey, T, E>(
 	ctx: QueryContext<K, T, E>,
@@ -595,7 +613,13 @@ export function updateQuery<K extends GenericQueryKey, T, E>(
 	}
 
 	if (event.type === 'invalidation') {
-		// TODO: execute query to revalidate result
+		const key = ctx.subscriber.getState()?.key;
+		if (!key) return;
+
+		runBackgroundQuery(ctx, ctx.state, {
+			key: key as K,
+			hash: ctx.subscriber.currentTopic() as string,
+		});
 		return;
 	}
 

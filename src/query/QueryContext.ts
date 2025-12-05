@@ -12,6 +12,7 @@ import type {
 	ExtractTTLFn,
 	QuerySharedState,
 	GenericQueryKey,
+	CacheDirective,
 } from '@/core/Type';
 import type { PubSub, Subscriber } from '@/PubSub';
 import type { RetryHandlerFn, RetryPolicy } from '@/core/RetryPolicy';
@@ -33,6 +34,50 @@ export type QuerySubscriber<T, E> = Subscriber<QueryProviderEvent<T, E>, QuerySh
  * @typeParam E Error from a failed {@link QueryFn query} execution
  */
 export type QueryProvider<T, E> = PubSub<QueryProviderEvent<T, E>, QuerySharedState<T, E>>;
+
+// TODO: fill and update these attributes.
+
+/**
+ * Query statistics
+ */
+export interface QueryStatistic {
+	/**
+	 * Number of cache hits
+	 */
+	cache_hit: number;
+	/**
+	 * Number of cache misses
+	 */
+	cache_miss: number;
+	/**
+	 * Number of cache delete requests after an error in the query
+	 */
+	cache_delete_on_error: number;
+	/**
+	 * Last used cache directive
+	 */
+	last_cache_directive: CacheDirective | null;
+	/**
+	 * Number of events processed
+	 */
+	events_processed: number;
+	/**
+	 * Number of events filtered
+	 */
+	events_filtered: number;
+	/**
+	 * Number of events originated from `self`
+	 */
+	events_originated_from_self: number;
+	/**
+	 * Number of events originated from `provider`
+	 */
+	events_originated_from_provider: number;
+	/**
+	 * Number of all query handler executions
+	 */
+	handler_executions: number;
+}
 
 /**
  * Query context
@@ -116,6 +161,10 @@ export interface QueryContext<K extends GenericQueryKey, T, E = unknown> {
 	 * Query state
 	 */
 	state: QueryState<T, E>;
+	/**
+	 * Query attributes
+	 */
+	stat: QueryStatistic;
 }
 
 /**

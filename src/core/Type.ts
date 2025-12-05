@@ -117,10 +117,11 @@ export type ExtractTTLFn<T> = (data: T, fallbackTTL: Millisecond) => Millisecond
  * in {@link QueryFn query functions}.
  */
 export interface CacheHandler {
-	// TODO: document which events are emitted by these methods
 	/**
 	 * Set a cache entry and update all queries that are subscribed to this key.
 	 * @description The primary way to mutate the data on already resolved queries.
+	 *
+	 * Publishes a {@link MutationQueryEvent mutation event} using the {@link QueryProvider state provider}.
 	 * @typeParam K Tuple with the query inputs
 	 * @typeParam T Data that will be cached
 	 * @param key Query key
@@ -137,6 +138,10 @@ export interface CacheHandler {
 	get<K extends GenericQueryKey, T>(key: K): Promise<T | undefined>;
 	/**
 	 * Invalidate all cache entries that match the prefix of the provided key.
+	 * @description Invalidate cache entries matching the key. Can ideally be used after mutating a series of
+	 * entries in the same key prefix.
+	 *
+	 * Publishes a {@link InvalidationQueryEvent mutation event} using the {@link QueryProvider state provider}.
 	 * @typeParam K Tuple with the query inputs
 	 * @param key Query key
 	 * @example
@@ -151,6 +156,9 @@ export interface CacheHandler {
 	invalidate<K extends GenericQueryKey>(key: K): Promise<void>;
 	/**
 	 * Delete a cache entry with the provided key.
+	 * @description Invalidate a cache entry that fully matches the key.
+	 *
+	 * Publishes a {@link InvalidationQueryEvent mutation event} using the {@link QueryProvider state provider}.
 	 * @typeParam K Tuple with the query inputs
 	 * @param key Query key
 	 */
@@ -315,9 +323,6 @@ export type QueryStateOrigin = 'self' | 'provider';
 /**
  * Query state metadata
  * @description Describe meta information about the query state.
- *
- * Query states that have this metadata can only be created from executing
- * queries with its own context or provided through other contexts.
  */
 export interface QueryStateMetadata {
 	readonly origin: QueryStateOrigin;
@@ -325,13 +330,31 @@ export interface QueryStateMetadata {
 	readonly cache: CacheDirective;
 }
 
-// TODO: detail when each of those events are emitted.
-
+/**
+ * Initialization query event
+ * @description Initialization query events are emitted when the {@link useQueryKey query key is changed} or
+ * the {@link resetQuery query context is reset}.
+ *
+ * ##### Emitted by
+ *
+ * - {@link useQueryKey}
+ * - {@link resetQuery}
+ */
 export interface InitializationQueryEvent {
 	readonly type: 'initialization';
 	readonly origin: 'self';
 }
 
+/**
+ * Invalidation query event
+ * @description Invalidation query events are emitted when the {@link CacheManager} invalidates
+ * {@link CacheManager#delete one} or {@link CacheManager#invalidate multiple} cache entries.
+ *
+ * ##### Emitted by
+ *
+ * - {@link CacheManager#delete}
+ * - {@link CacheManager#invalidate}
+ */
 export interface InvalidationQueryEvent {
 	readonly type: 'invalidation';
 	readonly origin: 'provider';
@@ -339,6 +362,12 @@ export interface InvalidationQueryEvent {
 
 /**
  * Mutation query event
+ * @description Mutation query events are emitted when the {@link CacheManager#set CacheManager sets} the
+ * value of a cache entry.
+ *
+ * ##### Emitted by
+ *
+ * - {@link CacheManager#set}
  */
 export interface MutationQueryEvent<T> {
 	readonly type: 'mutation';
@@ -346,6 +375,19 @@ export interface MutationQueryEvent<T> {
 	readonly state: SuccessQueryState<T>;
 }
 
+/**
+ * Transition query event
+ * @description Transition query events are emitted on all occasions a the query state is changed.
+ *
+ * ##### Emitted by
+ *
+ * - {@link executeQuery}
+ * - {@link runActiveQuery}
+ * - {@link runBackgroundQuery}
+ * - {@link queryResolve}
+ * - {@link queryReject}
+ * - {@link updateQuery}
+ */
 export interface TransitionQueryEvent<T, E> {
 	readonly type: 'transition';
 	readonly origin: 'provider' | 'self';
@@ -353,6 +395,9 @@ export interface TransitionQueryEvent<T, E> {
 	readonly metadata: QueryStateMetadata;
 }
 
+/**
+ * Specialization of a {@link TransitionQueryEvent transition query event} for success states
+ */
 export interface SuccessTransitionQueryEvent<T> extends TransitionQueryEvent<T, never> {
 	readonly state:
 		| IdleQueryState<T>
@@ -361,6 +406,9 @@ export interface SuccessTransitionQueryEvent<T> extends TransitionQueryEvent<T, 
 		| SuccessQueryState<T>;
 }
 
+/**
+ * Specialization of a {@link TransitionQueryEvent transition query event} for {@link ErrorQueryState error states}
+ */
 export interface ErrorTransitionQueryEvent<E> extends TransitionQueryEvent<never, E> {
 	readonly state: ErrorQueryState<E>;
 }
@@ -412,6 +460,10 @@ export type QueryStatePromise<T, E> = ObservablePromise<QueryState<T, E>>;
  */
 export interface QuerySharedState<T, E> {
 	/**
+	 * Query key
+	 */
+	readonly key: GenericQueryKey;
+	/**
 	 * Query state promise
 	 */
 	promise: QueryStatePromise<T, E> | null;
@@ -453,7 +505,7 @@ export type QueryStateHandlerEvent<T, E> =
  * Query state handler
  * @description Handler function that is executed for **every** new {@link QueryState query state}.
  * @param state Current query state
- * @param metadata State metadata
+ * @param event Query event
  * @param cache Cache handler
  * @typeParam T Return value of a successful query
  * @typeParam E Error from a failed {@link QueryFn query} execution
@@ -471,7 +523,7 @@ export type QueryDataHandlerEvent<T> = MutationQueryEvent<T> | SuccessTransition
  * @description Handler function that is executed for **every** new {@link QueryState query state} that
  * has a `data` field.
  * @param data Query state `data` field
- * @param metadata State metadata
+ * @param event Query event
  * @param cache Cache handler
  * @typeParam T Return value of a successful query
  */
@@ -486,7 +538,7 @@ export type QueryDataHandler<T> = (
  * @description Handler function that is executed for **every** new {@link QueryState query state} that
  * has an `error` field.
  * @param error Query state `error` field
- * @param metadata State metadata
+ * @param event Query event
  * @param cache Cache handler
  * @typeParam E Error from a failed {@link QueryFn query} execution
  */

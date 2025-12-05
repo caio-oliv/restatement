@@ -1,5 +1,13 @@
 import { assert, describe, expect, it, vi } from 'vitest';
-import { CacheManager, Mutation, NO_RETRY_POLICY } from '@/lib';
+import {
+	type QueryProvider,
+	type QueryProviderEvent,
+	CacheManager,
+	Mutation,
+	NO_RETRY_POLICY,
+	PubSub,
+	waitUntil,
+} from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { mockMutationHandler, testTransformer } from '@/test/TestHelper.mock';
 
@@ -427,5 +435,64 @@ describe('Mutation handler exception handling', () => {
 		);
 
 		expect(mutationFn).toBeCalledTimes(1);
+	});
+});
+
+describe('Mutation handler invalidation', () => {
+	it('send invalidation event through cache manager in mutation handler', async () => {
+		const store = makeCache<string>();
+		const provider: QueryProvider<string, Error> = new PubSub();
+		const cache = new CacheManager({ store, provider });
+		const mutationFn = vi.fn(testTransformer);
+		const handler = mockMutationHandler();
+		handler.dataFn.mockImplementation(async (_, cache) => {
+			cache.invalidate(['account']);
+		});
+		const mutation = Mutation.create({
+			cache,
+			mutationFn,
+			retryPolicy: NO_RETRY_POLICY,
+			...handler,
+		});
+
+		const listenerAccountUser1 = vi.fn();
+		provider.subscribe(cache.keyHashFn(['account', 'user', 1]), listenerAccountUser1);
+
+		const listenerAccountOrg = vi.fn();
+		provider.subscribe(cache.keyHashFn(['account', 'organization']), listenerAccountOrg);
+
+		const listenerLogsKernel = vi.fn();
+		provider.subscribe(cache.keyHashFn(['logs', 'kernel']), listenerLogsKernel);
+
+		expect(listenerAccountUser1).toHaveBeenCalledTimes(0);
+		expect(listenerAccountOrg).toHaveBeenCalledTimes(0);
+		expect(listenerLogsKernel).toHaveBeenCalledTimes(0);
+
+		await mutation.execute(['key#update', 'user', '#user_data#']);
+
+		await waitUntil(50);
+
+		expect(handler.dataFn).toHaveBeenCalledTimes(1);
+
+		expect(listenerAccountUser1).toHaveBeenCalledTimes(1);
+		expect(listenerAccountOrg).toHaveBeenCalledTimes(1);
+		expect(listenerLogsKernel).toHaveBeenCalledTimes(0);
+
+		expect(listenerAccountUser1).toHaveBeenNthCalledWith(
+			1,
+			cache.keyHashFn(['account', 'user', 1]),
+			{
+				type: 'invalidation',
+				origin: 'provider',
+			} satisfies QueryProviderEvent<string, Error>
+		);
+		expect(listenerAccountOrg).toHaveBeenNthCalledWith(
+			1,
+			cache.keyHashFn(['account', 'organization']),
+			{
+				type: 'invalidation',
+				origin: 'provider',
+			} satisfies QueryProviderEvent<string, Error>
+		);
 	});
 });

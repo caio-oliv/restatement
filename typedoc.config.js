@@ -22,6 +22,7 @@ const config = {
 		inheritDocTag: false,
 		ignoreUnescapedBraces: false,
 	},
+	intentionallyNotExported: ['src/integration/lru-cache.ts:LRUCache.LRUCache'],
 	blockTags: [...OptionDefaults.blockTags, '@description'],
 	router: 'kind',
 	sort: ['source-order'],

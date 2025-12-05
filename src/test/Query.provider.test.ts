@@ -5,13 +5,20 @@ import {
 	type QueryProvider,
 	type QueryStateHandlerEvent,
 	type QueryDataHandlerEvent,
+	type ErrorTransitionQueryEvent,
 	Query,
 	PubSub,
 	defaultKeyHashFn,
 	waitUntil,
+	NO_RETRY_POLICY,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
-import { delayedTestTransformer, mockQueryHandler, testTransformer } from '@/test/TestHelper.mock';
+import {
+	type TestKeys,
+	delayedTestTransformer,
+	mockQueryHandler,
+	testTransformer,
+} from '@/test/TestHelper.mock';
 
 function filterControlState({ event }: QueryStateTransition<string, Error>): boolean {
 	return event.origin === 'self';
@@ -557,5 +564,179 @@ describe('Query state provider / in-flight migration', () => {
 			error: null,
 			status: 'success',
 		});
+	});
+});
+
+describe('Query state provider / query re-validation', () => {
+	it('not re-validate query after an invalidation event when missing shared state', async () => {
+		type Topic = [string, string, string];
+
+		const store = makeCache<string>();
+		const provider: QueryProvider<string, Error> = new PubSub();
+		const queryFn = vi.fn(testTransformer);
+		const handler = mockQueryHandler();
+		const queryApi = Query.create<Topic, string, Error>({
+			store,
+			provider,
+			queryFn,
+			...handler,
+		});
+
+		const topic: Topic = ['account', 'user', '1'];
+
+		queryApi.use(topic);
+
+		{
+			expect(queryFn).toHaveBeenCalledTimes(0);
+
+			expect(handler.dataFn).toHaveBeenCalledTimes(0);
+			expect(handler.errorFn).toHaveBeenCalledTimes(0);
+			expect(handler.stateFn).toHaveBeenCalledTimes(0);
+		}
+
+		provider.publish(queryApi.ctx.keyHashFn(topic), { type: 'invalidation', origin: 'provider' });
+
+		await waitUntil(100);
+
+		{
+			expect(queryFn).toHaveBeenCalledTimes(0);
+
+			expect(handler.dataFn).toHaveBeenCalledTimes(0);
+			expect(handler.errorFn).toHaveBeenCalledTimes(0);
+			expect(handler.stateFn).toHaveBeenCalledTimes(0);
+		}
+	});
+
+	it('re-validate the query result after an invalidation event', async () => {
+		const store = makeCache<string>();
+		const provider: QueryProvider<string, Error> = new PubSub();
+		const queryFn = vi.fn(testTransformer);
+		const handler = mockQueryHandler();
+		const queryApi = Query.create<TestKeys, string, Error>({
+			store,
+			provider,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+			...handler,
+		});
+
+		const topic: TestKeys = ['key#valid', 'user', '1'];
+		const hash = queryApi.ctx.keyHashFn(topic);
+
+		queryApi.use(topic);
+
+		provider.setState(hash, { key: topic, promise: null });
+
+		{
+			expect(queryFn).toHaveBeenCalledTimes(0);
+
+			expect(handler.dataFn).toHaveBeenCalledTimes(0);
+			expect(handler.errorFn).toHaveBeenCalledTimes(0);
+			expect(handler.stateFn).toHaveBeenCalledTimes(0);
+		}
+
+		provider.publish(hash, { type: 'invalidation', origin: 'provider' });
+
+		await waitUntil(50);
+
+		{
+			expect(queryFn).toHaveBeenCalledTimes(1);
+
+			expect(handler.dataFn).toHaveBeenCalledTimes(1);
+			expect(handler.errorFn).toHaveBeenCalledTimes(0);
+			expect(handler.stateFn).toHaveBeenCalledTimes(1);
+
+			expect(handler.dataFn).toHaveBeenNthCalledWith(
+				1,
+				'data#valid:user:1',
+				{
+					type: 'transition',
+					origin: 'self',
+					metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+					state: { status: 'success', data: 'data#valid:user:1', error: null },
+				} satisfies QueryDataHandlerEvent<string>,
+				queryApi.cache
+			);
+
+			expect(handler.stateFn).toHaveBeenNthCalledWith(
+				1,
+				{ data: 'data#valid:user:1', error: null, status: 'success' } satisfies QueryState<
+					string,
+					Error
+				>,
+				{
+					type: 'transition',
+					origin: 'self',
+					metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+					state: { data: 'data#valid:user:1', error: null, status: 'success' },
+				} satisfies QueryStateHandlerEvent<string, Error>,
+				queryApi.cache
+			);
+		}
+	});
+
+	it('not re-validate the query error result after an invalidation event', async () => {
+		const store = makeCache<string>();
+		const provider: QueryProvider<string, Error> = new PubSub();
+		const queryFn = vi.fn(testTransformer);
+		const handler = mockQueryHandler();
+		const queryApi = Query.create<TestKeys, string, Error>({
+			store,
+			provider,
+			queryFn,
+			retryPolicy: NO_RETRY_POLICY,
+			...handler,
+		});
+
+		const topic: TestKeys = ['invalid', 'user', '1'];
+		const hash = queryApi.ctx.keyHashFn(topic);
+
+		queryApi.use(topic);
+
+		provider.setState(hash, { key: topic, promise: null });
+
+		{
+			expect(queryFn).toHaveBeenCalledTimes(0);
+
+			expect(handler.dataFn).toHaveBeenCalledTimes(0);
+			expect(handler.errorFn).toHaveBeenCalledTimes(0);
+			expect(handler.stateFn).toHaveBeenCalledTimes(0);
+		}
+
+		provider.publish(hash, { type: 'invalidation', origin: 'provider' });
+
+		await waitUntil(50);
+
+		{
+			expect(queryFn).toHaveBeenCalledTimes(1);
+
+			expect(handler.dataFn).toHaveBeenCalledTimes(0);
+			expect(handler.errorFn).toHaveBeenCalledTimes(1);
+			expect(handler.stateFn).toHaveBeenCalledTimes(1);
+
+			expect(handler.errorFn).toHaveBeenNthCalledWith(
+				1,
+				new Error('invalid_key'),
+				{
+					type: 'transition',
+					origin: 'self',
+					metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+					state: { status: 'error', data: null, error: new Error('invalid_key') },
+				} satisfies ErrorTransitionQueryEvent<Error>,
+				queryApi.cache
+			);
+
+			expect(handler.stateFn).toHaveBeenNthCalledWith(
+				1,
+				{ status: 'error', data: null, error: new Error('invalid_key') },
+				{
+					type: 'transition',
+					origin: 'self',
+					metadata: { cache: 'stale', origin: 'self', source: 'background-query' },
+					state: { status: 'error', data: null, error: new Error('invalid_key') },
+				} satisfies QueryStateHandlerEvent<string, Error>,
+				queryApi.cache
+			);
+		}
 	});
 });
