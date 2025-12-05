@@ -2,9 +2,9 @@ import { useRef, useState, useSyncExternalStore, type MutableRefObject } from 'r
 import {
 	makeQueryInput,
 	Query,
+	type QueryStateHandlerEvent,
 	type QueryState,
 	type LocalQueryInput,
-	type StateMetadata,
 	type CacheHandler,
 	type QueryStateHandler,
 	updateQueryContextFn,
@@ -27,11 +27,11 @@ function trackQueryState<K extends ReadonlyArray<unknown>, T, E = unknown>(
 	// eslint-disable-next-line jsdoc/require-jsdoc
 	async function stateFn(
 		state: QueryState<T, E>,
-		metadata: StateMetadata,
+		event: QueryStateHandlerEvent<T, E>,
 		cache: CacheHandler
 	): Promise<void> {
 		storeHandlerRef.current();
-		await previousStateFn?.(state, metadata, cache);
+		await previousStateFn?.(state, event, cache);
 	}
 
 	query.ctx.stateFn = stateFn;

@@ -16,8 +16,9 @@ describe('useQueryProvider', () => {
 
 				useEffect(() => {
 					provider.publish('topic#1', {
-						metadata: { source: 'mutation', origin: 'provider', cache: 'none' },
-						state: { status: 'idle', data: null, error: null },
+						type: 'mutation',
+						origin: 'provider',
+						state: { status: 'success', data: 101, error: null },
 					});
 				}, [provider]);
 
@@ -45,8 +46,9 @@ describe('useQueryProvider', () => {
 
 				useEffect(() => {
 					provider.publish('topic#2', {
-						metadata: { source: 'mutation', origin: 'provider', cache: 'none' },
-						state: { status: 'idle', data: null, error: null },
+						type: 'mutation',
+						origin: 'provider',
+						state: { status: 'success', data: 101, error: null },
 					});
 				}, [provider]);
 

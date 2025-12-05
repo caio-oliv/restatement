@@ -1,4 +1,3 @@
-import { useRestatementConfig } from '@/lib';
 import { useState } from 'react';
 import {
 	type LocalMutationInput,
@@ -6,6 +5,7 @@ import {
 	Mutation,
 	updateMutationContextFn,
 } from 'restatement';
+import { useRestatementConfig } from '@/context/RestatementContext';
 
 /**
  * Mutation hook
