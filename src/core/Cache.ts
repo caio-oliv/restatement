@@ -14,9 +14,9 @@ export interface CacheEntry<T> {
 	 */
 	readonly ttl: number;
 	/**
-	 * Remain Time To Live in milliseconds (duration).
+	 * Creation time in milliseconds since Unix epoch.
 	 */
-	readonly remain_ttl: number;
+	readonly time: number;
 }
 
 /**
@@ -52,6 +52,19 @@ export interface CacheStore<K, V> {
 	 * @param prefix Key prefix
 	 */
 	deletePrefix(prefix: K): Promise<void>;
+	/**
+	 * Delete all entries
+	 */
+	clear(): Promise<void>;
+}
+
+/**
+ * Returns the remain TTL of {@link CacheEntry cache entry}
+ * @param entry Cache entry
+ * @returns Remain Time To Live
+ */
+export function cacheEntryRemainTTL<T>(entry: CacheEntry<T>): Millisecond {
+	return Math.max(entry.ttl - (Date.now() - entry.time), 0);
 }
 
 /**
@@ -61,7 +74,7 @@ export interface CacheStore<K, V> {
  * @typeParam T Data type
  */
 export function cacheEntryDuration<T>(entry: CacheEntry<T>): Millisecond {
-	return entry.ttl - entry.remain_ttl;
+	return Date.now() - entry.time;
 }
 
 /**
@@ -72,5 +85,5 @@ export function cacheEntryDuration<T>(entry: CacheEntry<T>): Millisecond {
  * @typeParam T Data type
  */
 export function isCacheEntryFresh<T>(entry: CacheEntry<T>, fresh: Millisecond): boolean {
-	return entry.ttl - entry.remain_ttl < fresh;
+	return Date.now() - entry.time < fresh;
 }

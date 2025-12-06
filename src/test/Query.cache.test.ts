@@ -43,8 +43,7 @@ describe('Query cache usage / no-cache query', () => {
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
-			assert.isTrue(entry.remain_ttl <= 1_000);
-			assert.isTrue(entry.remain_ttl > 980);
+			assert.isAtMost(entry.time, Date.now());
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
@@ -55,7 +54,7 @@ describe('Query cache usage / no-cache query', () => {
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
-			assert.isTrue(entry.remain_ttl <= 960);
+			assert.isAtMost(entry.time, Date.now() - 50);
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
@@ -66,8 +65,7 @@ describe('Query cache usage / no-cache query', () => {
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
-			assert.isTrue(entry.remain_ttl <= 1_000);
-			assert.isTrue(entry.remain_ttl > 980);
+			assert.isAtMost(entry.time, Date.now());
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
@@ -201,8 +199,7 @@ describe('Query cache usage / fresh query', () => {
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
-			assert.isTrue(entry.remain_ttl <= 1_000);
-			assert.isTrue(entry.remain_ttl > 980);
+			assert.isAtMost(entry.time, Date.now());
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
@@ -213,7 +210,7 @@ describe('Query cache usage / fresh query', () => {
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
-			assert.isTrue(entry.remain_ttl <= 955);
+			assert.isAtMost(entry.time, Date.now() - 50);
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
@@ -224,8 +221,7 @@ describe('Query cache usage / fresh query', () => {
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
-			assert.isTrue(entry.remain_ttl <= 1_000);
-			assert.isTrue(entry.remain_ttl > 980);
+			assert.isAtMost(entry.time, Date.now());
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
@@ -388,8 +384,7 @@ describe('Query cache usage / stale query', () => {
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
-			assert.isTrue(entry.remain_ttl <= 1_000);
-			assert.isTrue(entry.remain_ttl > 980);
+			assert.isAtMost(entry.time, Date.now());
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
@@ -400,7 +395,7 @@ describe('Query cache usage / stale query', () => {
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
-			assert.isTrue(entry.remain_ttl <= 955);
+			assert.isAtMost(entry.time, Date.now() - 50);
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
@@ -412,8 +407,7 @@ describe('Query cache usage / stale query', () => {
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
-			assert.isTrue(entry.remain_ttl <= 1_000);
-			assert.isTrue(entry.remain_ttl > 980);
+			assert.isAtMost(entry.time, Date.now());
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}

@@ -166,7 +166,7 @@ export async function executeQuery<K extends GenericQueryKey, T, E>(
 ): Promise<QueryExecutionResult<T, E>> {
 	ctx.stat.last_cache_directive = cache;
 	const hash = ctx.keyHashFn(key);
-	ctx.subscriber.useTopic(hash);
+	ctx.subscriber.useTopic(hash, old => old ?? { key, promise: null });
 
 	if (cache === 'no-cache') {
 		// eslint-disable-next-line @typescript-eslint/return-await
@@ -234,7 +234,7 @@ export function useQueryKey<K extends GenericQueryKey, T, E>(
 	{ target = 'context' }: ResetOptions = {}
 ): void {
 	const hash = ctx.keyHashFn(key);
-	ctx.subscriber.useTopic(hash);
+	ctx.subscriber.useTopic(hash, old => old ?? { key, promise: null });
 	ctx.state = { data: ctx.placeholder, error: null, status: 'idle' };
 
 	if (target === 'handler') {
@@ -636,7 +636,7 @@ export function updateQuery<K extends GenericQueryKey, T, E>(
 }
 
 /**
- *
+ * Apply and propagate the query state
  * @param ctx Query context
  * @param hash Key hash
  * @param event Mutation or Transition event

@@ -456,13 +456,22 @@ describe('Mutation handler invalidation', () => {
 		});
 
 		const listenerAccountUser1 = vi.fn();
-		provider.subscribe(cache.keyHashFn(['account', 'user', 1]), listenerAccountUser1);
+		provider.subscribe(cache.keyHashFn(['account', 'user', 1]), listenerAccountUser1, {
+			key: ['account', 'user', 1],
+			promise: null,
+		});
 
 		const listenerAccountOrg = vi.fn();
-		provider.subscribe(cache.keyHashFn(['account', 'organization']), listenerAccountOrg);
+		provider.subscribe(cache.keyHashFn(['account', 'organization']), listenerAccountOrg, {
+			key: ['account', 'organization'],
+			promise: null,
+		});
 
 		const listenerLogsKernel = vi.fn();
-		provider.subscribe(cache.keyHashFn(['logs', 'kernel']), listenerLogsKernel);
+		provider.subscribe(cache.keyHashFn(['logs', 'kernel']), listenerLogsKernel, {
+			key: ['logs', 'kernel'],
+			promise: null,
+		});
 
 		expect(listenerAccountUser1).toHaveBeenCalledTimes(0);
 		expect(listenerAccountOrg).toHaveBeenCalledTimes(0);

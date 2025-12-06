@@ -123,3 +123,12 @@ export function syncPromiseResolver<Fn extends () => void | Promise<void>>(func:
 export function makeAbortSignal(): AbortSignal {
 	return new AbortController().signal;
 }
+
+/**
+ * Convert any value to a string
+ * @param value Any value
+ * @returns String
+ */
+export function anyAsString(value: unknown): string {
+	return value + '';
+}

@@ -568,55 +568,6 @@ describe('Query state provider / in-flight migration', () => {
 });
 
 describe('Query state provider / query re-validation', () => {
-	it('not re-validate query after an invalidation event when missing shared state', async () => {
-		type Topic = [string, string, string];
-
-		const store = makeCache<string>();
-		const provider: QueryProvider<string, Error> = new PubSub();
-		const queryFn = vi.fn(testTransformer);
-		const handler = mockQueryHandler();
-		const queryApi = Query.create<Topic, string, Error>({
-			store,
-			provider,
-			queryFn,
-			...handler,
-		});
-
-		const topic: Topic = ['account', 'user', '1'];
-
-		queryApi.use(topic);
-
-		{
-			expect(queryFn).toHaveBeenCalledTimes(0);
-
-			expect(handler.dataFn).toHaveBeenCalledTimes(0);
-			expect(handler.errorFn).toHaveBeenCalledTimes(0);
-			expect(handler.stateFn).toHaveBeenCalledTimes(0);
-		}
-
-		provider.publish(queryApi.ctx.keyHashFn(topic), { type: 'invalidation', origin: 'provider' });
-
-		await waitUntil(100);
-
-		{
-			expect(queryFn).toHaveBeenCalledTimes(0);
-
-			expect(handler.dataFn).toHaveBeenCalledTimes(0);
-			expect(handler.errorFn).toHaveBeenCalledTimes(0);
-			expect(handler.stateFn).toHaveBeenCalledTimes(0);
-		}
-
-		assert.deepStrictEqual(queryApi.ctx.stat, {
-			cache_hit: 0,
-			cache_miss: 0,
-			cache_delete_on_error: 0,
-			last_cache_directive: null,
-			events_filtered: 0,
-			events_processed: 0,
-			handler_executions: 0,
-		});
-	});
-
 	it('re-validate the query result after an invalidation event', async () => {
 		const store = makeCache<string>();
 		const provider: QueryProvider<string, Error> = new PubSub();
@@ -634,8 +585,6 @@ describe('Query state provider / query re-validation', () => {
 		const hash = queryApi.ctx.keyHashFn(topic);
 
 		queryApi.use(topic);
-
-		provider.setState(hash, { key: topic, promise: null });
 
 		{
 			expect(queryFn).toHaveBeenCalledTimes(0);

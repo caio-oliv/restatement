@@ -25,6 +25,11 @@ export class NoCache<K, V> implements CacheStore<K, V> {
 	public async deletePrefix(): Promise<void> {
 		/* no-op */
 	}
+
+	// eslint-disable-next-line class-methods-use-this, @typescript-eslint/class-methods-use-this
+	public async clear(): Promise<void> {
+		/* no-op */
+	}
 }
 
 export const NO_CACHE = new NoCache();

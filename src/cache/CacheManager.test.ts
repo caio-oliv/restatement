@@ -58,7 +58,7 @@ describe('CacheManager', () => {
 		const key = ['user', 'id:1'];
 		const hash = cache.keyHashFn(key);
 
-		provider.subscribe(hash, listener);
+		provider.subscribe(hash, listener, { key, promise: null });
 
 		const data = generateUserMock(1);
 

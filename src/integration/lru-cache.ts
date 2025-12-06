@@ -1,4 +1,5 @@
 import type { CacheEntry, CacheStore } from '@/core/Cache';
+import { anyAsString } from '@/Internal';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 namespace LRUCache {
@@ -59,6 +60,7 @@ namespace LRUCache {
 		set(k: K, v: V | undefined, setOptions?: SetOptions<V>): LRUCache<K, V>;
 		delete(k: K): boolean;
 		forEach(fn: ForEachFn<V, K>, thisp?: this): void;
+		clear(): void;
 	}
 }
 
@@ -95,7 +97,7 @@ export class LRUCacheAdapter<K = unknown, V = unknown> implements CacheStore<K, 
 		const remain_ttl = Math.trunc(status.ttl - (Date.now() - status.start));
 		if (remain_ttl <= 0) return undefined;
 
-		return { data, remain_ttl, ttl: status.ttl };
+		return { data, ttl: status.ttl, time: status.start };
 	}
 
 	public async set(key: K, data: V, ttl: number): Promise<void> {
@@ -107,10 +109,15 @@ export class LRUCacheAdapter<K = unknown, V = unknown> implements CacheStore<K, 
 	}
 
 	public async deletePrefix(prefix: K): Promise<void> {
+		const pre = anyAsString(prefix);
 		this.cache.forEach((_value, key, instance) => {
-			if ((key as string).startsWith(prefix as string)) {
+			if (anyAsString(key).startsWith(pre)) {
 				instance.delete(key);
 			}
 		});
+	}
+
+	public async clear(): Promise<void> {
+		this.cache.clear();
 	}
 }

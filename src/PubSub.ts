@@ -18,7 +18,7 @@ interface ListenerState<in T, out S> {
 	/**
 	 * Shared state between listeners.
 	 */
-	state: S | null;
+	state: S;
 }
 
 export type PubSubSetStateFn<in out S> = (old: S | null) => S;
@@ -26,14 +26,17 @@ export type PubSubSetStateFn<in out S> = (old: S | null) => S;
 export type PubSubUpdateStateValue<S> = S | PubSubSetStateFn<S>;
 
 /**
- * Make default {@link ListenerState}
- * @returns Default {@link ListenerState}
+ * Apply the state
+ * @param old Old state
+ * @param state State
+ * @returns State
  */
-function listenerState<T, S>(): ListenerState<T, S> {
-	return {
-		listeners: new Set(),
-		state: null,
-	};
+function applyState<S>(old: S | null, state: PubSubUpdateStateValue<S>): S {
+	if (typeof state === 'function') {
+		return (state as PubSubSetStateFn<S>)(old);
+	} else {
+		return state;
+	}
 }
 
 /**
@@ -48,12 +51,25 @@ export class PubSub<in out T, in out S> {
 	 * Subscribe a listener to a topic
 	 * @param topic Topic
 	 * @param listener Listener function
+	 * @param state State
 	 * @returns Unsubscriber handle
 	 */
-	public subscribe(topic: string, listener: Listener<T>): UnsubscribeHandle {
-		const state = this.#listenerMap.get(topic) ?? listenerState();
-		state.listeners.add(listener);
-		this.#listenerMap.set(topic, state);
+	public subscribe(
+		topic: string,
+		listener: Listener<T>,
+		state: PubSubUpdateStateValue<S>
+	): UnsubscribeHandle {
+		const lstate = this.#listenerMap.get(topic);
+		if (!lstate) {
+			this.#listenerMap.set(topic, {
+				listeners: new Set([listener]),
+				state: applyState(null, state),
+			});
+		} else {
+			lstate.listeners.add(listener);
+			lstate.state = applyState(lstate.state, state);
+		}
+
 		return () => this.unsubscribe(topic, listener);
 	}
 
@@ -113,25 +129,41 @@ export class PubSub<in out T, in out S> {
 	 * @returns `true` if the state was set
 	 */
 	public setState(topic: string, state: PubSubUpdateStateValue<S>): boolean {
-		const lState = this.#listenerMap.get(topic);
-		if (!lState) {
+		const lstate = this.#listenerMap.get(topic);
+		if (!lstate) {
 			return false;
 		}
-		if (typeof state === 'function') {
-			lState.state = (state as PubSubSetStateFn<S>)(lState.state);
-		} else {
-			lState.state = state;
-		}
-		this.#listenerMap.set(topic, lState);
+		lstate.state = applyState(lstate.state, state);
+		this.#listenerMap.set(topic, lstate);
 		return true;
 	}
 
 	/**
-	 * Returns a iterator of all topics
+	 * Returns an iterator of all topics
 	 * @returns Topic iterator
 	 */
 	public topics(): IteratorObject<string, BuiltinIteratorReturn> {
 		return this.#listenerMap.keys();
+	}
+
+	/**
+	 * Returns an iterator of all topics and states
+	 * @yields Topic and state tuple
+	 */
+	public *entries(): IteratorObject<[string, S], BuiltinIteratorReturn> {
+		for (const [topic, lState] of this.#listenerMap.entries()) {
+			yield [topic, lState.state];
+		}
+	}
+
+	/**
+	 * Returns an iterator of all states
+	 * @yields Topic and state tuple
+	 */
+	public *states(): IteratorObject<S, BuiltinIteratorReturn> {
+		for (const lstate of this.#listenerMap.values()) {
+			yield lstate.state;
+		}
 	}
 
 	/**
@@ -150,8 +182,9 @@ export interface Subscriber<in T, in out S> {
 	/**
 	 * Change the subscriber topic
 	 * @param topic Optional new topic
+	 * @param state State
 	 */
-	useTopic(topic: string | null): void;
+	useTopic(topic: string | null, state: PubSubUpdateStateValue<S>): void;
 	/**
 	 * Get current topic
 	 * @returns topic
@@ -197,13 +230,13 @@ export class SubscriberHandle<T, S> implements Subscriber<T, S> {
 		this.#provider = provider;
 	}
 
-	public useTopic(topic: string | null): void {
+	public useTopic(topic: string | null, state: PubSubUpdateStateValue<S>): void {
 		if (this.#topic !== null && this.#topic !== topic) {
 			this.#provider.unsubscribe(this.#topic, this.listener);
 		}
 
 		if (topic) {
-			this.#provider.subscribe(topic, this.listener);
+			this.#provider.subscribe(topic, this.listener, state);
 		}
 
 		this.#topic = topic;

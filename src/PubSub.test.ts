@@ -6,7 +6,7 @@ describe('PubSub (un)subscribe', () => {
 		const pubsub = new PubSub<string, string>();
 		const listener: Listener<string> = vi.fn();
 
-		pubsub.subscribe('event#1', listener);
+		pubsub.subscribe('event#1', listener, 'state');
 
 		assert.deepStrictEqual(pubsub.subscriberCount('event#1'), 1);
 
@@ -17,7 +17,7 @@ describe('PubSub (un)subscribe', () => {
 		const pubsub = new PubSub<string, string>();
 		const listener: Listener<string> = vi.fn();
 
-		const unsubHandle = pubsub.subscribe('event#1', listener);
+		const unsubHandle = pubsub.subscribe('event#1', listener, 'state');
 
 		assert.deepStrictEqual(pubsub.subscriberCount('event#1'), 1);
 
@@ -34,7 +34,7 @@ describe('PubSub (un)subscribe', () => {
 		const pubsub = new PubSub<string, string>();
 		const listener: Listener<string> = vi.fn();
 
-		pubsub.subscribe('event#1', listener);
+		pubsub.subscribe('event#1', listener, 'state');
 
 		assert.deepStrictEqual(pubsub.subscriberCount('event#1'), 1);
 
@@ -52,7 +52,7 @@ describe('PubSub (un)subscribe', () => {
 		const listener: Listener<string> = vi.fn();
 
 		{
-			pubsub.subscribe('event#1', listener);
+			pubsub.subscribe('event#1', listener, 'state');
 
 			assert.deepStrictEqual(pubsub.subscriberCount('event#1'), 1);
 
@@ -60,7 +60,7 @@ describe('PubSub (un)subscribe', () => {
 		}
 
 		{
-			pubsub.subscribe('event#1', listener);
+			pubsub.subscribe('event#1', listener, 'state');
 
 			assert.deepStrictEqual(pubsub.subscriberCount('event#1'), 1);
 
@@ -79,14 +79,14 @@ describe('PubSub (un)subscribe', () => {
 		const listener: Listener<string> = vi.fn();
 
 		{
-			pubsub.subscribe('event#1', listener);
+			pubsub.subscribe('event#1', listener, 'state');
 
 			assert.deepStrictEqual(pubsub.subscriberCount('event#1'), 1);
 
 			expect(listener).toBeCalledTimes(0);
 		}
 		{
-			pubsub.subscribe('event#2', listener);
+			pubsub.subscribe('event#2', listener, 'state');
 
 			assert.deepStrictEqual(pubsub.subscriberCount('event#2'), 1);
 
@@ -134,9 +134,9 @@ describe('PubSub (un)subscribe', () => {
 		const listener2: Listener<string> = vi.fn();
 		const listener3: Listener<string> = vi.fn();
 
-		pubsub.subscribe('event#1', listener1);
-		pubsub.subscribe('event#1', listener2);
-		pubsub.subscribe('event#1', listener3);
+		pubsub.subscribe('event#1', listener1, 'state');
+		pubsub.subscribe('event#1', listener2, 'state');
+		pubsub.subscribe('event#1', listener3, 'state');
 
 		assert.deepStrictEqual(pubsub.subscriberCount('event#1'), 3);
 
@@ -151,7 +151,7 @@ describe('PubSub publish', () => {
 		const pubsub = new PubSub();
 		const listener = vi.fn();
 
-		pubsub.subscribe('event#1', listener);
+		pubsub.subscribe('event#1', listener, 'state');
 
 		pubsub.publish('event#1', 'message-1');
 
@@ -164,9 +164,9 @@ describe('PubSub publish', () => {
 		const listener2 = vi.fn();
 		const listener3 = vi.fn();
 
-		pubsub.subscribe('event#1', listener1);
-		pubsub.subscribe('event#1', listener2);
-		pubsub.subscribe('event#1', listener3);
+		pubsub.subscribe('event#1', listener1, 'state');
+		pubsub.subscribe('event#1', listener2, 'state');
+		pubsub.subscribe('event#1', listener3, 'state');
 
 		pubsub.publish('event#1', 'message-1');
 
@@ -181,9 +181,9 @@ describe('PubSub publish', () => {
 		const listener2 = vi.fn();
 		const listener3 = vi.fn();
 
-		pubsub.subscribe('event#1', listener1);
-		pubsub.subscribe('event#1', listener2);
-		pubsub.subscribe('event#1', listener3);
+		pubsub.subscribe('event#1', listener1, 'state');
+		pubsub.subscribe('event#1', listener2, 'state');
+		pubsub.subscribe('event#1', listener3, 'state');
 
 		pubsub.publish('event#1', 'message-1', [listener3]);
 
@@ -209,7 +209,7 @@ describe('PubSub shared state', () => {
 		const pubsub = new PubSub<string, string>();
 		const listener = vi.fn();
 
-		pubsub.subscribe('event#1', listener);
+		pubsub.subscribe('event#1', listener, 'initial state');
 
 		const setted = pubsub.setState('event#1', 'state1');
 
@@ -243,7 +243,7 @@ describe('SubscriberHandle (un)subscribe', () => {
 		const listener = vi.fn();
 		const handle = new SubscriberHandle(listener, pubsub);
 
-		handle.useTopic('event#1');
+		handle.useTopic('event#1', 'state');
 
 		assert.strictEqual(handle.currentTopic(), 'event#1');
 		assert.deepStrictEqual(Array.from(pubsub.topics()), ['event#1']);
@@ -255,7 +255,7 @@ describe('SubscriberHandle (un)subscribe', () => {
 		const handle = new SubscriberHandle(listener, pubsub);
 
 		{
-			handle.useTopic('event#1');
+			handle.useTopic('event#1', 'state');
 
 			assert.strictEqual(handle.currentTopic(), 'event#1');
 			assert.deepStrictEqual(Array.from(pubsub.topics()), ['event#1']);
@@ -274,7 +274,7 @@ describe('SubscriberHandle (un)subscribe', () => {
 
 		{
 			using handle = new SubscriberHandle(listener, pubsub);
-			handle.useTopic('event#1');
+			handle.useTopic('event#1', 'state');
 
 			assert.strictEqual(handle.currentTopic(), 'event#1');
 			assert.deepStrictEqual(Array.from(pubsub.topics()), ['event#1']);
@@ -303,13 +303,13 @@ describe('SubscriberHandle (un)subscribe', () => {
 		const handle = new SubscriberHandle(listener, pubsub);
 
 		{
-			handle.useTopic('event#1');
+			handle.useTopic('event#1', 'state');
 
 			assert.strictEqual(handle.currentTopic(), 'event#1');
 			assert.deepStrictEqual(Array.from(pubsub.topics()), ['event#1']);
 		}
 		{
-			handle.useTopic('event_2');
+			handle.useTopic('event_2', 'state');
 
 			assert.strictEqual(handle.currentTopic(), 'event_2');
 			assert.deepStrictEqual(Array.from(pubsub.topics()), ['event_2']);
@@ -323,7 +323,7 @@ describe('SubscriberHandle publish', () => {
 		const listener = vi.fn();
 		const handle = new SubscriberHandle(listener, pubsub);
 
-		handle.useTopic('event#1');
+		handle.useTopic('event#1', 'state');
 
 		handle.publish('message-1');
 
@@ -345,8 +345,8 @@ describe('SubscriberHandle publish', () => {
 		const handle1 = new SubscriberHandle(vi.fn(), pubsub);
 		const handle2 = new SubscriberHandle(vi.fn(), pubsub);
 
-		handle1.useTopic('event#1');
-		handle2.useTopic('event#1');
+		handle1.useTopic('event#1', 'state');
+		handle2.useTopic('event#1', 'state');
 
 		assert.strictEqual(pubsub.subscriberCount('event#1'), 2);
 
@@ -374,8 +374,8 @@ describe('SubscriberHandle publish', () => {
 		const handle1 = new SubscriberHandle(vi.fn(), pubsub);
 		const handle2 = new SubscriberHandle(vi.fn(), pubsub);
 
-		handle1.useTopic('event#1');
-		handle2.useTopic('event#1');
+		handle1.useTopic('event#1', 'state');
+		handle2.useTopic('event#1', 'state');
 
 		assert.strictEqual(pubsub.subscriberCount('event#1'), 2);
 
@@ -402,7 +402,7 @@ describe('SubscriberHandle shared state', () => {
 		const pubsub = new PubSub();
 		const handle = new SubscriberHandle(vi.fn(), pubsub);
 
-		handle.useTopic('event#1');
+		handle.useTopic('event#1', 'state');
 
 		const setted = handle.setState('state1');
 
@@ -414,7 +414,7 @@ describe('SubscriberHandle shared state', () => {
 		const pubsub = new PubSub();
 		const handle = new SubscriberHandle(vi.fn(), pubsub);
 
-		handle.useTopic('event#1');
+		handle.useTopic('event#1', 'state');
 		handle.setState('prev-state');
 
 		const setted = handle.setState((old: string) => (old.startsWith('prev') ? 'new-state' : ''));

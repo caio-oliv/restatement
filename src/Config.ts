@@ -65,7 +65,10 @@ export type PartialRestatementConfig<T = unknown, E = unknown> = Partial<
 	readonly mutation?: PartialMutationConfig<T, E>;
 };
 
-export type PartialCacheConfig = Partial<Omit<CacheConfig, 'store'>>;
+export interface PartialCacheConfig {
+	readonly ttl?: Millisecond;
+	readonly fresh?: Millisecond;
+}
 
 export type PartialQueryConfig<T = unknown, E = unknown> = Partial<
 	Omit<QueryConfig<T, E>, 'retry'>
@@ -89,7 +92,7 @@ export type PartialRetryConfig<E = unknown> = Partial<RetryConfig<E>>;
  */
 // eslint-disable-next-line complexity
 export function restatementConfig<T = unknown, E = unknown>(
-	store: CacheStore<string, E>,
+	store: CacheStore<string, T>,
 	config: PartialRestatementConfig<T, E> = {}
 ): RestatementConfig<T, E> {
 	const ttl = config.cache?.ttl ?? DEFAULT_TTL_DURATION;

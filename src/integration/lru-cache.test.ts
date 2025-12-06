@@ -25,7 +25,6 @@ describe('lru-cache package integration', () => {
 	});
 
 	it('set and get cache entries', async () => {
-		const ERR = 1;
 		const options: LRUCache.Options<string, number, unknown> = {
 			max: 500,
 			...REQUIRED_LRU_CACHE_OPTIONS,
@@ -42,14 +41,14 @@ describe('lru-cache package integration', () => {
 			assert.isTrue(typeof entry === 'object');
 			assert.strictEqual(entry.data, 10);
 			assert.strictEqual(entry.ttl, 50);
-			assert.isAtMost(entry.remain_ttl, 50 + ERR);
+			assert.isAtMost(entry.time, Date.now());
 		}
 		{
 			const entry = (await adapter.getEntry('bike'))!;
 			assert.isTrue(typeof entry === 'object');
 			assert.strictEqual(entry.data, 20);
 			assert.strictEqual(entry.ttl, 100);
-			assert.isAtMost(entry.remain_ttl, 100 + ERR);
+			assert.isAtMost(entry.time, Date.now());
 		}
 
 		await adapter.set('truck', 70, 200);
@@ -65,14 +64,14 @@ describe('lru-cache package integration', () => {
 			assert.isTrue(typeof entry === 'object');
 			assert.strictEqual(entry.data, 20);
 			assert.strictEqual(entry.ttl, 100);
-			assert.isAtMost(entry.remain_ttl, 100 + ERR - 70);
+			assert.isAtMost(entry.time, Date.now() - 70);
 		}
 		{
 			const entry = (await adapter.getEntry('truck'))!;
 			assert.isTrue(typeof entry === 'object');
 			assert.strictEqual(entry.data, 70);
 			assert.strictEqual(entry.ttl, 200);
-			assert.isAtMost(entry.remain_ttl, 200 + ERR - 70);
+			assert.isAtMost(entry.time, Date.now() - 70);
 		}
 
 		await waitUntil(50);
@@ -90,7 +89,7 @@ describe('lru-cache package integration', () => {
 			assert.isTrue(typeof entry === 'object');
 			assert.strictEqual(entry.data, 70);
 			assert.strictEqual(entry.ttl, 200);
-			assert.isAtMost(entry.remain_ttl, 200 + ERR - (70 + 50));
+			assert.isAtMost(entry.time, Date.now() - (50 + 70));
 		}
 	});
 
