@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { assert, describe, expect, it, vi } from 'vitest';
 import { type QueryStateHandlerEvent, NO_RETRY_POLICY, Query } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { testTransformer, mockQueryHandler } from '@/test/TestHelper.mock';
@@ -99,6 +99,16 @@ describe('Query handler / exception handling', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 7,
+		});
 	});
 
 	it('handler exception for fresh query', async () => {
@@ -239,6 +249,16 @@ describe('Query handler / exception handling', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 2,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 5,
+			handler_executions: 9,
+		});
 	});
 
 	it('handler exception for stale query', async () => {
@@ -379,5 +399,15 @@ describe('Query handler / exception handling', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 2,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 5,
+			handler_executions: 9,
+		});
 	});
 });

@@ -605,6 +605,16 @@ describe('Query state provider / query re-validation', () => {
 			expect(handler.errorFn).toHaveBeenCalledTimes(0);
 			expect(handler.stateFn).toHaveBeenCalledTimes(0);
 		}
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: null,
+			events_filtered: 0,
+			events_processed: 0,
+			handler_executions: 0,
+		});
 	});
 
 	it('re-validate the query result after an invalidation event', async () => {
@@ -673,6 +683,16 @@ describe('Query state provider / query re-validation', () => {
 				queryApi.cache
 			);
 		}
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 2,
+		});
 	});
 
 	it('not re-validate the query error result after an invalidation event', async () => {
@@ -738,5 +758,15 @@ describe('Query state provider / query re-validation', () => {
 				queryApi.cache
 			);
 		}
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 2,
+		});
 	});
 });

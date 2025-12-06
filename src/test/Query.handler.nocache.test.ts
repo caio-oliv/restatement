@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { assert, describe, expect, it, vi } from 'vitest';
 import { type QueryStateHandlerEvent, NO_RETRY_POLICY, Query } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { testTransformer, mockQueryHandler } from '@/test/TestHelper.mock';
@@ -56,6 +56,16 @@ describe('Query handler / no-cache query', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 3,
+		});
 	});
 
 	it('idle to loading to error', async () => {
@@ -110,6 +120,16 @@ describe('Query handler / no-cache query', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 3,
+		});
 	});
 
 	it('success to loading to success', async () => {
@@ -211,6 +231,16 @@ describe('Query handler / no-cache query', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 7,
+		});
 	});
 
 	it('success to loading to error', async () => {
@@ -304,6 +334,16 @@ describe('Query handler / no-cache query', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 7,
+		});
 	});
 
 	it('error to loading to success', async () => {
@@ -401,6 +441,16 @@ describe('Query handler / no-cache query', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 6,
+		});
 	});
 
 	it('error to loading to error', async () => {
@@ -498,5 +548,15 @@ describe('Query handler / no-cache query', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 2,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 6,
+		});
 	});
 });

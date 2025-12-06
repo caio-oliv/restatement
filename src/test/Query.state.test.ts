@@ -40,6 +40,16 @@ describe('Query state transition / reset query', () => {
 			error: null,
 			status: 'idle',
 		});
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	it('reset query state to idle with placeholder', async () => {
@@ -79,6 +89,16 @@ describe('Query state transition / reset query', () => {
 		expect(handler.dataFn).toHaveBeenCalledTimes(2);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 4,
+		});
 	});
 
 	it('reset query state to idle and call the state handler', async () => {
@@ -132,6 +152,16 @@ describe('Query state transition / reset query', () => {
 			} satisfies InitializationQueryEvent,
 			queryApi.cache
 		);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 5,
+		});
 	});
 });
 
@@ -172,6 +202,16 @@ describe('Query state transition / reset query', () => {
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 		expect(handler.errorFn).toHaveBeenCalledTimes(0);
 		expect(handler.stateFn).toHaveBeenCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 3,
+		});
 	});
 
 	it('reset the state when using another key and call the state handler', async () => {
@@ -224,6 +264,16 @@ describe('Query state transition / reset query', () => {
 			} satisfies InitializationQueryEvent,
 			queryApi.cache
 		);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 4,
+		});
 	});
 });
 
@@ -261,6 +311,16 @@ describe('Query state transition / no-cache query', () => {
 		assert.deepStrictEqual(await result.next(), null);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	// error
@@ -296,6 +356,16 @@ describe('Query state transition / no-cache query', () => {
 		assert.deepStrictEqual(await result.next(), null);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	// loading
@@ -341,6 +411,16 @@ describe('Query state transition / no-cache query', () => {
 		assert.deepStrictEqual(await result.next(), null);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	// success to loading to success
@@ -404,6 +484,16 @@ describe('Query state transition / no-cache query', () => {
 		});
 
 		assert.deepStrictEqual(await result2.next(), null);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	// success to loading to error
@@ -467,6 +557,16 @@ describe('Query state transition / no-cache query', () => {
 		});
 
 		assert.deepStrictEqual(await result2.next(), null);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	// error to loading to success
@@ -530,6 +630,16 @@ describe('Query state transition / no-cache query', () => {
 		});
 
 		assert.deepStrictEqual(await result2.next(), null);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	// error to loading to error
@@ -595,6 +705,16 @@ describe('Query state transition / no-cache query', () => {
 		assert.deepStrictEqual(await result2.next(), null);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 2,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 });
 
@@ -632,6 +752,16 @@ describe('Query state transition / fresh query', () => {
 		assert.deepStrictEqual(await result.next(), null);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 1,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	// success from cache
@@ -669,6 +799,16 @@ describe('Query state transition / fresh query', () => {
 		assert.deepStrictEqual(await result.next(), null);
 
 		expect(queryFn).toBeCalledTimes(0);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 1,
+			handler_executions: 0,
+		});
 	});
 
 	// error
@@ -704,6 +844,16 @@ describe('Query state transition / fresh query', () => {
 		assert.deepStrictEqual(await result.next(), null);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 1,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	// loading
@@ -753,6 +903,16 @@ describe('Query state transition / fresh query', () => {
 		assert.deepStrictEqual(await result.next(), null);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 1,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	// success to loading to success from query
@@ -823,6 +983,16 @@ describe('Query state transition / fresh query', () => {
 		assert.deepStrictEqual(await result2.next(), null);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	// success to success from cache
@@ -880,6 +1050,16 @@ describe('Query state transition / fresh query', () => {
 		assert.deepStrictEqual(await result2.next(), null);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 1,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 3,
+			handler_executions: 0,
+		});
 	});
 
 	// success to loading to error
@@ -947,6 +1127,16 @@ describe('Query state transition / fresh query', () => {
 		assert.deepStrictEqual(await result2.next(), null);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	// error to loading to success from query
@@ -1014,6 +1204,16 @@ describe('Query state transition / fresh query', () => {
 		assert.deepStrictEqual(await result2.next(), null);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	// error to success from cache
@@ -1075,6 +1275,16 @@ describe('Query state transition / fresh query', () => {
 		assert.deepStrictEqual(await result2.next(), null);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 1,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 3,
+			handler_executions: 0,
+		});
 	});
 
 	// error to loading to error
@@ -1142,6 +1352,16 @@ describe('Query state transition / fresh query', () => {
 		assert.deepStrictEqual(await result2.next(), null);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 2,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 });
 
@@ -1179,6 +1399,16 @@ describe('Query state transition / stale query', () => {
 		assert.deepStrictEqual(await result.next(), null);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 1,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	// success from cache
@@ -1197,7 +1427,7 @@ describe('Query state transition / stale query', () => {
 			status: 'idle',
 		});
 
-		store.set(defaultKeyHashFn(['key#1']), 'data#1', 30_000);
+		await store.set(defaultKeyHashFn(['key#1']), 'data#1', 30_000);
 
 		const result = await queryApi.execute(['key#1'], { cache: 'stale' });
 
@@ -1216,6 +1446,16 @@ describe('Query state transition / stale query', () => {
 		assert.deepStrictEqual(await result.next(), null);
 
 		expect(queryFn).toBeCalledTimes(0);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 1,
+			handler_executions: 0,
+		});
 	});
 
 	// stale to success from background query
@@ -1276,6 +1516,16 @@ describe('Query state transition / stale query', () => {
 			data: 'data#1',
 			error: null,
 			status: 'success',
+		});
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
 		});
 	});
 
@@ -1338,6 +1588,16 @@ describe('Query state transition / stale query', () => {
 			error: new Error('invalid_key'),
 			status: 'error',
 		});
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 0,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	// error
@@ -1373,6 +1633,16 @@ describe('Query state transition / stale query', () => {
 		assert.deepStrictEqual(await result.next(), null);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 1,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	// loading
@@ -1422,6 +1692,16 @@ describe('Query state transition / stale query', () => {
 		assert.deepStrictEqual(await result.next(), null);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 1,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	// success to loading to success from query
@@ -1491,6 +1771,16 @@ describe('Query state transition / stale query', () => {
 		assert.deepStrictEqual(await result2.next(), null);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	// success to success from cache
@@ -1548,6 +1838,16 @@ describe('Query state transition / stale query', () => {
 		assert.deepStrictEqual(await result2.next(), null);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 1,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 3,
+			handler_executions: 0,
+		});
 	});
 
 	// success to stale to success from background query
@@ -1626,6 +1926,16 @@ describe('Query state transition / stale query', () => {
 			data: 'data#1',
 			error: null,
 			status: 'success',
+		});
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 1,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
 		});
 	});
 
@@ -1706,6 +2016,16 @@ describe('Query state transition / stale query', () => {
 			error: new Error('invalid_key'),
 			status: 'error',
 		});
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 1,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	// success to loading to error
@@ -1775,6 +2095,16 @@ describe('Query state transition / stale query', () => {
 		assert.deepStrictEqual(await result2.next(), null);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	// error to loading to success from query
@@ -1842,6 +2172,16 @@ describe('Query state transition / stale query', () => {
 		assert.deepStrictEqual(await result2.next(), null);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	// error to success from cache
@@ -1903,6 +2243,16 @@ describe('Query state transition / stale query', () => {
 		assert.deepStrictEqual(await result2.next(), null);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 1,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 3,
+			handler_executions: 0,
+		});
 	});
 
 	// error to stale to success from background query
@@ -1984,6 +2334,16 @@ describe('Query state transition / stale query', () => {
 			error: null,
 			status: 'success',
 		});
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 1,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	// error to stale to error from background query
@@ -2063,6 +2423,16 @@ describe('Query state transition / stale query', () => {
 			error: new Error('invalid_key'),
 			status: 'error',
 		});
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 1,
+			cache_delete_on_error: 2,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	// error to loading to error
@@ -2130,5 +2500,15 @@ describe('Query state transition / stale query', () => {
 		assert.deepStrictEqual(await result2.next(), null);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 2,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 });

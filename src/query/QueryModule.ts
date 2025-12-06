@@ -49,8 +49,6 @@ export function initQueryStatistic(): QueryStatistic {
 		last_cache_directive: null,
 		events_filtered: 0,
 		events_processed: 0,
-		events_originated_from_self: 0,
-		events_originated_from_provider: 0,
 		handler_executions: 0,
 	};
 }
@@ -166,6 +164,7 @@ export async function executeQuery<K extends GenericQueryKey, T, E>(
 	key: K,
 	{ cache = 'stale', ttl = ctx.ttl, signal = makeAbortSignal() }: ExecuteQueryOptions = {}
 ): Promise<QueryExecutionResult<T, E>> {
+	ctx.stat.last_cache_directive = cache;
 	const hash = ctx.keyHashFn(key);
 	ctx.subscriber.useTopic(hash);
 
@@ -176,6 +175,7 @@ export async function executeQuery<K extends GenericQueryKey, T, E>(
 
 	const entry = await ctx.internalCache.getEntry(hash).catch(blackhole);
 	if (entry === undefined) {
+		ctx.stat.cache_miss += 1;
 		// eslint-disable-next-line @typescript-eslint/return-await
 		return runActiveQuery(ctx, { key, hash }, { cache, ttl, signal });
 	}
@@ -189,6 +189,7 @@ export async function executeQuery<K extends GenericQueryKey, T, E>(
 			state,
 			metadata: { origin: 'self', source: 'cache', cache },
 		});
+		ctx.stat.cache_hit += 1;
 		return { state, next: nullpromise };
 	}
 
@@ -202,10 +203,12 @@ export async function executeQuery<K extends GenericQueryKey, T, E>(
 			metadata: { origin: 'self', source: 'cache', cache },
 		});
 
+		ctx.stat.cache_hit += 1;
 		// eslint-disable-next-line @typescript-eslint/return-await
 		return runBackgroundQuery(ctx, state, { key, hash }, { ttl, signal });
 	}
 
+	ctx.stat.cache_miss += 1;
 	// eslint-disable-next-line @typescript-eslint/return-await
 	return runActiveQuery(ctx, { key, hash }, { cache, ttl, signal });
 }
@@ -289,6 +292,7 @@ export function resetQuery<K extends GenericQueryKey, T, E>(
  */
 function stateInitialization<K extends GenericQueryKey, T, E>(ctx: QueryContext<K, T, E>): void {
 	ctx.stateFn?.(ctx.state, { type: 'initialization', origin: 'self' }, ctx.cache)?.catch(blackhole);
+	ctx.stat.handler_executions += ctx.stateFn ? 1 : 0;
 }
 
 /**
@@ -344,6 +348,7 @@ export async function runActiveQuery<K extends GenericQueryKey, T, E>(
 	{ key, hash }: KeyPair<K>,
 	{ cache = 'stale', ttl = ctx.ttl, signal = makeAbortSignal() }: RunActiveQueryOptions = {}
 ): Promise<QueryExecutionResult<T, E>> {
+	ctx.stat.last_cache_directive = cache;
 	const state: QueryState<T, E> = { status: 'loading', data: ctx.state.data, error: null };
 	const metadata: QueryStateMetadata = { origin: 'self', source: 'query', cache };
 
@@ -502,6 +507,7 @@ export async function runQuery<K extends GenericQueryKey, T, E>(
 		signal = makeAbortSignal(),
 	}: RunQueryOptions = {}
 ): Promise<QueryState<T, E>> {
+	ctx.stat.last_cache_directive = cache;
 	try {
 		const localQueryFn = ctx.queryFn;
 		const val = await execAsyncOperation(
@@ -579,6 +585,7 @@ export async function queryReject<K extends GenericQueryKey, T, E>(
 	const state: QueryState<T, E> = { status: 'error', error: err as E, data: null };
 	if (!ctx.keepCacheOnErrorFn(err as E)) {
 		await ctx.internalCache.delete(hash).catch(blackhole);
+		ctx.stat.cache_delete_on_error += 1;
 	}
 	updateQuery(ctx, hash, {
 		type: 'transition',
@@ -609,6 +616,7 @@ export function updateQuery<K extends GenericQueryKey, T, E>(
 	}
 
 	if (!ctx.filterFn({ current: ctx.state, event })) {
+		ctx.stat.events_filtered += 1;
 		return;
 	}
 
@@ -620,6 +628,7 @@ export function updateQuery<K extends GenericQueryKey, T, E>(
 			key: key as K,
 			hash: ctx.subscriber.currentTopic() as string,
 		});
+		ctx.stat.events_processed += 1;
 		return;
 	}
 
@@ -641,13 +650,18 @@ function propagateQueryUpdate<K extends GenericQueryKey, T, E>(
 
 	if (ctx.state.data !== null) {
 		ctx.dataFn?.(ctx.state.data, event as QueryDataHandlerEvent<T>, ctx.cache)?.catch(blackhole);
+		ctx.stat.handler_executions += ctx.dataFn ? 1 : 0;
 	}
 	if (ctx.state.error !== null) {
 		ctx
 			.errorFn?.(ctx.state.error, event as ErrorTransitionQueryEvent<E>, ctx.cache)
 			?.catch(blackhole);
+		ctx.stat.handler_executions += ctx.errorFn ? 1 : 0;
 	}
 	ctx.stateFn?.(ctx.state, event, ctx.cache)?.catch(blackhole);
+	ctx.stat.handler_executions += ctx.stateFn ? 1 : 0;
+
+	ctx.stat.events_processed += 1;
 
 	if (event.origin === 'self') {
 		ctx.subscriber.publishTopic(hash, {

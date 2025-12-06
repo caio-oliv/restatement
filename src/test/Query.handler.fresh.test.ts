@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { assert, describe, expect, it, vi } from 'vitest';
 import {
 	type QueryStateHandlerEvent,
 	DEFAULT_TTL_DURATION,
@@ -62,6 +62,16 @@ describe('Query handler / fresh query', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 1,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 3,
+		});
 	});
 
 	it('idle to success from cache', async () => {
@@ -107,6 +117,16 @@ describe('Query handler / fresh query', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(0);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 1,
+			handler_executions: 2,
+		});
 	});
 
 	it('idle to loading to error', async () => {
@@ -161,6 +181,16 @@ describe('Query handler / fresh query', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 1,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 3,
+		});
 	});
 
 	it('success to loading to success from query', async () => {
@@ -256,6 +286,16 @@ describe('Query handler / fresh query', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 7,
+		});
 	});
 
 	it('success to success from cache', async () => {
@@ -342,6 +382,16 @@ describe('Query handler / fresh query', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 1,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 3,
+			handler_executions: 5,
+		});
 	});
 
 	it('success to loading to error', async () => {
@@ -435,6 +485,16 @@ describe('Query handler / fresh query', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 7,
+		});
 	});
 
 	it('error to loading to success from query', async () => {
@@ -528,6 +588,16 @@ describe('Query handler / fresh query', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 6,
+		});
 	});
 
 	it('error to success from cache', async () => {
@@ -612,6 +682,16 @@ describe('Query handler / fresh query', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(1);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 1,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 3,
+			handler_executions: 5,
+		});
 	});
 
 	it('error to loading to error', async () => {
@@ -705,5 +785,15 @@ describe('Query handler / fresh query', () => {
 		);
 
 		expect(queryFn).toBeCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 2,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 6,
+		});
 	});
 });

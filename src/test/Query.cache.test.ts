@@ -14,6 +14,16 @@ describe('Query cache usage / no-cache query', () => {
 		const value = await store.get(defaultKeyHashFn(['key#1']));
 
 		assert.deepStrictEqual(value, 'data#1');
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	it('update the cache remaking the same query', async () => {
@@ -61,6 +71,16 @@ describe('Query cache usage / no-cache query', () => {
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	it('remove the cache with a failed query', async () => {
@@ -89,6 +109,16 @@ describe('Query cache usage / no-cache query', () => {
 			const value = await store.get(defaultKeyHashFn(['invalid_1']));
 			assert.deepStrictEqual(value, undefined);
 		}
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	it('not remove the cache with a failed query', async () => {
@@ -118,6 +148,16 @@ describe('Query cache usage / no-cache query', () => {
 			const value = await store.get(defaultKeyHashFn(['invalid_1']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'no-cache',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 });
 
@@ -132,6 +172,16 @@ describe('Query cache usage / fresh query', () => {
 		const value = await store.get(defaultKeyHashFn(['key#1']));
 
 		assert.deepStrictEqual(value, 'data#1');
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 1,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	it('update the cache remaking the same query when the cache is not fresh', async () => {
@@ -179,6 +229,16 @@ describe('Query cache usage / fresh query', () => {
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	it('remove the cache with a failed query when the cache is not fresh', async () => {
@@ -209,6 +269,16 @@ describe('Query cache usage / fresh query', () => {
 			const value = await store.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, undefined);
 		}
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	it('remove the cache with a failed query', async () => {
@@ -229,6 +299,16 @@ describe('Query cache usage / fresh query', () => {
 			const value = await store.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, undefined);
 		}
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 1,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	it('not remove the cache with a failed query', async () => {
@@ -255,6 +335,16 @@ describe('Query cache usage / fresh query', () => {
 			const value = await store.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 1,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 });
 
@@ -269,6 +359,16 @@ describe('Query cache usage / stale query', () => {
 		const value = await store.get(defaultKeyHashFn(['key#1']));
 
 		assert.deepStrictEqual(value, 'data#1');
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 1,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	it('update the cache remaking the same query when the cache is stale', async () => {
@@ -317,6 +417,16 @@ describe('Query cache usage / stale query', () => {
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 1,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	it('remove the cache with a failed query when the cache is stale', async () => {
@@ -346,6 +456,16 @@ describe('Query cache usage / stale query', () => {
 			const value = await store.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, undefined);
 		}
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 1,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	it('remove the cache with a failed query', async () => {
@@ -367,6 +487,16 @@ describe('Query cache usage / stale query', () => {
 			const value = await store.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, undefined);
 		}
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 0,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 
 	it('not remove the cache with a failed query', async () => {
@@ -394,6 +524,16 @@ describe('Query cache usage / stale query', () => {
 			const value = await store.get(defaultKeyHashFn(['invalid']));
 			assert.deepStrictEqual(value, 'valid_result');
 		}
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 1,
+			cache_miss: 0,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 2,
+			handler_executions: 0,
+		});
 	});
 });
 
@@ -429,6 +569,16 @@ describe('Query cache exception handling', () => {
 		}
 
 		expect(queryFn).toHaveBeenCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	it('handle exception when setting a cache entry', async () => {
@@ -462,6 +612,16 @@ describe('Query cache exception handling', () => {
 		}
 
 		expect(queryFn).toHaveBeenCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 0,
+			last_cache_directive: 'stale',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 
 	it('handle exception when deleting a cache entry', async () => {
@@ -496,5 +656,15 @@ describe('Query cache exception handling', () => {
 		}
 
 		expect(queryFn).toHaveBeenCalledTimes(2);
+
+		assert.deepStrictEqual(queryApi.ctx.stat, {
+			cache_hit: 0,
+			cache_miss: 2,
+			cache_delete_on_error: 1,
+			last_cache_directive: 'fresh',
+			events_filtered: 0,
+			events_processed: 4,
+			handler_executions: 0,
+		});
 	});
 });

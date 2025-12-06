@@ -35,18 +35,20 @@ export type QuerySubscriber<T, E> = Subscriber<QueryProviderEvent<T, E>, QuerySh
  */
 export type QueryProvider<T, E> = PubSub<QueryProviderEvent<T, E>, QuerySharedState<T, E>>;
 
-// TODO: fill and update these attributes.
-
 /**
  * Query statistics
  */
 export interface QueryStatistic {
 	/**
 	 * Number of cache hits
+	 * @description Cache Hit.
+	 * Only calls through {@link executeQuery} are used to account for cache hits.
 	 */
 	cache_hit: number;
 	/**
 	 * Number of cache misses
+	 * @description Cache Miss.
+	 * Only calls through {@link executeQuery} are used to account for cache misses.
 	 */
 	cache_miss: number;
 	/**
@@ -54,7 +56,7 @@ export interface QueryStatistic {
 	 */
 	cache_delete_on_error: number;
 	/**
-	 * Last used cache directive
+	 * Last cache directive used
 	 */
 	last_cache_directive: CacheDirective | null;
 	/**
@@ -65,14 +67,6 @@ export interface QueryStatistic {
 	 * Number of events filtered
 	 */
 	events_filtered: number;
-	/**
-	 * Number of events originated from `self`
-	 */
-	events_originated_from_self: number;
-	/**
-	 * Number of events originated from `provider`
-	 */
-	events_originated_from_provider: number;
 	/**
 	 * Number of all query handler executions
 	 */
