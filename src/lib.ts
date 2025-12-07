@@ -6,6 +6,8 @@ export * from '@/PubSub';
 export * from '@/Default';
 export * from '@/cache/NoCache';
 export * from '@/cache/CacheManager';
+export * from '@/cache/PersistentCache';
+export * from '@/cache/TrackingCache';
 export * from '@/Helper';
 export * from '@/query/QueryContext';
 export * from '@/query/QueryModule';

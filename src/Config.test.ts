@@ -1,8 +1,24 @@
 import { assert, describe, it, vi } from 'vitest';
-import { CacheManager, makeMutationInput, makeQueryInput, restatementConfig } from '@/lib';
+import { CacheManager, makeMutationInput, makeQueryInput, PubSub, restatementConfig } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 
 describe('Config / query input', () => {
+	it('initialize the config with a null provider', () => {
+		const cache = makeCache();
+		const config = restatementConfig<unknown, unknown>(cache, {
+			provider: null,
+		});
+
+		assert.strictEqual(config.provider, null);
+	});
+
+	it('initialize the config with the default provider', () => {
+		const cache = makeCache();
+		const config = restatementConfig<unknown, unknown>(cache);
+
+		assert.instanceOf(config.provider, PubSub);
+	});
+
 	it('initialize the query input', () => {
 		const cache = makeCache();
 		const config = restatementConfig<unknown, unknown>(cache);

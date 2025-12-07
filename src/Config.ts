@@ -97,7 +97,8 @@ export function restatementConfig<T = unknown, E = unknown>(
 ): RestatementConfig<T, E> {
 	const ttl = config.cache?.ttl ?? DEFAULT_TTL_DURATION;
 	const fresh = config.cache?.fresh ?? DEFAULT_FRESH_DURATION;
-	const provider = config.provider ?? new PubSub();
+	const provider: QueryProvider<T, E> | null =
+		config.provider === undefined ? new PubSub() : config.provider;
 	const keyHashFn = config.keyHashFn ?? defaultKeyHashFn;
 
 	return {
