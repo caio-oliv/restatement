@@ -42,8 +42,9 @@
 		"docs:open": "python -m http.server 9000 -d docs",
 		"test": "vitest run",
 		"test:cov": "vitest run --bail 1 --coverage",
+		"test:cov:open": "python -m http.server 9010 -d coverage",
 		"bench": "vitest bench --run",
-		"clear:coverage": "rimraf coverage",
+		"clear:cov": "rimraf coverage",
 		"clear:build": "rimraf dist",
 		"clear:docs": "rimraf docs docsmd",
 		"clear": "rimraf dist coverage docs docsmd"

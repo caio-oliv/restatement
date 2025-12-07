@@ -1,11 +1,25 @@
-import type { MutationState, QueryState } from '@/core/Type';
+import type {
+	ErrorMutationState,
+	ErrorQueryState,
+	IdleMutationState,
+	IdleQueryState,
+	LoadingMutationState,
+	LoadingQueryState,
+	MutationState,
+	QueryState,
+	StaleQueryState,
+	SuccessMutationState,
+	SuccessQueryState,
+} from '@/core/Type';
 
 /**
  * Returns `true` if the state is `idle`, `false` otherwise.
  * @param state State
  * @returns Boolean
  */
-export function isIdle<T, E>(state: QueryState<T, E> | MutationState<T, E>): boolean {
+export function isIdle<T, E>(
+	state: QueryState<T, E> | MutationState<T, E>
+): state is IdleQueryState<T> | IdleMutationState<T> {
 	return state.status === 'idle';
 }
 
@@ -14,7 +28,9 @@ export function isIdle<T, E>(state: QueryState<T, E> | MutationState<T, E>): boo
  * @param state State
  * @returns Boolean
  */
-export function isSuccess<T, E>(state: QueryState<T, E> | MutationState<T, E>): boolean {
+export function isSuccess<T, E>(
+	state: QueryState<T, E> | MutationState<T, E>
+): state is SuccessQueryState<T> | SuccessMutationState<T> {
 	return state.status === 'success';
 }
 
@@ -23,7 +39,9 @@ export function isSuccess<T, E>(state: QueryState<T, E> | MutationState<T, E>): 
  * @param state State
  * @returns Boolean
  */
-export function isError<T, E>(state: QueryState<T, E> | MutationState<T, E>): boolean {
+export function isError<T, E>(
+	state: QueryState<T, E> | MutationState<T, E>
+): state is ErrorQueryState<E> | ErrorMutationState<E> {
 	return state.status === 'error';
 }
 
@@ -32,7 +50,9 @@ export function isError<T, E>(state: QueryState<T, E> | MutationState<T, E>): bo
  * @param state State
  * @returns Boolean
  */
-export function isLoading<T, E>(state: QueryState<T, E> | MutationState<T, E>): boolean {
+export function isLoading<T, E>(
+	state: QueryState<T, E> | MutationState<T, E>
+): state is LoadingQueryState<T> | LoadingMutationState {
 	return state.status === 'loading';
 }
 
@@ -41,6 +61,6 @@ export function isLoading<T, E>(state: QueryState<T, E> | MutationState<T, E>): 
  * @param state State
  * @returns Boolean
  */
-export function isStale<T, E>(state: QueryState<T, E>): boolean {
+export function isStale<T, E>(state: QueryState<T, E>): state is StaleQueryState<T> {
 	return state.status === 'stale';
 }
