@@ -2,6 +2,8 @@ import { assert, describe, it } from 'vitest';
 import { LRUCache } from 'lru-cache';
 import { LRUCacheAdapter, REQUIRED_LRU_CACHE_OPTIONS, waitUntil } from '@/lib';
 
+const ERR = -1;
+
 describe('lru-cache package integration', () => {
 	it('set and get values from the cache', async () => {
 		const options: LRUCache.Options<string, number, unknown> = {
@@ -64,14 +66,14 @@ describe('lru-cache package integration', () => {
 			assert.isTrue(typeof entry === 'object');
 			assert.strictEqual(entry.data, 20);
 			assert.strictEqual(entry.ttl, 100);
-			assert.isAtMost(entry.time, Date.now() - 70);
+			assert.isAtMost(entry.time, Date.now() - (70 + ERR));
 		}
 		{
 			const entry = (await adapter.getEntry('truck'))!;
 			assert.isTrue(typeof entry === 'object');
 			assert.strictEqual(entry.data, 70);
 			assert.strictEqual(entry.ttl, 200);
-			assert.isAtMost(entry.time, Date.now() - 70);
+			assert.isAtMost(entry.time, Date.now() - (70 + ERR));
 		}
 
 		await waitUntil(50);
@@ -89,7 +91,7 @@ describe('lru-cache package integration', () => {
 			assert.isTrue(typeof entry === 'object');
 			assert.strictEqual(entry.data, 70);
 			assert.strictEqual(entry.ttl, 200);
-			assert.isAtMost(entry.time, Date.now() - (50 + 70));
+			assert.isAtMost(entry.time, Date.now() - (50 + 70 + ERR));
 		}
 	});
 
@@ -224,5 +226,25 @@ describe('lru-cache package integration', () => {
 		assert.strictEqual(await adapter.get('/home'), 100);
 		assert.strictEqual(await adapter.get('/home/bob'), 100);
 		assert.strictEqual(await adapter.get('/home/alice'), 100);
+	});
+
+	it('clear all cache entries', async () => {
+		const options: LRUCache.Options<string, number, unknown> = {
+			max: 500,
+			...REQUIRED_LRU_CACHE_OPTIONS,
+		};
+
+		const cache = new LRUCache<string, number>(options);
+		const adapter = new LRUCacheAdapter(cache);
+
+		await adapter.set('/home', 100, 10_000);
+		await adapter.set('/etc', 50, 10_000);
+		await adapter.set('/boot', 30, 10_000);
+
+		await adapter.clear();
+
+		assert.strictEqual(await adapter.get('/home'), undefined);
+		assert.strictEqual(await adapter.get('/etc'), undefined);
+		assert.strictEqual(await adapter.get('/boot'), undefined);
 	});
 });

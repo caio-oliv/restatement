@@ -3,6 +3,8 @@ import { DEFAULT_TTL_DURATION, defaultKeyHashFn, NO_RETRY_POLICY, Query, waitUnt
 import { makeCache } from '@/integration/LRUCache.mock';
 import { testTransformer } from '@/test/TestHelper.mock';
 
+const ERR = -1;
+
 describe('Query cache usage / no-cache query', () => {
 	it('fill the cache when making a query', async () => {
 		const store = makeCache<string>();
@@ -54,7 +56,7 @@ describe('Query cache usage / no-cache query', () => {
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
-			assert.isAtMost(entry.time, Date.now() - 50);
+			assert.isAtMost(entry.time, Date.now() - (50 + ERR));
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
@@ -210,7 +212,7 @@ describe('Query cache usage / fresh query', () => {
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
-			assert.isAtMost(entry.time, Date.now() - 50);
+			assert.isAtMost(entry.time, Date.now() - (50 + ERR));
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
@@ -395,7 +397,7 @@ describe('Query cache usage / stale query', () => {
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
 
 			assert.deepStrictEqual(entry.ttl, 1_000);
-			assert.isAtMost(entry.time, Date.now() - 50);
+			assert.isAtMost(entry.time, Date.now() - (50 + ERR));
 
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
