@@ -163,6 +163,10 @@ export interface CacheHandler {
 	 * @param key Query key
 	 */
 	delete<K extends GenericQueryKey>(key: K): Promise<void>;
+	/**
+	 * Delete **ALL** cache entries from the cache
+	 */
+	clear(): Promise<void>;
 }
 
 /**

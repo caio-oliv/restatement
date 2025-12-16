@@ -5,6 +5,7 @@ import {
 	type QueryProvider,
 	type QueryStateHandlerEvent,
 	type QueryDataHandlerEvent,
+	type QueryExecutionResult,
 	type ErrorTransitionQueryEvent,
 	Query,
 	PubSub,
@@ -717,5 +718,103 @@ describe('Query state provider / query re-validation', () => {
 			events_processed: 2,
 			handler_executions: 2,
 		});
+	});
+});
+
+describe('Query state provider / dispose', () => {
+	it('not update the state provider after disposing query context', async () => {
+		const store = makeCache<string>();
+		const provider: QueryProvider<string, Error> = new PubSub();
+		const handler = mockQueryHandler();
+		const listener = vi.fn();
+		const key = ['key#1'] as [string];
+
+		const unsub = provider.subscribe(defaultKeyHashFn(key), listener, { key, promise: null });
+
+		const queryFn = vi.fn(testTransformer);
+		const queryApi = Query.create<[string], string, Error>({
+			store,
+			provider,
+			queryFn,
+			...handler,
+		});
+
+		const resultpromise = queryApi.execute(key, { cache: 'no-cache' });
+		queryApi.dispose();
+
+		const result = await resultpromise;
+
+		// query got into a final (success) state, but that state was never propagated through the handlers and providers
+		assert.deepStrictEqual(result.state, { status: 'success', data: 'data#1', error: null });
+
+		expect(handler.stateFn).toHaveBeenCalledTimes(1);
+		expect(handler.stateFn).toHaveBeenNthCalledWith(
+			1,
+			{ status: 'loading', data: null, error: null } as QueryState<string, Error>,
+			{
+				type: 'transition',
+				origin: 'self',
+				metadata: { cache: 'no-cache', origin: 'self', source: 'query' },
+				state: { status: 'loading', data: null, error: null },
+			} as QueryStateHandlerEvent<string, Error>,
+			queryApi.cache
+		);
+		expect(handler.dataFn).toHaveBeenCalledTimes(0);
+		expect(handler.errorFn).toHaveBeenCalledTimes(0);
+
+		expect(listener).toHaveBeenCalledTimes(1);
+		expect(listener).toHaveBeenNthCalledWith(1, defaultKeyHashFn(key), {
+			type: 'transition',
+			origin: 'provider',
+			metadata: { cache: 'no-cache', origin: 'provider', source: 'query' },
+			state: { status: 'loading', data: null, error: null },
+		} as QueryStateHandlerEvent<string, Error>);
+
+		unsub();
+	});
+
+	it('not update the state provider after disposing query context before a background query', async () => {
+		const store = makeCache<string>();
+		const provider: QueryProvider<string, Error> = new PubSub();
+		const handler = mockQueryHandler();
+		const listener = vi.fn();
+		const key = ['key#yes'] as [string];
+		const hash = defaultKeyHashFn(key);
+
+		const unsub = provider.subscribe(hash, listener, { key, promise: null });
+
+		let resultpromise: Promise<QueryExecutionResult<string, Error>>;
+		{
+			const queryFn = vi.fn(testTransformer);
+			using queryApi = Query.create<[string], string, Error>({
+				store,
+				provider,
+				queryFn,
+				...handler,
+				ttl: 100,
+				fresh: 50,
+			});
+
+			await store.set(hash, 'data#yes_stale', queryApi.ctx.ttl);
+			await waitUntil(60);
+
+			resultpromise = queryApi.execute(key, { cache: 'stale' });
+		}
+
+		const result = await resultpromise;
+
+		assert.deepStrictEqual(result.state, { status: 'stale', data: 'data#yes_stale', error: null });
+
+		const backgroundresult = await result.next();
+
+		assert.deepStrictEqual(backgroundresult, { status: 'success', data: 'data#yes', error: null });
+
+		expect(handler.stateFn).toHaveBeenCalledTimes(0);
+		expect(handler.dataFn).toHaveBeenCalledTimes(0);
+		expect(handler.errorFn).toHaveBeenCalledTimes(0);
+
+		expect(listener).toHaveBeenCalledTimes(0);
+
+		unsub();
 	});
 });

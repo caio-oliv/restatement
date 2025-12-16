@@ -53,7 +53,7 @@ export interface CacheStore<K, V> {
 	 */
 	deletePrefix(prefix: K): Promise<void>;
 	/**
-	 * Delete all entries
+	 * Delete **ALL** entries
 	 */
 	clear(): Promise<void>;
 }

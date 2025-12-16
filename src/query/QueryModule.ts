@@ -24,7 +24,7 @@ import type {
 } from '@/query/QueryContext';
 import { blackhole, makeAbortSignal, observablePromise, nullpromise } from '@/Internal';
 import { isCacheEntryFresh } from '@/core/Cache';
-import { DummySubscriber, SubscriberHandle } from '@/PubSub';
+import { DummySubscriber, SubscriberHandle } from '@/pubsub/PubSub';
 import { CacheManager } from '@/cache/CacheManager';
 import {
 	defaultKeyHashFn,

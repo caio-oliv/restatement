@@ -14,7 +14,7 @@ import type {
 	GenericQueryKey,
 	CacheDirective,
 } from '@/core/Type';
-import type { PubSub, Subscriber } from '@/PubSub';
+import type { PublishSubscribe, Subscriber } from '@/core/PublishSubscribe';
 import type { RetryHandlerFn, RetryPolicy } from '@/core/RetryPolicy';
 import type { CacheStore } from '@/core/Cache';
 import type { CacheManager } from '@/cache/CacheManager';
@@ -33,7 +33,10 @@ export type QuerySubscriber<T, E> = Subscriber<QueryProviderEvent<T, E>, QuerySh
  * @typeParam T Return value of a successful query
  * @typeParam E Error from a failed {@link QueryFn query} execution
  */
-export type QueryProvider<T, E> = PubSub<QueryProviderEvent<T, E>, QuerySharedState<T, E>>;
+export type QueryProvider<T, E> = PublishSubscribe<
+	QueryProviderEvent<T, E>,
+	QuerySharedState<T, E>
+>;
 
 /**
  * Query statistics

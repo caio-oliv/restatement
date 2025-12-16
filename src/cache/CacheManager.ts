@@ -105,6 +105,10 @@ export class CacheManager implements CacheHandler {
 		}
 	}
 
+	public async clear(): Promise<void> {
+		await this.#internalCache.clear();
+	}
+
 	readonly #internalCache: CacheStore<string, unknown>;
 	readonly #provider: QueryProvider<unknown, unknown> | null;
 }

@@ -13,7 +13,7 @@ import type { QueryProvider, QueryInput, LocalQueryInput } from '@/query/QueryCo
 import type { LocalMutationInput, MutationInput } from '@/mutation/MutationContext';
 import type { CacheStore } from '@/core/Cache';
 import { type CacheManagerInput, CacheManager } from '@/cache/CacheManager';
-import { PubSub } from '@/PubSub';
+import { PubSub } from '@/pubsub/PubSub';
 import {
 	DEFAULT_FRESH_DURATION,
 	DEFAULT_RETRY_POLICY,
