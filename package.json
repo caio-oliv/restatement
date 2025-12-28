@@ -1,6 +1,6 @@
 {
 	"name": "restatement",
-	"version": "0.4.0-rc.1",
+	"version": "0.4.0-rc.2",
 	"description": "remote state management for front-end applications",
 	"author": "Caio Oliveira <caio.vsoliveira23@gmail.com>",
 	"homepage": "https://github.com/caio-oliv/restatement#readme",
