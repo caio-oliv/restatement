@@ -63,8 +63,8 @@ devDependencies:
     specifier: ^18.3.1
     version: 18.3.1(react@18.3.1)
   restatement:
-    specifier: 0.4.0-rc.2
-    version: 0.4.0-rc.2(lru-cache@11.1.0)
+    specifier: 0.4.0-rc.3
+    version: 0.4.0-rc.3(lru-cache@11.1.0)
   rimraf:
     specifier: ^6.0.1
     version: 6.0.1
@@ -2639,8 +2639,8 @@ packages:
       supports-preserve-symlinks-flag: 1.0.0
     dev: true
 
-  /restatement@0.4.0-rc.2(lru-cache@11.1.0):
-    resolution: {integrity: sha512-uHFY0vfBdyqYBHR7PyriVvUB6UsNxeeED8UPpGShl+yDxbuNKFRWL6XD8l5VJC8+g6ED4xWjvxMExyW9jMuCDg==}
+  /restatement@0.4.0-rc.3(lru-cache@11.1.0):
+    resolution: {integrity: sha512-hjfeyLmf28ufqBwYjiRPMd1jZxehzj7pPqA3SSaY1vv3EW70b+FnAA/9+we18cqIiQCkNclL/uL2VAFjjmg5EQ==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       lru-cache: '>=8.0.0'

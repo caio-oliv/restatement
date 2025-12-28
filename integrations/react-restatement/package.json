@@ -1,6 +1,6 @@
 {
 	"name": "react-restatement",
-	"version": "0.4.0-rc.2",
+	"version": "0.1.0-rc.1",
 	"description": "remote state management for react",
 	"author": "Caio Oliveira <caio.vsoliveira23@gmail.com>",
 	"homepage": "https://github.com/caio-oliv/restatement#readme",
@@ -76,7 +76,7 @@
 		"prettier": "^3.4.2",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
-		"restatement": "0.4.0-rc.2",
+		"restatement": "0.4.0-rc.3",
 		"rimraf": "^6.0.1",
 		"rollup": "^4.43.0",
 		"run-z": "^2.1.0",
@@ -88,7 +88,7 @@
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",
-		"restatement": "0.4.0-rc.2"
+		"restatement": "0.4.0-rc.3"
 	},
 	"peerDependenciesMeta": {
 		"react": {
