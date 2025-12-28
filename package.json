@@ -23,8 +23,12 @@
 	"license": "MIT",
 	"type": "module",
 	"source": "src/lib.ts",
-	"module": "dist/lib-esm.js",
-	"main": "dist/lib-common.js",
+	"main": "dist/lib-esm.js",
+	"exports": {
+		"import": "./dist/lib-esm.js",
+		"require": "./dist/lib-common.js",
+		"default": "./dist/lib-esm.js"
+	},
 	"types": "dist/lib-type.d.ts",
 	"sideEffects": false,
 	"files": [

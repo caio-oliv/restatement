@@ -19,12 +19,18 @@ import typescript from '@rollup/plugin-typescript';
  * @type {object}
  * @property {'module'} type -
  * @property {string} source -
- * @property {string} main -
- * @property {string} module -
+ * @property {Exports} exports -
  * @property {string} types -
  * @property {Record<string, string>} dependencies -
  * @property {Record<string, string>} devDependencies -
  * @property {Record<string, string>} peerDependencies -
+ */
+
+/**
+ * @typedef Exports
+ * @type {object}
+ * @property {string} import -
+ * @property {string} require -
  */
 
 const projectPath = cwd();
@@ -58,12 +64,12 @@ const config = {
 	],
 	output: [
 		{
-			file: packageJson.main,
+			file: packageJson.exports.require,
 			sourcemap: true,
 			format: 'cjs',
 		},
 		{
-			file: packageJson.module,
+			file: packageJson.exports.import,
 			sourcemap: true,
 			format: 'es',
 		},
