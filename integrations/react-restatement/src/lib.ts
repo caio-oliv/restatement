@@ -1,3 +1,4 @@
+export * from 'restatement';
 export * from '@/context/RestatementContext';
 export * from '@/context/RestatementProvider';
 export * from '@/hooks/useQueryCache';

@@ -1,6 +1,5 @@
 import React, { type JSXElementConstructor } from 'react';
-import { type RestatementConfig } from 'restatement';
-import { RestatementProvider } from '@/lib';
+import { RestatementProvider, type RestatementConfig } from '@/lib';
 
 /**
  * Create a RestatementProviderWrapper with the Restatement config provided

@@ -6,7 +6,7 @@ import {
 	restatementConfig,
 	waitUntil,
 	type RestatementConfig,
-} from 'restatement';
+} from '@/lib';
 
 /**
  * Test restatement config
