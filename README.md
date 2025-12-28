@@ -6,31 +6,42 @@
 
 - Typed API
 - Zero dependencies
-- Flexible implementation
+- Flexible integration
+
+## Installation
+
+```sh
+npm install restatement
+```
 
 ## Usage
 
-Setup all the shared pieces:
-
-- `Cache` to store all the remote state
-- `PubSub` to notify the query instances that the value has changed.
-
-and make a `new RemoteStateQuery()` for all the queries that can be cached.
-
-## Example
+- Setup your cache of choice. [lru-cache](https://www.npmjs.com/package/lru-cache) supported by default.
+- Create a config object.
+- Start using queries and mutations on your project.
 
 ```ts
-const cacheStore = new CacheStore();
-const stateProvider = new PubSub();
+import { restatementConfig } from 'restatement';
+import { LRUCache } from 'lru-cache';
 
+const cache = new LRUCache<string, number>(/* ... */);
+const cacheStore = new LRUCacheAdapter(cache);
+
+const config = restatementConfig(cacheStore);
 
 async function getUserInfo() { /* ... */ }
 
 // in component UserInfo
-const queryA = new RemoteStateQuery({ cacheStore, stateProvider, queryFn: getUserInfo });
+const queryA = Query.create(makeQueryInput(
+	config,
+	{ key: ['account', 'user', 123], queryFn: getUserInfo }
+));
 
 // in component ShoppingCart
-const queryB = new RemoteStateQuery({ cacheStore, stateProvider, queryFn: getUserInfo });
+const queryB = Query.create(makeQueryInput(
+	config,
+	{ key: ['account', 'user', 123], queryFn: getUserInfo }
+));
 ```
 
 This will result in only 1 query being executed, since the `queryA` will cache the value returned by the `getUserInfo`, making `queryB` return the most recent value from the cache.
@@ -41,7 +52,7 @@ Clone the repo and run `pnpm install`.
 
 ### Testing
 
-To run the tests, use the package script `test` or `test --coverage` for code coverage.
+To run the tests, use the package script `test` or `test:cov` for code coverage.
 
 ### Building
 

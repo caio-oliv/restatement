@@ -2,6 +2,8 @@ import type { Linter } from 'eslint';
 import { includeIgnoreFile } from '@eslint/compat';
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
 import jsdoc from 'eslint-plugin-jsdoc';
 import prettier from 'eslint-plugin-prettier/recommended';
 
@@ -9,6 +11,25 @@ const rootUrl = new URL(import.meta.url);
 const gitignoreUrl = new URL('.gitignore', import.meta.url);
 
 const globalIgnore = includeIgnoreFile(gitignoreUrl.pathname);
+
+type ImportedConfig = Pick<Linter.Config, 'plugins' | 'rules'>;
+
+/**
+ * Merge `plugins` and `rules` of eslint config objects
+ * @param configs Config objects
+ * @returns Final config
+ */
+function mergeConfig(...configs: Array<ImportedConfig>): ImportedConfig {
+	const final: ImportedConfig = {
+		plugins: {},
+		rules: {},
+	};
+	for (const config of configs) {
+		final.plugins = { ...final.plugins, ...config.plugins };
+		final.rules = { ...final.rules, ...config.rules };
+	}
+	return final;
+}
 
 const jsonConfig: Linter.Config = {
 	name: 'restatement/json-files',
@@ -38,6 +59,28 @@ const testConfig: Linter.Config = {
 
 		'jsdoc/require-jsdoc': 'off',
 	},
+};
+
+const exampleConfig: Linter.Config = {
+	name: 'restatement/examples',
+	files: ['examples/**/*.{ts,tsx}'],
+	rules: {
+		'no-console': 'off',
+
+		'@typescript-eslint/no-non-null-assertion': 'off',
+		'@typescript-eslint/no-useless-constructor': 'off',
+		'@typescript-eslint/no-empty-function': 'off',
+
+		'@typescript-eslint/explicit-function-return-type': 'off',
+
+		'jsdoc/require-jsdoc': 'off',
+	},
+};
+
+const reactConfig: Linter.Config = {
+	name: 'restatement/react',
+	files: ['**/*.tsx'],
+	...mergeConfig(reactHooks.configs.flat.recommended, reactRefresh.configs.vite),
 };
 
 const projectConfig: Linter.Config = {
@@ -152,6 +195,8 @@ const configs: Array<Linter.Config> = [
 	prettier,
 	projectConfig,
 	testConfig,
+	exampleConfig,
+	reactConfig,
 	jsonConfig,
 ];
 
