@@ -24,9 +24,19 @@
 	"license": "MIT",
 	"type": "module",
 	"source": "src/lib.ts",
-	"module": "dist/lib-esm.js",
-	"main": "dist/lib-common.js",
+	"main": "dist/lib-esm.js",
 	"types": "dist/lib-type.d.ts",
+	"exports": {
+		"import": {
+			"types": "./dist/lib-type.d.ts",
+			"default": "./dist/lib-esm.js"
+		},
+		"require": {
+			"types": "./dist/lib-type.d.ts",
+			"default": "./dist/lib-common.js"
+		},
+		"default": "./dist/lib-esm.js"
+	},
 	"sideEffects": false,
 	"files": [
 		"dist/*"
@@ -66,6 +76,7 @@
 		"prettier": "^3.4.2",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
+		"restatement": "0.4.0-rc.2",
 		"rimraf": "^6.0.1",
 		"rollup": "^4.43.0",
 		"run-z": "^2.1.0",
@@ -75,14 +86,15 @@
 		"vite": "^6.3.5",
 		"vitest": "^3.2.4"
 	},
-	"dependencies": {
-		"restatement": "0.4.0-rc.2"
-	},
 	"peerDependencies": {
-		"react": "^18 || ^19"
+		"react": "^18 || ^19",
+		"restatement": "0.4.0-rc.2"
 	},
 	"peerDependenciesMeta": {
 		"react": {
+			"optional": false
+		},
+		"restatement": {
 			"optional": false
 		}
 	},

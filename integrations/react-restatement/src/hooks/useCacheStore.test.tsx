@@ -1,7 +1,8 @@
 import { it, describe, assert } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useEffect } from 'react';
-import { useCacheStore, LRUCacheAdapter } from '@/lib';
+import { LRUCacheAdapter } from 'restatement';
+import { useCacheStore } from '@/lib';
 import { testRestatementConfig } from '@/test/Helper.mock';
 import { makeRestatementProviderWrapper } from '@/test/Component.mock';
 

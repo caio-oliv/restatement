@@ -1,7 +1,8 @@
 import { assert, describe, expect, it, vi } from 'vitest';
 import { useRef } from 'react';
 import { renderHook } from '@testing-library/react';
-import { useMutation, waitUntil } from '@/lib';
+import { waitUntil } from 'restatement';
+import { useMutation } from '@/lib';
 import { testQueryFn, testRestatementConfig, type TestKeys } from '@/test/Helper.mock';
 import { makeRestatementProviderWrapper } from '@/test/Component.mock';
 

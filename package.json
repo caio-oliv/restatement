@@ -24,12 +24,18 @@
 	"type": "module",
 	"source": "src/lib.ts",
 	"main": "dist/lib-esm.js",
+	"types": "dist/lib-type.d.ts",
 	"exports": {
-		"import": "./dist/lib-esm.js",
-		"require": "./dist/lib-common.js",
+		"import": {
+			"types": "./dist/lib-type.d.ts",
+			"default": "./dist/lib-esm.js"
+		},
+		"require": {
+			"types": "./dist/lib-type.d.ts",
+			"default": "./dist/lib-common.js"
+		},
 		"default": "./dist/lib-esm.js"
 	},
-	"types": "dist/lib-type.d.ts",
 	"sideEffects": false,
 	"files": [
 		"dist/*"
@@ -60,6 +66,7 @@
 		"@types/node": "^18.19.75",
 		"@vitest/coverage-v8": "^3.0.5",
 		"dts-bundle-generator": "^9.3.1",
+		"esbuild": "^0.27.2",
 		"eslint": "^9.29.0",
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-jsdoc": "^50.6.3",
@@ -72,6 +79,7 @@
 		"prettier": "^3.4.2",
 		"rimraf": "^6.0.1",
 		"rollup": "^4.34.6",
+		"rollup-plugin-esbuild": "^6.2.1",
 		"run-z": "^2.1.0",
 		"tslib": "^2.8.1",
 		"typedoc": "^0.28.7",

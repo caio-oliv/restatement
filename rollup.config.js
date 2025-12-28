@@ -1,18 +1,9 @@
 import { join } from 'node:path';
 import { readFileSync } from 'node:fs';
 import { cwd } from 'node:process';
+import { URL } from 'node:url';
 import typescript from '@rollup/plugin-typescript';
-
-// interface PackageJson {
-// 	type: 'module';
-// 	source: string;
-// 	main: string;
-// 	module: string;
-// 	types: string;
-// 	dependencies?: Record<string, string>;
-// 	devDependencies?: Record<string, string>;
-// 	peerDependencies?: Record<string, string>;
-// }
+import esbuild from 'rollup-plugin-esbuild';
 
 /**
  * @typedef PackageJson
@@ -21,55 +12,98 @@ import typescript from '@rollup/plugin-typescript';
  * @property {string} source -
  * @property {Exports} exports -
  * @property {string} types -
- * @property {Record<string, string>} dependencies -
- * @property {Record<string, string>} devDependencies -
- * @property {Record<string, string>} peerDependencies -
+ * @property {Record<string, string> | undefined} dependencies -
+ * @property {Record<string, string> | undefined} devDependencies -
+ * @property {Record<string, string> | undefined} peerDependencies -
  */
 
 /**
  * @typedef Exports
  * @type {object}
- * @property {string} import -
- * @property {string} require -
+ * @property {SubExports} import -
+ * @property {SubExports} require -
+ * @property {string} default -
  */
 
-const projectPath = cwd();
+/**
+ * @typedef SubExports
+ * @type {object}
+ * @property {string} types -
+ * @property {string} default -
+ */
 
-const tsconfigPath = join(projectPath, 'tsconfig.json');
-const packageJsonPath = join(projectPath, 'package.json');
+/**
+ * @typedef Tsconfig
+ * @type {object}
+ * @property {CompilerOptions} compilerOptions -
+ */
+
+/**
+ * @typedef CompilerOptions
+ * @type {object}
+ * @property {string} target -
+ */
+
+const PROJECT_PATH = cwd();
+
+const tsconfigPath = join(PROJECT_PATH, 'tsconfig.json');
+const tsconfigRulesPath = new URL('./rules.tsconfig.json', import.meta.url).pathname;
+const packageJsonPath = join(PROJECT_PATH, 'package.json');
 
 /**
  * @type {PackageJson}
  */
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const packageJson = JSON.parse(readFileSync(packageJsonPath, { encoding: 'utf-8' }));
-const peerDependencies = Object.keys(packageJson.peerDependencies ?? {});
+const PACKAGE_JSON = JSON.parse(readFileSync(packageJsonPath, { encoding: 'utf-8' }));
+
+/**
+ * @type {Tsconfig}
+ */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+const TSCONFIG_RULES = JSON.parse(readFileSync(tsconfigRulesPath, { encoding: 'utf-8' }));
+
+/**
+ * Get external modules
+ * @returns External modules
+ */
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+function externalModules() {
+	const external = [];
+	external.push(...Object.keys(PACKAGE_JSON.peerDependencies ?? {}));
+	return external;
+}
 
 /**
  * @type {import('rollup').RollupOptions}
  */
 const config = {
-	input: packageJson.source,
-	external: peerDependencies,
+	input: PACKAGE_JSON.source,
+	external: externalModules(),
 	plugins: [
 		typescript({
-			project: projectPath,
+			project: PROJECT_PATH,
 			tsconfig: tsconfigPath,
-			include: ['src/**/*.ts'],
+			include: ['src/**/*.ts', 'src/**/*.tsx'],
 			composite: false,
 			incremental: false,
 			declaration: false,
 			outputToFilesystem: true,
 		}),
+		esbuild({
+			include: /\.tsx?$/,
+			minify: false,
+			target: TSCONFIG_RULES.compilerOptions.target,
+			jsx: 'transform',
+		}),
 	],
 	output: [
 		{
-			file: packageJson.exports.require,
+			file: PACKAGE_JSON.exports.require.default,
 			sourcemap: true,
 			format: 'cjs',
 		},
 		{
-			file: packageJson.exports.import,
+			file: PACKAGE_JSON.exports.import.default,
 			sourcemap: true,
 			format: 'es',
 		},

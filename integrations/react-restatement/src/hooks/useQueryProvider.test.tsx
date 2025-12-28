@@ -1,7 +1,8 @@
 import { it, describe, assert } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useEffect, useRef } from 'react';
-import { useQueryProvider, PubSub } from '@/lib';
+import { PubSub } from 'restatement';
+import { useQueryProvider } from '@/lib';
 import { testRestatementConfig } from '@/test/Helper.mock';
 import { makeRestatementProviderWrapper } from '@/test/Component.mock';
 

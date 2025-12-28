@@ -10,8 +10,6 @@ import prettier from 'eslint-plugin-prettier/recommended';
 const rootUrl = new URL(import.meta.url);
 const gitignoreUrl = new URL('.gitignore', import.meta.url);
 
-const globalIgnore = includeIgnoreFile(gitignoreUrl.pathname);
-
 type ImportedConfig = Pick<Linter.Config, 'plugins' | 'rules'>;
 
 /**
@@ -31,8 +29,16 @@ function mergeConfig(...configs: Array<ImportedConfig>): ImportedConfig {
 	return final;
 }
 
-const jsonConfig: Linter.Config = {
-	name: 'restatement/json-files',
+export const GLOBAL_IGNORE_CONFIG = includeIgnoreFile(gitignoreUrl.pathname);
+
+export const ESLINT_CONFIG = eslint.configs.recommended;
+
+export const JSDOC_CONFIG = jsdoc.configs['flat/recommended-typescript'];
+
+export const PRETTIER_CONFIG = prettier;
+
+export const JSON_CONFIG: Linter.Config = {
+	name: 'restatement/json',
 	files: ['**/*.json'],
 	rules: {
 		'prettier/prettier': 'warn',
@@ -40,7 +46,7 @@ const jsonConfig: Linter.Config = {
 	},
 };
 
-const testConfig: Linter.Config = {
+export const TEST_CONFIG: Linter.Config = {
 	name: 'restatement/test',
 	files: ['**/*.test.{ts,tsx}'],
 	rules: {
@@ -61,7 +67,7 @@ const testConfig: Linter.Config = {
 	},
 };
 
-const exampleConfig: Linter.Config = {
+export const EXAMPLES_CONFIG: Linter.Config = {
 	name: 'restatement/examples',
 	files: ['examples/**/*.{ts,tsx}'],
 	rules: {
@@ -77,13 +83,13 @@ const exampleConfig: Linter.Config = {
 	},
 };
 
-const reactConfig: Linter.Config = {
+export const REACT_CONFIG: Linter.Config = {
 	name: 'restatement/react',
 	files: ['**/*.tsx'],
 	...mergeConfig(reactHooks.configs.flat.recommended, reactRefresh.configs.vite),
 };
 
-const projectConfig: Linter.Config = {
+export const PROJECT_CONFIG: Linter.Config = {
 	name: 'restatement/project',
 	plugins: {
 		'@typescript-eslint': tseslint.plugin,
@@ -188,16 +194,16 @@ const projectConfig: Linter.Config = {
 } as Linter.Config;
 
 const configs: Array<Linter.Config> = [
-	globalIgnore,
-	eslint.configs.recommended,
+	GLOBAL_IGNORE_CONFIG,
+	ESLINT_CONFIG,
 	...(tseslint.configs.recommended as Array<Linter.Config>),
-	jsdoc.configs['flat/recommended-typescript'],
-	prettier,
-	projectConfig,
-	testConfig,
-	exampleConfig,
-	reactConfig,
-	jsonConfig,
+	JSDOC_CONFIG,
+	PRETTIER_CONFIG,
+	PROJECT_CONFIG,
+	TEST_CONFIG,
+	EXAMPLES_CONFIG,
+	REACT_CONFIG,
+	JSON_CONFIG,
 ];
 
 export default configs;
