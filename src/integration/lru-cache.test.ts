@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 import { LRUCache } from 'lru-cache';
-import { LRUCacheAdapter, REQUIRED_LRU_CACHE_OPTIONS, waitUntil } from '@/lib';
+import { LRUCacheAdapter, REQUIRED_LRU_CACHE_OPTIONS, waitTimeout } from '@/lib';
 
 const ERR = -1;
 
@@ -20,7 +20,7 @@ describe('lru-cache package integration', () => {
 		assert.strictEqual(await adapter.get('car'), 10);
 		assert.strictEqual(await adapter.get('bike'), 20);
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		assert.strictEqual(await adapter.get('car'), undefined);
 		assert.strictEqual(await adapter.get('bike'), 20);
@@ -55,7 +55,7 @@ describe('lru-cache package integration', () => {
 
 		await adapter.set('truck', 70, 200);
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		{
 			const entry = await adapter.getEntry('car');
@@ -76,7 +76,7 @@ describe('lru-cache package integration', () => {
 			assert.isAtMost(entry.time, Date.now() - (70 + ERR));
 		}
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		{
 			const entry = await adapter.getEntry('car');

@@ -6,7 +6,7 @@ import {
 	Mutation,
 	NO_RETRY_POLICY,
 	PubSub,
-	waitUntil,
+	waitTimeout,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { mockMutationHandler, testTransformer } from '@/test/TestHelper.mock';
@@ -479,7 +479,7 @@ describe('Mutation handler invalidation', () => {
 
 		await mutation.execute(['key#update', 'user', '#user_data#']);
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);
 

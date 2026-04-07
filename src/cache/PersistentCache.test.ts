@@ -1,5 +1,5 @@
 import { assert, describe, it } from 'vitest';
-import { waitUntil, PersistentCache } from '@/lib';
+import { waitTimeout, PersistentCache } from '@/lib';
 
 describe('PersistentCache', () => {
 	it('get and set values in the cache', async () => {
@@ -33,7 +33,7 @@ describe('PersistentCache', () => {
 			assert.isAtMost(entry.time, Date.now());
 		}
 
-		await waitUntil(100);
+		await waitTimeout(100);
 
 		assert.strictEqual(await cache.get('car'), 10);
 		assert.strictEqual(await cache.get('bike'), 20);

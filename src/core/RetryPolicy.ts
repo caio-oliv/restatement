@@ -1,5 +1,6 @@
 import type { Millisecond } from '@/core/Type';
 import type { BackoffTimer } from '@/core/BackoffTimer';
+import { makeAbortSignal } from '@/Internal';
 
 /**
  * Operation result
@@ -135,11 +136,44 @@ export const NO_RETRY_POLICY = new NoRetryPolicy();
 /**
  * Wait until timeout
  * @param time Wait time in {@link Millisecond milliseconds}
+ * @param abort Abort signal
  * @returns Promise that will resolve after specified time.
  */
-export function waitUntil(time: Millisecond): Promise<void> {
-	return new Promise(resolve => {
-		setTimeout(resolve, time);
+export function waitTimeout(
+	time: Millisecond,
+	abort: AbortSignal = makeAbortSignal()
+): Promise<void> {
+	let fulfilled = false;
+	let timer: number | undefined = undefined;
+
+	return new Promise((resolve, reject) => {
+		abort.onabort = abortTimer;
+		abortTimer.apply(abort);
+
+		timer = setTimeout(resolveTimer, time) as unknown as number;
+
+		// eslint-disable-next-line jsdoc/require-jsdoc
+		function abortTimer(this: AbortSignal): void {
+			if (this.aborted && !fulfilled) {
+				clear();
+				reject(this.reason);
+			}
+		}
+
+		// eslint-disable-next-line jsdoc/require-jsdoc
+		function resolveTimer(): void {
+			if (!fulfilled) {
+				clear();
+				resolve();
+			}
+		}
+
+		// eslint-disable-next-line jsdoc/require-jsdoc
+		function clear(): void {
+			fulfilled = true;
+			abort.onabort = null;
+			if (timer) clearTimeout(timer);
+		}
 	});
 }
 
@@ -173,7 +207,7 @@ export async function execAsyncOperation<T, E = unknown>(
 			const delay = policy.delay(retryAttempt, lastError);
 			if (delay < 0) throw lastError;
 
-			await waitUntil(delay);
+			await waitTimeout(delay);
 			retryHandleFn?.(retryAttempt, lastError);
 		}
 	}

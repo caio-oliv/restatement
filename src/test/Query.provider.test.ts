@@ -10,7 +10,7 @@ import {
 	Query,
 	PubSub,
 	defaultKeyHashFn,
-	waitUntil,
+	waitTimeout,
 	NO_RETRY_POLICY,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
@@ -367,7 +367,7 @@ describe('Query state provider', () => {
 
 		await store.set(defaultKeyHashFn(['key#1']), 'data_stale#1', 100);
 
-		await waitUntil(60);
+		await waitTimeout(60);
 
 		const resultPromise1 = queryApi1.execute(['key#1'], { cache: 'fresh' });
 		const resultPromise2 = queryApi2.execute(['key#1'], { cache: 'no-cache' });
@@ -597,7 +597,7 @@ describe('Query state provider / query re-validation', () => {
 
 		provider.publish(hash, { type: 'invalidation', origin: 'provider' });
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		{
 			expect(queryFn).toHaveBeenCalledTimes(1);
@@ -675,7 +675,7 @@ describe('Query state provider / query re-validation', () => {
 
 		provider.publish(hash, { type: 'invalidation', origin: 'provider' });
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		{
 			expect(queryFn).toHaveBeenCalledTimes(1);
@@ -796,7 +796,7 @@ describe('Query state provider / dispose', () => {
 			});
 
 			await store.set(hash, 'data#yes_stale', queryApi.ctx.ttl);
-			await waitUntil(60);
+			await waitTimeout(60);
 
 			resultpromise = queryApi.execute(key, { cache: 'stale' });
 		}

@@ -5,7 +5,7 @@ import {
 	defaultKeyHashFn,
 	NO_RETRY_POLICY,
 	Query,
-	waitUntil,
+	waitTimeout,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { testTransformer, mockQueryHandler } from '@/test/TestHelper.mock';
@@ -190,10 +190,10 @@ describe('Query handler / stale query', () => {
 		expect(queryFn).toBeCalledTimes(1);
 
 		await store.set(defaultKeyHashFn(['key#1']), 'stale_data#1', DEFAULT_TTL_DURATION);
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		queryFn.mockImplementationOnce(async (...keys) => {
-			await waitUntil(10);
+			await waitTimeout(10);
 			return await testTransformer(...keys);
 		});
 
@@ -331,10 +331,10 @@ describe('Query handler / stale query', () => {
 		expect(queryFn).toBeCalledTimes(1);
 
 		await store.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', DEFAULT_TTL_DURATION);
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		queryFn.mockImplementationOnce(async (...keys) => {
-			await waitUntil(10);
+			await waitTimeout(10);
 			return await testTransformer(...keys);
 		});
 
@@ -728,10 +728,10 @@ describe('Query handler / stale query', () => {
 		expect(queryFn).toBeCalledTimes(1);
 
 		await store.set(defaultKeyHashFn(['key#1']), 'stale_data#1', DEFAULT_TTL_DURATION);
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		queryFn.mockImplementationOnce(async (...keys) => {
-			await waitUntil(10);
+			await waitTimeout(10);
 			return await testTransformer(...keys);
 		});
 
@@ -765,7 +765,7 @@ describe('Query handler / stale query', () => {
 			queryApi.cache
 		);
 
-		await waitUntil(100);
+		await waitTimeout(100);
 		// await result.next();
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(3);
@@ -865,10 +865,10 @@ describe('Query handler / stale query', () => {
 		expect(queryFn).toBeCalledTimes(1);
 
 		await store.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', DEFAULT_TTL_DURATION);
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		queryFn.mockImplementationOnce(async (...keys) => {
-			await waitUntil(10);
+			await waitTimeout(10);
 			return await testTransformer(...keys);
 		});
 
@@ -902,7 +902,7 @@ describe('Query handler / stale query', () => {
 			queryApi.cache
 		);
 
-		await waitUntil(100);
+		await waitTimeout(100);
 		// await result.next();
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(2);
@@ -1302,10 +1302,10 @@ describe('Query handler / stale query', () => {
 		expect(queryFn).toBeCalledTimes(1);
 
 		await store.set(defaultKeyHashFn(['key#1']), 'stale_data#1', DEFAULT_TTL_DURATION);
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		queryFn.mockImplementationOnce(async (...keys) => {
-			await waitUntil(10);
+			await waitTimeout(10);
 			return await testTransformer(...keys);
 		});
 
@@ -1339,7 +1339,7 @@ describe('Query handler / stale query', () => {
 			queryApi.cache
 		);
 
-		await waitUntil(100);
+		await waitTimeout(100);
 		// await result.next();
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(2);
@@ -1439,10 +1439,10 @@ describe('Query handler / stale query', () => {
 		expect(queryFn).toBeCalledTimes(1);
 
 		await store.set(defaultKeyHashFn(['invalid_1']), 'stale_data#1', DEFAULT_TTL_DURATION);
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		queryFn.mockImplementationOnce(async (...keys) => {
-			await waitUntil(10);
+			await waitTimeout(10);
 			return await testTransformer(...keys);
 		});
 
@@ -1476,7 +1476,7 @@ describe('Query handler / stale query', () => {
 			queryApi.cache
 		);
 
-		await waitUntil(100);
+		await waitTimeout(100);
 		// await result.next();
 
 		expect(handler.dataFn).toHaveBeenCalledTimes(1);

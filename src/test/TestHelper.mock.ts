@@ -9,7 +9,7 @@ import type {
 	QueryHandler,
 	QueryStateHandler,
 } from '@/core/Type';
-import { waitUntil } from '@/core/RetryPolicy';
+import { waitTimeout } from '@/core/RetryPolicy';
 
 /**
  * Make a empty promise
@@ -92,7 +92,7 @@ export async function testTransformer(keys: TestKeys): Promise<string> {
  */
 export function delayedTestTransformer(delay: number): TestTransformerFn {
 	return async (keys: TestKeys): Promise<string> => {
-		await waitUntil(delay);
+		await waitTimeout(delay);
 		return await testTransformer(keys);
 	};
 }

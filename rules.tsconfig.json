@@ -31,7 +31,7 @@
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedIndexedAccess": true,
-		"noPropertyAccessFromIndexSignature": true,
+		"noPropertyAccessFromIndexSignature": false,
 		"noStrictGenericChecks": false,
 		"allowUnreachableCode": false,
 		"allowSyntheticDefaultImports": true,

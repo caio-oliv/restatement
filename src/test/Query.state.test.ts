@@ -3,7 +3,7 @@ import {
 	defaultKeyHashFn,
 	NO_RETRY_POLICY,
 	Query,
-	waitUntil,
+	waitTimeout,
 	type InitializationQueryEvent,
 } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
@@ -392,7 +392,7 @@ describe('Query state transition / no-cache query', () => {
 			status: 'loading',
 		});
 
-		await waitUntil(100);
+		await waitTimeout(100);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -467,7 +467,7 @@ describe('Query state transition / no-cache query', () => {
 			status: 'loading',
 		});
 
-		await waitUntil(120);
+		await waitTimeout(120);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#2',
@@ -540,7 +540,7 @@ describe('Query state transition / no-cache query', () => {
 			status: 'loading',
 		});
 
-		await waitUntil(120);
+		await waitTimeout(120);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -613,7 +613,7 @@ describe('Query state transition / no-cache query', () => {
 			status: 'loading',
 		});
 
-		await waitUntil(120);
+		await waitTimeout(120);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#2',
@@ -686,7 +686,7 @@ describe('Query state transition / no-cache query', () => {
 			status: 'loading',
 		});
 
-		await waitUntil(120);
+		await waitTimeout(120);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -876,7 +876,7 @@ describe('Query state transition / fresh query', () => {
 
 		const resultPromise = queryApi.execute(['key#1'], { cache: 'fresh' });
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -884,7 +884,7 @@ describe('Query state transition / fresh query', () => {
 			status: 'loading',
 		});
 
-		await waitUntil(100);
+		await waitTimeout(100);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -952,11 +952,11 @@ describe('Query state transition / fresh query', () => {
 
 		queryFn.mockImplementationOnce(delayedTestTransformer(100));
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		const result2Promise = queryApi.execute(['key#1'], { cache: 'fresh' });
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -964,7 +964,7 @@ describe('Query state transition / fresh query', () => {
 			status: 'loading',
 		});
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -1031,7 +1031,7 @@ describe('Query state transition / fresh query', () => {
 
 		const result2Promise = queryApi.execute(['key#1'], { cache: 'fresh' });
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -1100,7 +1100,7 @@ describe('Query state transition / fresh query', () => {
 
 		const result2Promise = queryApi.execute(['invalid_key'], { cache: 'fresh' });
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -1108,7 +1108,7 @@ describe('Query state transition / fresh query', () => {
 			status: 'loading',
 		});
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1177,7 +1177,7 @@ describe('Query state transition / fresh query', () => {
 
 		const result2Promise = queryApi.execute(['key#2'], { cache: 'fresh' });
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1185,7 +1185,7 @@ describe('Query state transition / fresh query', () => {
 			status: 'loading',
 		});
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#2',
@@ -1256,7 +1256,7 @@ describe('Query state transition / fresh query', () => {
 
 		const result2Promise = queryApi.execute(['key#2'], { cache: 'fresh' });
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#2',
@@ -1325,7 +1325,7 @@ describe('Query state transition / fresh query', () => {
 
 		const result2Promise = queryApi.execute(['invalid_2'], { cache: 'fresh' });
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1333,7 +1333,7 @@ describe('Query state transition / fresh query', () => {
 			status: 'loading',
 		});
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1480,11 +1480,11 @@ describe('Query state transition / stale query', () => {
 
 		queryFn.mockImplementationOnce(delayedTestTransformer(50));
 
-		await waitUntil(60);
+		await waitTimeout(60);
 
 		const resultPromise = queryApi.execute(['key#1'], { cache: 'stale' });
 
-		await waitUntil(10);
+		await waitTimeout(10);
 
 		expect(queryFn).toBeCalledTimes(1);
 
@@ -1502,7 +1502,7 @@ describe('Query state transition / stale query', () => {
 			status: 'stale',
 		});
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		expect(queryFn).toBeCalledTimes(1);
 
@@ -1551,11 +1551,11 @@ describe('Query state transition / stale query', () => {
 
 		queryFn.mockImplementationOnce(delayedTestTransformer(50));
 
-		await waitUntil(60);
+		await waitTimeout(60);
 
 		const resultPromise = queryApi.execute(['invalid_1'], { cache: 'stale' });
 
-		await waitUntil(10);
+		await waitTimeout(10);
 
 		expect(queryFn).toBeCalledTimes(1);
 
@@ -1573,7 +1573,7 @@ describe('Query state transition / stale query', () => {
 			status: 'stale',
 		});
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		expect(queryFn).toBeCalledTimes(1);
 
@@ -1665,7 +1665,7 @@ describe('Query state transition / stale query', () => {
 
 		const resultPromise = queryApi.execute(['key#1'], { cache: 'stale' });
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -1673,7 +1673,7 @@ describe('Query state transition / stale query', () => {
 			status: 'loading',
 		});
 
-		await waitUntil(100);
+		await waitTimeout(100);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -1744,7 +1744,7 @@ describe('Query state transition / stale query', () => {
 
 		const result2Promise = queryApi.execute(['key#1'], { cache: 'stale' });
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -1752,7 +1752,7 @@ describe('Query state transition / stale query', () => {
 			status: 'loading',
 		});
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -1819,7 +1819,7 @@ describe('Query state transition / stale query', () => {
 
 		const result2Promise = queryApi.execute(['key#1'], { cache: 'stale' });
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -1890,11 +1890,11 @@ describe('Query state transition / stale query', () => {
 
 		queryFn.mockImplementationOnce(delayedTestTransformer(50));
 
-		await waitUntil(60);
+		await waitTimeout(60);
 
 		const result2Promise = queryApi.execute(['key#1'], { cache: 'stale' });
 
-		await waitUntil(10);
+		await waitTimeout(10);
 
 		expect(queryFn).toBeCalledTimes(2);
 
@@ -1912,7 +1912,7 @@ describe('Query state transition / stale query', () => {
 			status: 'stale',
 		});
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		expect(queryFn).toBeCalledTimes(2);
 
@@ -1979,11 +1979,11 @@ describe('Query state transition / stale query', () => {
 
 		queryFn.mockImplementationOnce(delayedTestTransformer(50));
 
-		await waitUntil(60);
+		await waitTimeout(60);
 
 		const result2Promise = queryApi.execute(['invalid_1'], { cache: 'stale' });
 
-		await waitUntil(10);
+		await waitTimeout(10);
 
 		expect(queryFn).toBeCalledTimes(2);
 
@@ -2001,7 +2001,7 @@ describe('Query state transition / stale query', () => {
 			status: 'stale',
 		});
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		expect(queryFn).toBeCalledTimes(2);
 
@@ -2068,7 +2068,7 @@ describe('Query state transition / stale query', () => {
 
 		const result2Promise = queryApi.execute(['invalid_key'], { cache: 'stale' });
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -2076,7 +2076,7 @@ describe('Query state transition / stale query', () => {
 			status: 'loading',
 		});
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -2145,7 +2145,7 @@ describe('Query state transition / stale query', () => {
 
 		const result2Promise = queryApi.execute(['key#1'], { cache: 'stale' });
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -2153,7 +2153,7 @@ describe('Query state transition / stale query', () => {
 			status: 'loading',
 		});
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -2224,7 +2224,7 @@ describe('Query state transition / stale query', () => {
 
 		const result2Promise = queryApi.execute(['key#1'], { cache: 'stale' });
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: 'data#1',
@@ -2297,11 +2297,11 @@ describe('Query state transition / stale query', () => {
 
 		queryFn.mockImplementationOnce(delayedTestTransformer(50));
 
-		await waitUntil(60);
+		await waitTimeout(60);
 
 		const result2Promise = queryApi.execute(['key#1'], { cache: 'stale' });
 
-		await waitUntil(10);
+		await waitTimeout(10);
 
 		expect(queryFn).toBeCalledTimes(2);
 
@@ -2319,7 +2319,7 @@ describe('Query state transition / stale query', () => {
 			status: 'stale',
 		});
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		expect(queryFn).toBeCalledTimes(2);
 
@@ -2386,11 +2386,11 @@ describe('Query state transition / stale query', () => {
 
 		queryFn.mockImplementationOnce(delayedTestTransformer(50));
 
-		await waitUntil(60);
+		await waitTimeout(60);
 
 		const result2Promise = queryApi.execute(['invalid_1'], { cache: 'stale' });
 
-		await waitUntil(10);
+		await waitTimeout(10);
 
 		expect(queryFn).toBeCalledTimes(2);
 
@@ -2408,7 +2408,7 @@ describe('Query state transition / stale query', () => {
 			status: 'stale',
 		});
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		expect(queryFn).toBeCalledTimes(2);
 
@@ -2473,7 +2473,7 @@ describe('Query state transition / stale query', () => {
 
 		const result2Promise = queryApi.execute(['invalid_1'], { cache: 'stale' });
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,
@@ -2481,7 +2481,7 @@ describe('Query state transition / stale query', () => {
 			status: 'loading',
 		});
 
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		assert.deepStrictEqual(queryApi.getState(), {
 			data: null,

@@ -6,7 +6,7 @@ import {
 	FixedBackoffTimer,
 	Query,
 	updateQueryContextFn,
-	waitUntil,
+	waitTimeout,
 	type QueryState,
 	type QueryContextMutFns,
 	NO_RETRY_POLICY,
@@ -137,10 +137,10 @@ describe('Query function swap / queryFn', () => {
 		});
 
 		await store.set(queryCtl.ctx.keyHashFn(['key#updated_result']), 'stale_data', 100);
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		secondQueryFn.mockImplementationOnce(async (...params) => {
-			await waitUntil(10);
+			await waitTimeout(10);
 			return await testTransformer(...params);
 		});
 
@@ -394,7 +394,7 @@ describe('Query function swap / filterFn', () => {
 		});
 
 		await store.set(queryCtl.ctx.keyHashFn(['key#true']), 'stale_data', DEFAULT_TTL_DURATION);
-		await waitUntil(70);
+		await waitTimeout(70);
 
 		const queryPromise = queryCtl.execute(['key#true'], { cache: 'stale' });
 
@@ -466,7 +466,7 @@ describe('Query function swap / keepCacheOnErrorFn', () => {
 		});
 
 		await store.set(queryCtl.ctx.keyHashFn(['key#0101']), 'cached_value', DEFAULT_TTL_DURATION);
-		await waitUntil(110);
+		await waitTimeout(110);
 
 		{
 			queryFn.mockRejectedValueOnce(new Error('manual_error_1'));
@@ -519,7 +519,7 @@ describe('Query function swap / keepCacheOnErrorFn', () => {
 
 		{
 			await store.set(queryCtl.ctx.keyHashFn(['key#0101']), 'cached_value', DEFAULT_TTL_DURATION);
-			await waitUntil(110);
+			await waitTimeout(110);
 
 			queryFn.mockRejectedValueOnce(new Error('manual_error_1'));
 
@@ -537,7 +537,7 @@ describe('Query function swap / keepCacheOnErrorFn', () => {
 		}
 		{
 			await store.set(queryCtl.ctx.keyHashFn(['key#0101']), 'cached_value', DEFAULT_TTL_DURATION);
-			await waitUntil(110);
+			await waitTimeout(110);
 
 			queryFn.mockRejectedValueOnce(new Error('manual_error_2'));
 
@@ -580,14 +580,14 @@ describe('Query function swap / retryHandleFn', () => {
 
 			const queryPromise = queryCtl.execute(['key#ok?'], { cache: 'no-cache' });
 
-			await waitUntil(100);
+			await waitTimeout(100);
 
 			expect(retryHandleFn).toBeCalledTimes(1);
 			expect(secondRetryHandleFn).toBeCalledTimes(0);
 
 			queryCtl.ctx.retryHandleFn = secondRetryHandleFn;
 
-			await waitUntil(50);
+			await waitTimeout(50);
 
 			expect(retryHandleFn).toBeCalledTimes(2);
 			expect(secondRetryHandleFn).toBeCalledTimes(0);
@@ -610,12 +610,12 @@ describe('Query function swap / retryHandleFn', () => {
 
 			const queryPromise = queryCtl.execute(['key#yes'], { cache: 'no-cache' });
 
-			await waitUntil(100);
+			await waitTimeout(100);
 
 			expect(retryHandleFn).toBeCalledTimes(0);
 			expect(secondRetryHandleFn).toBeCalledTimes(1);
 
-			await waitUntil(50);
+			await waitTimeout(50);
 
 			expect(retryHandleFn).toBeCalledTimes(0);
 			expect(secondRetryHandleFn).toBeCalledTimes(2);

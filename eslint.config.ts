@@ -71,6 +71,8 @@ export const EXAMPLES_CONFIG: Linter.Config = {
 	name: 'restatement/examples',
 	files: ['examples/**/*.{ts,tsx}'],
 	rules: {
+		'max-lines-per-function': ['error', { max: 1000, skipBlankLines: true, skipComments: true }],
+
 		'no-console': 'off',
 
 		'@typescript-eslint/no-non-null-assertion': 'off',

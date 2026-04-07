@@ -1,5 +1,5 @@
 import { assert, describe, expect, it, vi } from 'vitest';
-import { DEFAULT_TTL_DURATION, defaultKeyHashFn, NO_RETRY_POLICY, Query, waitUntil } from '@/lib';
+import { DEFAULT_TTL_DURATION, defaultKeyHashFn, NO_RETRY_POLICY, Query, waitTimeout } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 import { testTransformer } from '@/test/TestHelper.mock';
 
@@ -50,7 +50,7 @@ describe('Query cache usage / no-cache query', () => {
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		{
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
@@ -206,7 +206,7 @@ describe('Query cache usage / fresh query', () => {
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		{
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;
@@ -259,7 +259,7 @@ describe('Query cache usage / fresh query', () => {
 			assert.deepStrictEqual(value, 'valid_result');
 		}
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		await queryApi.execute(['invalid'], { cache: 'fresh' });
 
@@ -391,7 +391,7 @@ describe('Query cache usage / stale query', () => {
 			assert.deepStrictEqual(entry.data, 'data#1');
 		}
 
-		await waitUntil(50);
+		await waitTimeout(50);
 
 		{
 			const entry = (await store.getEntry(defaultKeyHashFn(['key#1'])))!;

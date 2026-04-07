@@ -1,5 +1,11 @@
 import { assert, describe, it, expect, vi } from 'vitest';
-import { execAsyncOperation, NO_RETRY_POLICY, type Millisecond, type OperationResult } from '@/lib';
+import {
+	execAsyncOperation,
+	NO_RETRY_POLICY,
+	waitTimeout,
+	type Millisecond,
+	type OperationResult,
+} from '@/lib';
 
 async function failedOperation(): Promise<void> {
 	throw new Error('failed');
@@ -116,5 +122,88 @@ describe('NoRetryPolicy', () => {
 		const policy = NO_RETRY_POLICY;
 
 		assert.strictEqual(policy.notify(), undefined);
+	});
+});
+
+describe('waitTimeout', () => {
+	it('wait until 100 milliseconds is elapsed', async () => {
+		const TIMEOUT: Millisecond = 100;
+
+		const start = Date.now();
+		await waitTimeout(TIMEOUT);
+		const elapsed = Date.now() - start;
+
+		assert.isAtLeast(elapsed, TIMEOUT);
+	});
+
+	it('wait until 10 milliseconds is elapsed', async () => {
+		const TIMEOUT: Millisecond = 10;
+
+		const start = Date.now();
+		await waitTimeout(TIMEOUT);
+		const elapsed = Date.now() - start;
+
+		assert.isAtLeast(elapsed, TIMEOUT);
+	});
+
+	it('abort timer before timeout', async () => {
+		const TIMEOUT: Millisecond = 100;
+
+		const signal = AbortSignal.timeout(10);
+
+		await expect(() => waitTimeout(TIMEOUT, signal)).rejects.toThrowError();
+	});
+
+	it('abort timer before 1 millisecond timeout', async () => {
+		const TIMEOUT: Millisecond = 1;
+
+		const signal = AbortSignal.abort(new Error('AlreadyAborted'));
+
+		await expect(() => waitTimeout(TIMEOUT, signal)).rejects.toThrowError(
+			new Error('AlreadyAborted')
+		);
+	});
+
+	it('abort timer before 0 millisecond timeout', async () => {
+		const TIMEOUT: Millisecond = 0;
+
+		const controller = new AbortController();
+		const signal = controller.signal;
+
+		const error = new Error('AbortPrecedence');
+
+		controller.abort(error);
+
+		await expect(() => waitTimeout(TIMEOUT, signal)).rejects.toThrowError(error);
+	});
+
+	it('try abort the timer after resolution timeout', async () => {
+		const TIMEOUT: Millisecond = 10;
+
+		const signal = AbortSignal.timeout(100);
+
+		await waitTimeout(TIMEOUT, signal);
+
+		assert.strictEqual(signal.aborted, false);
+
+		await waitTimeout(100);
+
+		assert.strictEqual(signal.aborted, true);
+	});
+
+	it('try abort the timer after resolution', async () => {
+		const TIMEOUT: Millisecond = 10;
+
+		const controller = new AbortController();
+		const signal = controller.signal;
+
+		await waitTimeout(TIMEOUT, signal);
+
+		assert.strictEqual(signal.aborted, false);
+
+		controller.abort(new Error('AbortAfter'));
+
+		assert.strictEqual(signal.aborted, true);
+		assert.deepStrictEqual(signal.reason, new Error('AbortAfter'));
 	});
 });

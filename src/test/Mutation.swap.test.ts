@@ -7,7 +7,7 @@ import {
 	Mutation,
 	NO_RETRY_POLICY,
 	updateMutationContextFn,
-	waitUntil,
+	waitTimeout,
 	type MutationContextMutFns,
 	type MutationState,
 } from '@/lib';
@@ -339,14 +339,14 @@ describe('Mutation function swap / retryHandleFn', () => {
 
 			const mutationPromise = mutation.execute(['key#ok?']);
 
-			await waitUntil(100);
+			await waitTimeout(100);
 
 			expect(retryHandleFn).toBeCalledTimes(1);
 			expect(otherRetryHandleFn).toBeCalledTimes(0);
 
 			mutation.ctx.retryHandleFn = otherRetryHandleFn;
 
-			await waitUntil(50);
+			await waitTimeout(50);
 
 			expect(retryHandleFn).toBeCalledTimes(2);
 			expect(otherRetryHandleFn).toBeCalledTimes(0);
@@ -371,12 +371,12 @@ describe('Mutation function swap / retryHandleFn', () => {
 
 			const mutationPromise = mutation.execute(['key#yes']);
 
-			await waitUntil(100);
+			await waitTimeout(100);
 
 			expect(retryHandleFn).toBeCalledTimes(0);
 			expect(otherRetryHandleFn).toBeCalledTimes(1);
 
-			await waitUntil(50);
+			await waitTimeout(50);
 
 			expect(retryHandleFn).toBeCalledTimes(0);
 			expect(otherRetryHandleFn).toBeCalledTimes(2);
