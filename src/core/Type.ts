@@ -4,6 +4,11 @@
 export type Millisecond = number;
 
 /**
+ * Duration in second precision (signed integer)
+ */
+export type Second = number;
+
+/**
  * Query cache directive
  * @description Cache directives that dictate how cached results should be used.
  *
@@ -272,6 +277,8 @@ export interface ErrorQueryState<E> {
 /**
  * Union of all possible query states.
  *
+ * See {@link QueryStatus} for all status.
+ *
  * - {@link IdleQueryState idle}
  * - {@link LoadingQueryState loading}
  * - {@link StaleQueryState stale}
@@ -286,6 +293,11 @@ export type QueryState<T, E> =
 	| StaleQueryState<T>
 	| SuccessQueryState<T>
 	| ErrorQueryState<E>;
+
+/**
+ * Union of all possible {@link QueryState} status.
+ */
+export type QueryStatus = 'idle' | 'loading' | 'stale' | 'success' | 'error';
 
 /**
  * Source of a {@link QueryState query state}
