@@ -3,7 +3,7 @@ import type { QueryContext, QueryInput } from '@/query/QueryContext';
 import {
 	disposeQuery,
 	executeQuery,
-	makeQueryContext,
+	queryContext,
 	resetQuery,
 	useQueryKey,
 	type ExecuteQueryOptions,
@@ -36,7 +36,7 @@ export class Query<K extends GenericQueryKey, T, E = unknown> {
 	public static create<K extends GenericQueryKey, T, E = unknown>(
 		input: QueryInput<K, T, E>
 	): Query<K, T, E> {
-		return new Query(makeQueryContext(input));
+		return new Query(queryContext(input));
 	}
 
 	/**

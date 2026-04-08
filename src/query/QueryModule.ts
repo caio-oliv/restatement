@@ -76,7 +76,7 @@ export function initQueryStatistic(): QueryStatistic {
  * @param input.provider State provider
  * @returns Query context
  */
-export function makeQueryContext<K extends GenericQueryKey, T, E = unknown>({
+export function queryContext<K extends GenericQueryKey, T, E = unknown>({
 	placeholder = null,
 	store,
 	queryFn,

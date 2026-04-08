@@ -1,5 +1,5 @@
 import { assert, describe, it, vi } from 'vitest';
-import { CacheManager, makeMutationInput, makeQueryInput, PubSub, restatementConfig } from '@/lib';
+import { CacheManager, mutationInput, queryInput, PubSub, restatementConfig } from '@/lib';
 import { makeCache } from '@/integration/LRUCache.mock';
 
 describe('Config / query input', () => {
@@ -24,7 +24,7 @@ describe('Config / query input', () => {
 		const config = restatementConfig<unknown, unknown>(cache);
 		const queryFn = vi.fn();
 
-		const input = makeQueryInput(config, { queryFn });
+		const input = queryInput(config, { queryFn });
 
 		assert.strictEqual(input.placeholder, null);
 		assert.strictEqual(input.store, config.cache.store);
@@ -50,7 +50,7 @@ describe('Config / mutation input', () => {
 		const config = restatementConfig<unknown, unknown>(cache);
 		const mutationFn = vi.fn();
 
-		const input = makeMutationInput(config, { mutationFn });
+		const input = mutationInput(config, { mutationFn });
 
 		assert.strictEqual(input.placeholder, null);
 		assert.instanceOf(input.cache, CacheManager);

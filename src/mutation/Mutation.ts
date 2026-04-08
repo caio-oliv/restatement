@@ -3,7 +3,7 @@ import type { MutationContext, MutationInput } from '@/mutation/MutationContext'
 import type { CacheManager } from '@/cache/CacheManager';
 import {
 	executeMutation,
-	makeMutationContext,
+	mutationContext,
 	resetMutation,
 	type ExecuteMutationOptions,
 } from '@/mutation/MutationModule';
@@ -32,7 +32,7 @@ export class Mutation<I, T, E = unknown> {
 	 * @returns Mutation
 	 */
 	public static create<I, T, E = unknown>(input: MutationInput<I, T, E>): Mutation<I, T, E> {
-		return new Mutation(makeMutationContext(input));
+		return new Mutation(mutationContext(input));
 	}
 
 	/**

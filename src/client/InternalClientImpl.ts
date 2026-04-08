@@ -14,15 +14,15 @@ import type {
 	Patch,
 	PatchRank,
 } from '@/core/Client';
-import { executeMutation, makeMutationContext } from '@/mutation/MutationModule';
+import { executeMutation, mutationContext } from '@/mutation/MutationModule';
 import {
 	disposeQuery,
 	executeQuery,
-	makeQueryContext,
+	queryContext,
 	runActiveQuery,
 	runQuery,
 } from '@/query/QueryModule';
-import { makeQueryInput, makeMutationInput, type RestatementConfig } from '@/Config';
+import { queryInput, mutationInput, type RestatementConfig } from '@/Config';
 import type { TrackingCache } from '@/cache/TrackingCache';
 
 /**
@@ -35,8 +35,8 @@ export function clientExecuteQuery<K extends GenericQueryKey, T, E>(
 	config: RestatementConfig<T, E>,
 	options: ClientExecuteQueryOptions<K, T, E>
 ): Promise<QueryExecutionResult<T, E>> {
-	const input = makeQueryInput(config, options);
-	const ctx = makeQueryContext(input);
+	const input = queryInput(config, options);
+	const ctx = queryContext(input);
 	const promise = executeQuery(ctx, options.key, options);
 	promise.finally(() => disposeQuery(ctx));
 	return promise;
@@ -52,8 +52,8 @@ export async function clientRunActiveQuery<K extends GenericQueryKey, T, E>(
 	config: RestatementConfig<T, E>,
 	options: ClientRunQueryOptions<K, T, E>
 ): Promise<QueryState<T, E>> {
-	const input = makeQueryInput(config, options);
-	const ctx = makeQueryContext(input);
+	const input = queryInput(config, options);
+	const ctx = queryContext(input);
 	const result = await runActiveQuery(
 		ctx,
 		{ key: options.key, hash: ctx.keyHashFn(options.key) },
@@ -73,8 +73,8 @@ export function clientRunQuery<K extends GenericQueryKey, T, E>(
 	config: RestatementConfig<T, E>,
 	options: ClientRunQueryOptions<K, T, E>
 ): Promise<QueryState<T, E>> {
-	const input = makeQueryInput(config, options);
-	const ctx = makeQueryContext(input);
+	const input = queryInput(config, options);
+	const ctx = queryContext(input);
 	const promise = runQuery(
 		ctx,
 		{ key: options.key, hash: ctx.keyHashFn(options.key) },
@@ -94,8 +94,8 @@ export function clientExecuteMutation<I, T, E>(
 	config: RestatementConfig<T, E>,
 	options: ClientExecuteMutationOptions<I, T, E>
 ): Promise<MutationState<T, E>> {
-	const input = makeMutationInput(config, options);
-	const ctx = makeMutationContext(input);
+	const input = mutationInput(config, options);
+	const ctx = mutationContext(input);
 	return executeMutation(ctx, options.input, { signal: options.signal });
 }
 

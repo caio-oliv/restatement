@@ -9,7 +9,7 @@ import { DetachedClientImpl } from '@/client/DetachedClientImpl';
  * @param config Restatement Config
  * @returns Client instance
  */
-export function makeClient(config: RestatementConfig): Client {
+export function client(config: RestatementConfig): Client {
 	return new ClientImpl(config);
 }
 
@@ -18,7 +18,7 @@ export function makeClient(config: RestatementConfig): Client {
  * @param config Restatement Config
  * @returns Detached Client instance
  */
-export function makeDetachedClient(config: RestatementConfig): DetachedClient {
+export function detachedClient(config: RestatementConfig): DetachedClient {
 	return new DetachedClientImpl(config);
 }
 

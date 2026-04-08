@@ -25,7 +25,7 @@ import { blackhole, makeAbortSignal } from '@/Internal';
  * @param input.filterFn Mutation state filter
  * @returns Mutation context
  */
-export function makeMutationContext<I, T, E>({
+export function mutationContext<I, T, E>({
 	placeholder = null,
 	cache,
 	mutationFn,

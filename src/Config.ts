@@ -134,7 +134,7 @@ export function restatementConfig<T = unknown, E = unknown>(
  * @param config Config object
  * @returns CacheManager input
  */
-export function makeCacheManagerInput<T = unknown, E = unknown>(
+export function cacheManagerInput<T = unknown, E = unknown>(
 	config: RestatementConfig<T, E>
 ): Required<CacheManagerInput> {
 	return {
@@ -151,10 +151,10 @@ export function makeCacheManagerInput<T = unknown, E = unknown>(
  * @param config Config object
  * @returns CacheManager instance
  */
-export function makeCacheManager<T = unknown, E = unknown>(
+export function cacheManager<T = unknown, E = unknown>(
 	config: RestatementConfig<T, E>
 ): CacheManager {
-	return new CacheManager(makeCacheManagerInput(config));
+	return new CacheManager(cacheManagerInput(config));
 }
 
 /**
@@ -163,7 +163,7 @@ export function makeCacheManager<T = unknown, E = unknown>(
  * @param local Local query input
  * @returns Query input
  */
-export function makeQueryInput<K extends GenericQueryKey, T, E = unknown>(
+export function queryInput<K extends GenericQueryKey, T, E = unknown>(
 	config: RestatementConfig<T, E>,
 	local: LocalQueryInput<K, T, E>
 ): Required<QueryInput<K, T, E>> {
@@ -192,13 +192,13 @@ export function makeQueryInput<K extends GenericQueryKey, T, E = unknown>(
  * @param local Local mutation input
  * @returns Mutation input
  */
-export function makeMutationInput<I, T, E = unknown>(
+export function mutationInput<I, T, E = unknown>(
 	config: RestatementConfig<T, E>,
 	local: LocalMutationInput<I, T, E>
 ): Required<MutationInput<I, T, E>> {
 	return {
 		placeholder: local.placeholder ?? null,
-		cache: makeCacheManager(config),
+		cache: cacheManager(config),
 		mutationFn: local.mutationFn,
 		retryPolicy: local.retryPolicy ?? config.mutation.retry.policy,
 		retryHandleFn: local.retryHandleFn ?? config.mutation.retry.handleFn,
