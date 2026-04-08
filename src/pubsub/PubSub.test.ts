@@ -227,6 +227,46 @@ describe('PubSub shared state', () => {
 	});
 });
 
+describe('PubSub iterator', () => {
+	it('list all topics', () => {
+		const pubsub = new PubSub<string, string>();
+		const listener = vi.fn();
+
+		pubsub.subscribe('event#1', listener, 'initial state');
+
+		assert.deepStrictEqual(Array.from(pubsub.topics()), ['event#1']);
+	});
+
+	it('list all entries (topic, state)', () => {
+		const pubsub = new PubSub<string, string>();
+		const listener = vi.fn();
+
+		pubsub.subscribe('event#1', listener, 'state@0');
+
+		assert.deepStrictEqual(Array.from(pubsub.entries()), [['event#1', 'state@0']]);
+
+		pubsub.subscribe('event#32', listener, 'state@1');
+
+		assert.deepStrictEqual(Array.from(pubsub.entries()), [
+			['event#1', 'state@0'],
+			['event#32', 'state@1'],
+		]);
+	});
+
+	it('list all states', () => {
+		const pubsub = new PubSub<string, string>();
+		const listener = vi.fn();
+
+		pubsub.subscribe('event#1', listener, 'state@0');
+
+		assert.deepStrictEqual(Array.from(pubsub.states()), ['state@0']);
+
+		pubsub.subscribe('event#32', listener, 'state@1');
+
+		assert.deepStrictEqual(Array.from(pubsub.states()), ['state@0', 'state@1']);
+	});
+});
+
 describe('SubscriberHandle (un)subscribe', () => {
 	it('make a subscriber handle but not subscribe to any topic', () => {
 		const pubsub = new PubSub();

@@ -52,6 +52,27 @@ describe('SharedState', () => {
 		assert.strictEqual(shared.getState('other.topic'), 'hi');
 	});
 
+	it('unsubscribe multiple times from same topic', () => {
+		const shared = new SharedState<string, string>();
+		const listener = vi.fn();
+
+		shared.subscribe('other.topic', listener, 'hi');
+
+		shared.subscribe('home', listener, 'init');
+
+		assert.strictEqual(shared.getState('home'), 'init');
+
+		shared.unsubscribe('home');
+
+		assert.strictEqual(shared.getState('home'), null);
+		assert.strictEqual(shared.getState('other.topic'), 'hi');
+
+		shared.unsubscribe('home');
+
+		assert.strictEqual(shared.getState('home'), null);
+		assert.strictEqual(shared.getState('other.topic'), 'hi');
+	});
+
 	it('publish does not call the listener function', () => {
 		const shared = new SharedState<string, string>();
 		const listener = vi.fn();
@@ -80,5 +101,45 @@ describe('SharedState', () => {
 		shared.setState('delete_event', 100);
 
 		assert.strictEqual(shared.getState('delete_event'), null);
+	});
+});
+
+describe('SharedState iterator', () => {
+	it('list all topics', () => {
+		const pubsub = new SharedState<string, string>();
+		const listener = vi.fn();
+
+		pubsub.subscribe('event#1', listener, 'initial state');
+
+		assert.deepStrictEqual(Array.from(pubsub.topics()), ['event#1']);
+	});
+
+	it('list all entries (topic, state)', () => {
+		const pubsub = new SharedState<string, string>();
+		const listener = vi.fn();
+
+		pubsub.subscribe('event#1', listener, 'state@0');
+
+		assert.deepStrictEqual(Array.from(pubsub.entries()), [['event#1', 'state@0']]);
+
+		pubsub.subscribe('event#32', listener, 'state@1');
+
+		assert.deepStrictEqual(Array.from(pubsub.entries()), [
+			['event#1', 'state@0'],
+			['event#32', 'state@1'],
+		]);
+	});
+
+	it('list all states', () => {
+		const pubsub = new SharedState<string, string>();
+		const listener = vi.fn();
+
+		pubsub.subscribe('event#1', listener, 'state@0');
+
+		assert.deepStrictEqual(Array.from(pubsub.states()), ['state@0']);
+
+		pubsub.subscribe('event#32', listener, 'state@1');
+
+		assert.deepStrictEqual(Array.from(pubsub.states()), ['state@0', 'state@1']);
 	});
 });
