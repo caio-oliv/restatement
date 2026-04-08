@@ -97,6 +97,50 @@ describe('retryAsyncOperation', () => {
 			assert.isAtMost(operationTime - handlerTime, 5);
 		}
 	});
+
+	it('do not retry if operation is aborted', async () => {
+		async function operation(signal: AbortSignal) {
+			await waitTimeout(1_000, signal);
+		}
+
+		const retryPolicy = retryPolicyMock();
+		retryPolicy.delay.mockImplementation(attempt => (attempt <= 5 ? 20 : -1));
+		retryPolicy.limit = 5;
+
+		const signal = AbortSignal.timeout(50);
+
+		await expect(() =>
+			execAsyncOperation(() => operation(signal), retryPolicy, null, signal)
+		).rejects.toThrowError();
+
+		expect(retryPolicy.notify).toHaveBeenCalledTimes(0);
+		expect(retryPolicy.delay).toHaveBeenCalledTimes(0);
+	});
+
+	it('do not notify failure if operation is aborted', async () => {
+		let operationRetries = 2;
+
+		async function operation(signal: AbortSignal) {
+			await waitTimeout(operationRetries ? 10 : 1_000, signal);
+			if (operationRetries) {
+				operationRetries -= 1;
+				throw new Error('Normal ocasional error');
+			}
+		}
+
+		const retryPolicy = retryPolicyMock();
+		retryPolicy.delay.mockImplementation(attempt => (attempt <= 5 ? 10 : -1));
+		retryPolicy.limit = 5;
+
+		const signal = AbortSignal.timeout(100);
+
+		await expect(() =>
+			execAsyncOperation(() => operation(signal), retryPolicy, null, signal)
+		).rejects.toThrowError();
+
+		expect(retryPolicy.notify).toHaveBeenCalledTimes(2);
+		expect(retryPolicy.delay).toHaveBeenCalledTimes(2);
+	});
 });
 
 describe('NoRetryPolicy', () => {

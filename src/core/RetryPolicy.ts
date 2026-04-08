@@ -182,6 +182,7 @@ export function waitTimeout(
  * @param operation Async operation
  * @param policy Retry policy
  * @param retryHandleFn Retry callback handler, called before every retry
+ * @param signal Abort signal
  * @returns Promise with the result of all the retry attempts.
  * @typeParam T Async operation success value
  * @typeParam E Async operation error value
@@ -189,7 +190,8 @@ export function waitTimeout(
 export async function execAsyncOperation<T, E = unknown>(
 	operation: AsyncOperation<T>,
 	policy: RetryPolicy<E>,
-	retryHandleFn: RetryHandlerFn<E> | null = null
+	retryHandleFn: RetryHandlerFn<E> | null = null,
+	signal: AbortSignal = makeAbortSignal()
 ): Promise<T> {
 	let retryAttempt = 0;
 	let lastError: E;
@@ -200,9 +202,14 @@ export async function execAsyncOperation<T, E = unknown>(
 			policy.notify('success');
 			return value;
 		} catch (err) {
-			policy.notify('fail');
 			lastError = err as E;
 			retryAttempt += 1;
+
+			if (signal.aborted) {
+				throw lastError;
+			}
+
+			policy.notify('fail');
 
 			const delay = policy.delay(retryAttempt, lastError);
 			if (delay < 0) throw lastError;

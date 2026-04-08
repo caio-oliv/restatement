@@ -129,7 +129,8 @@ export async function runMutation<I, T, E>(
 		const data = await execAsyncOperation(
 			() => localMutationFn(input, signal),
 			ctx.retryPolicy,
-			ctx.retryHandleFn
+			ctx.retryHandleFn,
+			signal
 		);
 
 		return mutationResolve(ctx, data);

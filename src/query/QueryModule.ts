@@ -513,7 +513,8 @@ export async function runQuery<K extends GenericQueryKey, T, E>(
 		const val = await execAsyncOperation(
 			() => localQueryFn(key, signal),
 			ctx.retryPolicy,
-			ctx.retryHandleFn
+			ctx.retryHandleFn,
+			signal
 		);
 		return (await queryResolve(ctx, val, hash, cache, source, ttl).catch(blackhole)) ?? ctx.state;
 	} catch (err) {
