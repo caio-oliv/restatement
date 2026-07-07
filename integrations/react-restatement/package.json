@@ -1,6 +1,6 @@
 {
 	"name": "react-restatement",
-	"version": "0.1.0-rc.1",
+	"version": "0.1.0-rc.2",
 	"description": "remote state management for react",
 	"author": "Caio Oliveira <caio.vsoliveira23@gmail.com>",
 	"homepage": "https://github.com/caio-oliv/restatement#readme",
