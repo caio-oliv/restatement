@@ -1,7 +1,7 @@
 import { describe, it, vi, assert, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useEffect, useRef } from 'react';
-import { waitUntil } from 'restatement';
+import { waitTimeout } from 'restatement';
 import { useQuery } from '@/lib';
 import { testQueryFn, type TestKeys, testRestatementConfig } from '@/test/Helper.mock';
 import { makeRestatementProviderWrapper } from '@/test/Component.mock';
@@ -38,7 +38,7 @@ describe('useQuery', () => {
 			state: { status: 'idle', data: null, error: null },
 		});
 
-		await waitUntil(10);
+		await waitTimeout(10);
 
 		assert.strictEqual(Array.from(config.provider!.topics()).length, 1);
 
@@ -52,7 +52,7 @@ describe('useQuery', () => {
 		expect(stateFn).toBeCalledTimes(2);
 
 		rerender(99);
-		await waitUntil(10);
+		await waitTimeout(10);
 
 		assert.strictEqual(Array.from(config.provider!.topics()).length, 1);
 
@@ -99,7 +99,7 @@ describe('useQuery', () => {
 			state: { status: 'idle', data: null, error: null },
 		});
 
-		await waitUntil(20);
+		await waitTimeout(20);
 
 		assert.strictEqual(Array.from(config.provider!.topics()).length, 0);
 		expect(stateFn).toBeCalledTimes(0);
@@ -119,7 +119,7 @@ describe('useQuery', () => {
 			state: { status: 'idle', data: null, error: null },
 		});
 
-		await waitUntil(10);
+		await waitTimeout(10);
 
 		expect(queryFn).toHaveBeenNthCalledWith(
 			1,
@@ -145,7 +145,7 @@ describe('useQuery', () => {
 			state: { status: 'loading', data: null, error: null },
 		});
 
-		await waitUntil(100);
+		await waitTimeout(100);
 
 		assert.deepStrictEqual(result.current, {
 			out: 'render3',

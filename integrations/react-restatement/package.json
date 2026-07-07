@@ -76,7 +76,7 @@
 		"prettier": "^3.4.2",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
-		"restatement": "0.4.0-rc.3",
+		"restatement": "0.4.0-rc.5",
 		"rimraf": "^6.0.1",
 		"rollup": "^4.43.0",
 		"run-z": "^2.1.0",
@@ -88,7 +88,7 @@
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",
-		"restatement": "0.4.0-rc.3"
+		"restatement": "0.4.0-rc.5"
 	},
 	"peerDependenciesMeta": {
 		"react": {
@@ -98,7 +98,7 @@
 			"optional": false
 		}
 	},
-	"packageManager": "pnpm@8.15.0",
+	"packageManager": "pnpm@10.34.4",
 	"devEngines": {
 		"packageManager": {
 			"name": "pnpm",

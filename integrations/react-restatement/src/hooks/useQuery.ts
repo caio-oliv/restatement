@@ -1,6 +1,6 @@
 import { useRef, useState, useSyncExternalStore, type MutableRefObject } from 'react';
 import {
-	makeQueryInput,
+	queryInput,
 	Query,
 	type QueryStateHandlerEvent,
 	type QueryState,
@@ -77,8 +77,8 @@ export function useQuery<K extends ReadonlyArray<unknown>, T, E = unknown>(
 	 * The query instance must have a stable reference throughout the hook lifecycle
 	 */
 	const [query] = useState<Query<K, T, E>>(() => {
-		const queryInput = makeQueryInput<K, T, E>(contextConfig, config);
-		return Query.create(queryInput);
+		const qInput = queryInput<K, T, E>(contextConfig, config);
+		return Query.create(qInput);
 	});
 
 	const storeHandlerRef = useRef<StoreHandler>(defaultStoreHandler);

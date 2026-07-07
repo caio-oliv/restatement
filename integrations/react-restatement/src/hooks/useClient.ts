@@ -1,6 +1,6 @@
 import { useRestatementConfig } from '@/context/RestatementContext';
 import { useState } from 'react';
-import { makeClient, makeDetachedClient, type Client, type DetachedClient } from 'restatement';
+import { client, detachedClient, type Client, type DetachedClient } from 'restatement';
 
 /**
  * Client hook
@@ -8,8 +8,8 @@ import { makeClient, makeDetachedClient, type Client, type DetachedClient } from
  */
 export function useClient(): Client {
 	const config = useRestatementConfig<unknown, unknown>();
-	const [client] = useState(() => makeClient(config));
-	return client;
+	const [cli] = useState(() => client(config));
+	return cli;
 }
 
 /**
@@ -18,6 +18,6 @@ export function useClient(): Client {
  */
 export function useDetachedClient(): DetachedClient {
 	const config = useRestatementConfig<unknown, unknown>();
-	const [client] = useState(() => makeDetachedClient(config));
+	const [client] = useState(() => detachedClient(config));
 	return client;
 }

@@ -4,7 +4,7 @@ import {
 	NoRetryPolicy,
 	REQUIRED_LRU_CACHE_OPTIONS,
 	restatementConfig,
-	waitUntil,
+	waitTimeout,
 	type RestatementConfig,
 } from 'restatement';
 
@@ -43,7 +43,7 @@ export async function testQueryFn([control, ...args]: TestKeys): Promise<string>
 
 	const time = delay ? Number.parseInt(delay) : 0;
 	if (time > 0) {
-		await waitUntil(time);
+		await waitTimeout(time);
 	}
 
 	let value = 'result';

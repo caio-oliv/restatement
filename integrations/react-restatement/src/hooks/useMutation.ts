@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
 	type LocalMutationInput,
-	makeMutationInput,
+	mutationInput,
 	Mutation,
 	updateMutationContextFn,
 } from 'restatement';
@@ -18,7 +18,7 @@ export function useMutation<I, T, E = unknown>(
 	const contextConfig = useRestatementConfig<T, E>();
 
 	const [mutation] = useState(() => {
-		const input = makeMutationInput(contextConfig, config);
+		const input = mutationInput(contextConfig, config);
 		return Mutation.create(input);
 	});
 
