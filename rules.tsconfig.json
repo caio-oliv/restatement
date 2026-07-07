@@ -3,7 +3,7 @@
 		"target": "es2022",
 		"lib": ["ES2022"],
 		"module": "esnext",
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 
 		"allowJs": true,
 		"checkJs": true,
@@ -38,7 +38,6 @@
 		"preserveConstEnums": true,
 		"useUnknownInCatchVariables": true,
 		"exactOptionalPropertyTypes": false,
-		"forceConsistentCasingInFileNames": true,
-		"downlevelIteration": false
+		"forceConsistentCasingInFileNames": true
 	}
 }

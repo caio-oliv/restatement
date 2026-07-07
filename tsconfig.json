@@ -6,10 +6,9 @@
 
 		"rootDir": "./",
 		"outDir": "dist",
-		"baseUrl": "src",
 		"paths": {
-			"@/*": ["./*"],
-			"@test/*": ["./../test/*"]
+			"@/*": ["./src/*"],
+			"@test/*": ["./test/*"]
 		}
 	},
 	"include": [
